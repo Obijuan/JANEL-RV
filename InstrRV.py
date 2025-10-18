@@ -98,7 +98,9 @@ TIPO ECALL
 """
 
 
-# -- Clase para representar una instruccion del RISCV
+# ───────────────────────────────────────────────────────
+#   Clase para representar una instruccion del RISCV
+# ───────────────────────────────────────────────────────
 class InstrRV:
 
     # ──────── CONSTANTES PARA DEFINIR LOS PARAMETROS DE LA ISA RISC-V
@@ -111,6 +113,11 @@ class InstrRV:
     OPCODE_POS = 0
     OPCODE_SIZE = 0b111_1111
     OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
+
+    # ── RD: Registro destino
+    RD_POS = 7
+    RD_SIZE = 0b1_1111
+    RD_MASK = RD_SIZE << RD_POS
 
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
@@ -129,3 +136,22 @@ class InstrRV:
         # ── Obtener el codigo de operacion y devolverlo
         opcode = (self.mcode & InstrRV.OPCODE_MASK) >> InstrRV.OPCODE_POS
         return opcode
+
+    # ────────────────────
+    #  Registro destino
+    # ────────────────────
+    @property
+    def rd(self) -> int:
+
+        # ── Obtener el registro destino y devolverlo
+        rd = (self.mcode & InstrRV.RD_MASK) >> InstrRV.RD_POS
+        return rd
+
+    # ────────────────────────────────
+    #  DEBUG! Imprimir la instruccion
+    # ────────────────────────────────
+    def debug(self):
+        print(f"* Instruccion: {self.mcode:#010x}")
+        print(f"  * Opcode: {self.opcode:#04x}")
+        print(f"  * Rd: x{self.rd}")
+        print()
