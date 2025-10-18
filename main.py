@@ -13,7 +13,8 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 │1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
 │      imm12            |   rs1   |func3|   rd      |    opcode   |
-╰───────────────────────┴─────────┴─────┴───────────┴─────────────╯
+╰───────────────────────┼─────────┼─────┼───────────┼─────────────┤
+<─────── 12 ───────────>|<── 5 ──>|<─3─>|<─── 5 ───>|<──── 7 ────>|
 
 
  TIPO R: Hay 3 registros (Ex. add, sub)
@@ -98,11 +99,30 @@ TIPO ECALL
     //-- lwu
 """
 
-# -- Instruccion de prueba
-inst = 0x0000_0013
+# ──────── CONSTANTES PARA DEFINIR LOS PARAMETROS DE LA ISA RISC-V
+# ── Las posiciones de los campos indican el numero de bit donde
+# ── se situa el bit de MENOR PESO
+# ── El tamaño se condifica en UNARIO. Si un campo ocupa 3 bits,
+# ── su tamaño en unario es 111
 
-# -- Obtener el campo opcode
-OPCODE_MASK = 0b111_1111
+# ── OPCODE
+OPCODE_POS = 0
+OPCODE_SIZE = 0b111_1111
+OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
+
+
+# ────────────────────────────────────────────────────────────
+#   Optener el opcode de una instrucción en código máquina
+# ────────────────────────────────────────────────────────────
+def get_opcode(mcode: int):
+    opcode = (inst & OPCODE_MASK) >> OPCODE_POS
+    return opcode
+
+
+# -- Instruccion de prueba
+inst = 0x0000_0013  # nop --> addi x0, x0, 0
+opcode = get_opcode(inst)
 
 # -- Imprimir la instruccion
 print(f"* Instruccion: {inst:#010x}")
+print(f"  * Opcode: {opcode:#04x}")
