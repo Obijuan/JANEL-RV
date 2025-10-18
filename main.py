@@ -99,30 +99,52 @@ TIPO ECALL
     //-- lwu
 """
 
-# ──────── CONSTANTES PARA DEFINIR LOS PARAMETROS DE LA ISA RISC-V
-# ── Las posiciones de los campos indican el numero de bit donde
-# ── se situa el bit de MENOR PESO
-# ── El tamaño se condifica en UNARIO. Si un campo ocupa 3 bits,
-# ── su tamaño en unario es 111
 
-# ── OPCODE
-OPCODE_POS = 0
-OPCODE_SIZE = 0b111_1111
-OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
+# ── INSTRUCCIONES para hacer pruebas
+ADDI_X0_X0_0 = 0x0000_0013
+NOP = ADDI_X0_X0_0
 
 
-# ────────────────────────────────────────────────────────────
-#   Optener el opcode de una instrucción en código máquina
-# ────────────────────────────────────────────────────────────
-def get_opcode(mcode: int):
-    opcode = (inst & OPCODE_MASK) >> OPCODE_POS
-    return opcode
+# -- Clase para representar una instruccion del RISCV
+class InstrRV:
 
+    # ──────── CONSTANTES PARA DEFINIR LOS PARAMETROS DE LA ISA RISC-V
+    # ── Las posiciones de los campos indican el numero de bit donde
+    # ── se situa el bit de MENOR PESO
+    # ── El tamaño se condifica en UNARIO. Si un campo ocupa 3 bits,
+    # ── su tamaño en unario es 111
+
+    # ── OPCODE
+    OPCODE_POS = 0
+    OPCODE_SIZE = 0b111_1111
+    OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
+
+    # ─────────────────────────────────────────────
+    #   CONSTRUCTOR a partir del codigo maquina
+    # ─────────────────────────────────────────────
+    def __init__(self, mcode: int) -> None:
+
+        # ── Codigo maquina de la instruccion
+        self.mcode = mcode
+
+    # ────────────────────────────────────────────────────────────
+    #   opcode de una instrucción en código máquina
+    # ────────────────────────────────────────────────────────────
+    @property
+    def opcode(self) -> int:
+
+        # ── Obtener el codigo de operacion y devolverlo
+        opcode = (self.mcode & InstrRV.OPCODE_MASK) >> InstrRV.OPCODE_POS
+        return opcode
+
+
+# ─────────────────
+#   MAIN
+# ─────────────────
 
 # -- Instruccion de prueba
-inst = 0x0000_0013  # nop --> addi x0, x0, 0
-opcode = get_opcode(inst)
+inst = InstrRV(ADDI_X0_X0_0)
 
 # -- Imprimir la instruccion
-print(f"* Instruccion: {inst:#010x}")
-print(f"  * Opcode: {opcode:#04x}")
+print(f"* Instruccion: {inst.mcode:#010x}")
+print(f"  * Opcode: {inst.opcode:#04x}")
