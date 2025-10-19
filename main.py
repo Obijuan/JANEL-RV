@@ -143,9 +143,8 @@ def test1():
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-# test1()
 ADD_X1_X2_X3 = 0x003100b3
-
+test1()
 inst = InstrRV(ADD_X1_X2_X3)
 inst.debug()
 print_inst_tipo_R_BW(inst)

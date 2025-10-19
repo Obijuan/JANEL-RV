@@ -151,6 +151,16 @@ class InstrRV:
     IMM12_SIZE = 0b1111_1111_1111
     IMM12_MASK = IMM12_SIZE << IMM12_POS
 
+    # ──────── CONSTANTES PARA DEFINIR EL TIPO DE INSTRUCCION
+    TYPE_I_ARITH = 'I_ARITH'  # Instrucciones tipo I aritmeticas
+    TYPE_I_LOAD = 'I_LOAD'    # Instrucciones tipo I de carga
+    TYPE_UNKNOWN = 'UNKNOWN'  # Tipo desconocido
+    TYPE = {
+        0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
+                                    # SLTI, SLTIU, SLLI, SRLI, SRAI
+        0b_00000_11: TYPE_I_LOAD,  # LB, LH, LW, LBU, LHU
+    }
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -158,6 +168,13 @@ class InstrRV:
 
         # ── Codigo maquina de la instruccion
         self.mcode = mcode
+
+        # ── Determinar el Tipo de instrucción
+        opcode = self.opcode
+        try:
+            self.type = InstrRV.TYPE[opcode]
+        except KeyError:
+            self.type = 'UNKNOWN'
 
     # ────────────────────────────────────────────────────────────
     #   opcode de una instrucción en código máquina
@@ -234,11 +251,17 @@ class InstrRV:
     # ────────────────────────────────
     def debug(self):
         print(f"🟢 Instruccion: {self.mcode:#010x}")
+        print(f"  • Tipo: {self.type}")
         print(f"  • Opcode: {self.opcode:#04x}")
-        print(f"  • Func3: {self.func3:#05b}")
-        print(f"  • Func7: {self.func7:#04x}")
-        print(f"  • Rd: x{self.rd}")
-        print(f"  • Rs1: x{self.rs1}")
-        print(f"  • Rs2: x{self.rs2}")
-        print(f"  • Imm12: {self.imm12:#05x}")
+
+        if self.type == InstrRV.TYPE_I_ARITH or \
+           self.type == InstrRV.TYPE_I_LOAD:
+            print(f"  • Func3: {self.func3:#05b}")
+            print(f"  • Rd: x{self.rd}")
+            print(f"  • Rs1: x{self.rs1}")
+            print(f"  • Imm12: {self.imm12:#05x}")
+        else:
+            print(f"  • Func7: {self.func7:#04x}")
+            print(f"  • Rs2: x{self.rs2}")
+
         print()
