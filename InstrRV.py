@@ -14,6 +14,8 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 ╰───────────────────────┼─────────┼─────┼───────────┼─────────────┤
 <─────── 12 ───────────>|<── 5 ──>|<─3─>|<─── 5 ───>|<──── 7 ────>|
 
+* addi rd, rs1, imm12  -->  rd = rs1 + ext(imm12)
+
 
  TIPO R: Hay 3 registros (Ex. add, sub)
 
@@ -119,6 +121,11 @@ class InstrRV:
     RD_SIZE = 0b1_1111
     RD_MASK = RD_SIZE << RD_POS
 
+    # ── RS1: Registro fuente 1
+    RS1_POS = 15
+    RS1_SIZE = 0b1_1111
+    RS1_MASK = RS1_SIZE << RS1_POS
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -147,6 +154,16 @@ class InstrRV:
         rd = (self.mcode & InstrRV.RD_MASK) >> InstrRV.RD_POS
         return rd
 
+    # ─────────────────────
+    #  Registro fuente 1
+    # ─────────────────────
+    @property
+    def rs1(self) -> int:
+
+        # ── Obtener el registro fuente 1 y devolverlo
+        rs1 = (self.mcode & InstrRV.RS1_MASK) >> InstrRV.RS1_POS
+        return rs1
+
     # ────────────────────────────────
     #  DEBUG! Imprimir la instruccion
     # ────────────────────────────────
@@ -154,4 +171,5 @@ class InstrRV:
         print(f"* Instruccion: {self.mcode:#010x}")
         print(f"  * Opcode: {self.opcode:#04x}")
         print(f"  * Rd: x{self.rd}")
+        print(f"  * Rs1: x{self.rs1}")
         print()
