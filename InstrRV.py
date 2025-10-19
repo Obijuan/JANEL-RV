@@ -11,8 +11,8 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 │1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
 │      imm12            |   rs1   |func3|   rd      |    opcode   |
-╰───────────────────────┼─────────┼─────┼───────────┼─────────────┤
-<─────── 12 ───────────>|<── 5 ──>|<─3─>|<─── 5 ───>|<──── 7 ────>|
+├───────────────────────┼─────────┼─────┼───────────┼─────────────┤
+|<─────── 12 ──────────>|◀───────▶|<─3─>|<─── 5 ───>|<──── 7 ────>|
 
 * addi rd, rs1, imm12  -->  rd = rs1 + ext(imm12)
 
@@ -116,6 +116,11 @@ class InstrRV:
     OPCODE_SIZE = 0b111_1111
     OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
 
+    # ── FUNC3
+    FUNC3_POS = 12
+    FUNC3_SIZE = 0b111
+    FUNC3_MASK = FUNC3_SIZE << FUNC3_POS
+
     # ── RD: Registro destino
     RD_POS = 7
     RD_SIZE = 0b1_1111
@@ -125,6 +130,16 @@ class InstrRV:
     RS1_POS = 15
     RS1_SIZE = 0b1_1111
     RS1_MASK = RS1_SIZE << RS1_POS
+
+    # ── RS2: Registro fuente 2
+    RS2_POS = 20
+    RS2_SIZE = 0b1_1111
+    RS2_MASK = RS2_SIZE << RS2_POS
+
+    # ── IMM12: Inmediato de 12 bits (TIPO I)
+    IMM12_POS = 20
+    IMM12_SIZE = 0b1111_1111_1111
+    IMM12_MASK = IMM12_SIZE << IMM12_POS
 
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
@@ -143,6 +158,16 @@ class InstrRV:
         # ── Obtener el codigo de operacion y devolverlo
         opcode = (self.mcode & InstrRV.OPCODE_MASK) >> InstrRV.OPCODE_POS
         return opcode
+
+    # ─────────────────────
+    #  Func3
+    # ─────────────────────
+    @property
+    def func3(self) -> int:
+
+        # ── Obtener el campo func3 y devolverlo
+        func3 = (self.mcode & InstrRV.FUNC3_MASK) >> InstrRV.FUNC3_POS
+        return func3
 
     # ────────────────────
     #  Registro destino
@@ -164,12 +189,24 @@ class InstrRV:
         rs1 = (self.mcode & InstrRV.RS1_MASK) >> InstrRV.RS1_POS
         return rs1
 
+    # ──────────────────────────────
+    #  Valor immediato de 12 bits
+    # ──────────────────────────────
+    @property
+    def imm12(self) -> int:
+
+        # ── Obtener el immediato de 12 bits y devolverlo
+        imm12 = (self.mcode & InstrRV.IMM12_MASK) >> InstrRV.IMM12_POS
+        return imm12
+
     # ────────────────────────────────
     #  DEBUG! Imprimir la instruccion
     # ────────────────────────────────
     def debug(self):
-        print(f"* Instruccion: {self.mcode:#010x}")
-        print(f"  * Opcode: {self.opcode:#04x}")
-        print(f"  * Rd: x{self.rd}")
-        print(f"  * Rs1: x{self.rs1}")
+        print(f"🟢 Instruccion: {self.mcode:#010x}")
+        print(f"  • Opcode: {self.opcode:#04x}")
+        print(f"  • Func3: {self.func3:#05b}")
+        print(f"  • Rd: x{self.rd}")
+        print(f"  • Rs1: x{self.rs1}")
+        print(f"  • Imm12: {self.imm12:#05x}")
         print()
