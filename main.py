@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from InstrRV import InstrRV
+import ansi
 
 
 # ── INSTRUCCIONES para hacer pruebas
@@ -27,4 +28,44 @@ print(f"   │  {inst.rd:02}   │ {inst.opcode:#04x}   │")
 print("├──────────┼───────┼───────┼───────┼────────┤")
 print("│ᐊ────────ᐅ│ᐊ─────ᐅ│ᐊ─────ᐅ│ᐊ─────ᐅ│ᐊ──────ᐅ│")
 print("     12        5       3       5         7")
+print()
+
+# ----- Alias para los colores
+# -- Color para los numeros de bits y tamaños
+C0 = ansi.LWHITE
+
+# -- Color para las líneas
+C1 = ansi.BLUE
+
+# -- Color para los campos
+C2 = ansi.LYELLOW
+
+print(f"{C0} 31      20 19   15 14   12 11   7 6      0")
+print(f"{C1}├──────────┼───────┼───────┼───────┼────────┤")
+print("│ imm12    │ rs1   │ func3 │  rd   │ opcode │")
+print(f"{C1}│ ", end='')
+print(f"{C2}{inst.imm12:#05x}    ", end='')
+print(f"{C1}│ ", end='')
+print(f"{C2}{inst.rs1:02}    ", end='')
+print(f"{C1}│ ", end='')
+print(f"{C2}{inst.func3}     ", end='')
+print(f"{C1}│", end='')
+print(f"{C2}  {inst.rd:02}   ", end='')
+print(f"{C1}│", end='')
+print(f"{C2} {inst.opcode:#04x}   ", end='')
+print(f"{C1}│")
+print("├──────────┼───────┼───────┼───────┼────────┤")
+print(f"{C1}│", end='')
+print(f"{C0}ᐊ────────ᐅ", end='')
+print(f"{C1}│", end='')
+print(f"{C0}ᐊ─────ᐅ", end='')
+print(f"{C1}│", end='')
+print(f"{C0}ᐊ─────ᐅ", end='')
+print(f"{C1}│", end='')
+print(f"{C0}ᐊ─────ᐅ", end='')
+print(f"{C1}│", end='')
+print(f"{C0}ᐊ──────ᐅ", end='')
+print(f"{C1}│")
+print(f"{C0}     12        5       3       5        7")
+print(ansi.RESET, end='')
 print()
