@@ -161,6 +161,12 @@ class InstrRV:
         0b_00000_11: TYPE_I_LOAD,  # LB, LH, LW, LBU, LHU
     }
 
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo I aritmeticas a partir de func3
+    type_i_arith_nemonic = {
+        0b000: 'addi',
+    }
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -170,17 +176,51 @@ class InstrRV:
         self.mcode = mcode
 
         # ── Determinar el Tipo de instrucción
-        opcode = self.opcode
+        self.opcode = self.get_opcode()
         try:
-            self.type = InstrRV.TYPE[opcode]
+            self.type = InstrRV.TYPE[self.opcode]
         except KeyError:
             self.type = 'UNKNOWN'
+
+        # ── Obtener el resto de propiedades en funcion del
+        # ── tipo de instrucción
+        if self.type == InstrRV.TYPE_I_ARITH:
+
+            # ── Obtener el campo func3
+            self.func3 = self.get_func3()
+
+            # ── Obtener el nemonico
+            self.nemonic = self.type_i_arith_nemonic[self.func3]
+
+            # ── Obtener el registro destino
+            self.rd = self.get_rd()
+
+            # ── Obtener el registro fuente 1
+            self.rs1 = self.get_rs1()
+
+            # ── Obtener el campo imm12
+            self.imm12 = self.get_imm12()
+
+            # ── Obtener el valor inmediato como una palabra del sistema
+            self.imm = self.ext_sign(self.imm12)
+
+    # ────────────────────────────────────────────────────────────
+    #   Extension de signo del imm12
+    # ────────────────────────────────────────────────────────────
+    def ext_sign(self, imm12) -> int:
+
+        # ─── Obtener el bit de signo (bit 11)
+        sign = imm12 & (1 << 11)
+        print(f"Signo: {sign:b}")
+        if sign == 0:
+            return imm12
+        else:
+            return imm12 - (2 ** 12)
 
     # ────────────────────────────────────────────────────────────
     #   opcode de una instrucción en código máquina
     # ────────────────────────────────────────────────────────────
-    @property
-    def opcode(self) -> int:
+    def get_opcode(self) -> int:
 
         # ── Obtener el codigo de operacion y devolverlo
         opcode = (self.mcode & InstrRV.OPCODE_MASK) >> InstrRV.OPCODE_POS
@@ -189,8 +229,7 @@ class InstrRV:
     # ─────────────────────
     #  Func3
     # ─────────────────────
-    @property
-    def func3(self) -> int:
+    def get_func3(self) -> int:
 
         # ── Obtener el campo func3 y devolverlo
         func3 = (self.mcode & InstrRV.FUNC3_MASK) >> InstrRV.FUNC3_POS
@@ -209,8 +248,7 @@ class InstrRV:
     # ────────────────────
     #  Registro destino
     # ────────────────────
-    @property
-    def rd(self) -> int:
+    def get_rd(self) -> int:
 
         # ── Obtener el registro destino y devolverlo
         rd = (self.mcode & InstrRV.RD_MASK) >> InstrRV.RD_POS
@@ -219,8 +257,7 @@ class InstrRV:
     # ─────────────────────
     #  Registro fuente 1
     # ─────────────────────
-    @property
-    def rs1(self) -> int:
+    def get_rs1(self) -> int:
 
         # ── Obtener el registro fuente 1 y devolverlo
         rs1 = (self.mcode & InstrRV.RS1_MASK) >> InstrRV.RS1_POS
@@ -239,8 +276,7 @@ class InstrRV:
     # ──────────────────────────────
     #  Valor immediato de 12 bits
     # ──────────────────────────────
-    @property
-    def imm12(self) -> int:
+    def get_imm12(self) -> int:
 
         # ── Obtener el immediato de 12 bits y devolverlo
         imm12 = (self.mcode & InstrRV.IMM12_MASK) >> InstrRV.IMM12_POS
@@ -251,17 +287,8 @@ class InstrRV:
     # ────────────────────────────────
     def debug(self):
         print(f"🟢 Instruccion: {self.mcode:#010x}")
+        print(f"  • {self.nemonic} x{self.rd}, x{self.rs1}, ", end='')
+        # print(f"{self.imm12:#05x}")
+        print(f"{self.imm}")
         print(f"  • Tipo: {self.type}")
-        print(f"  • Opcode: {self.opcode:#04x}")
-
-        if self.type == InstrRV.TYPE_I_ARITH or \
-           self.type == InstrRV.TYPE_I_LOAD:
-            print(f"  • Func3: {self.func3:#05b}")
-            print(f"  • Rd: x{self.rd}")
-            print(f"  • Rs1: x{self.rs1}")
-            print(f"  • Imm12: {self.imm12:#05x}")
-        else:
-            print(f"  • Func7: {self.func7:#04x}")
-            print(f"  • Rs2: x{self.rs2}")
-
         print()
