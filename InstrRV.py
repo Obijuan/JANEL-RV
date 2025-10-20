@@ -202,12 +202,12 @@ class InstrRV:
             self.imm12 = self.get_imm12()
 
             # ── Obtener el valor inmediato como una palabra del sistema
-            self.imm = self.ext_sign(self.imm12)
+            self.imm = self.ext_sign12(self.imm12)
 
     # ────────────────────────────────────────────────────────────
     #   Extension de signo del imm12
     # ────────────────────────────────────────────────────────────
-    def ext_sign(self, imm12) -> int:
+    def ext_sign12(self, imm12) -> int:
 
         # ─── Obtener el bit de signo (bit 11)
         sign = imm12 & (1 << 11)
