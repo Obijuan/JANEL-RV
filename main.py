@@ -127,10 +127,14 @@ def test1():
     ADDI_X0_X0_0 = 0x0000_0013
     ADDI_X1_X2_3 = 0x0031_0093
     ADDI_X10_X20_0xFFF = 0xfffa0513
+    ADDI_X3_X4_0x7FF = 0x7ff20193
+    ADDI_X5_X6_neg2048 = 0x80030293
 
     insts = [ADDI_X0_X0_0,
              ADDI_X1_X2_3,
-             ADDI_X10_X20_0xFFF]
+             ADDI_X10_X20_0xFFF,
+             ADDI_X3_X4_0x7FF,
+             ADDI_X5_X6_neg2048]
 
     # -- Instruccion de prueba
     for mcode in insts:
