@@ -171,7 +171,7 @@ class InstrRV:
         0b010: 'slti',
         0b011: 'sltiu',
         0b100: 'xori',
-        0b101: 'srli',  # -- srai TODO
+        0b101: 'srli',  # -- y srai
         0b110: 'ori',
         0b111: 'andi',
     }
@@ -198,8 +198,15 @@ class InstrRV:
             # ── Obtener el campo func3
             self.func3 = self.get_func3()
 
+            # ── Obtener el campo imm12
+            self.imm12 = self.get_imm12()
+
+            # ── Obtener el bit 10 del valor inmediato
+            imm12_bit10 = (self.imm12 >> 10) & 0b1
+
             # ── Obtener el nemonico
-            self.nemonic = self.type_i_arith_nemonic[self.func3]
+            self.nemonic = self.get_type_i_arith_nemonic(self.func3,
+                                                         imm12_bit10)
 
             # ── Obtener el registro destino
             self.rd = self.get_rd()
@@ -207,11 +214,22 @@ class InstrRV:
             # ── Obtener el registro fuente 1
             self.rs1 = self.get_rs1()
 
-            # ── Obtener el campo imm12
-            self.imm12 = self.get_imm12()
-
             # ── Obtener el valor inmediato como una palabra del sistema
             self.imm = self.ext_sign12(self.imm12)
+
+    # ────────────────────────────────────────────────────────────
+    #   Obtener el nemonico de la instruccion aritmetica de tipo I
+    # ────────────────────────────────────────────────────────────
+    def get_type_i_arith_nemonic(self, func3: int, imm12_bit10: int) -> str:
+
+        # ── Obtener el nemonico
+        nemonic = self.type_i_arith_nemonic[func3]
+
+        # ── Caso especial: SRAI
+        if func3 == 0b101 and imm12_bit10 == 1:
+            nemonic = 'srai'
+
+        return nemonic
 
     # ────────────────────────────────────────────────────────────
     #   Extension de signo del imm12

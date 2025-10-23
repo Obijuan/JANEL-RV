@@ -144,8 +144,26 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SRLI  (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_srli(self):
+
+        mcode_asm = {
+            0x000bdb13:  "srli x22, x23, 0",
+            0x001cdc13:  "srli x24, x25, 1",
+            0x002ddd13:  "srli x26, x27, 2",
+            0x004ede13:  "srli x28, x29, 4",
+            0x008fdf13:  "srli x30, x31, 8",
+            0x01015093:  "srli x1, x2, 16",
+            0x01f25193:  "srli x3, x4, 31",
+        }
+        print("SRLI: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
     # TODO:
-    # srli  # -- srai TODO
+    # -- srai
 
 
 if __name__ == "__main__":
