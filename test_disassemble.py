@@ -106,9 +106,30 @@ class TestDisassemble(unittest.TestCase):
             0xf9c7b713: "sltiu x14, x15, -100",
             0xfff8b813: "sltiu x16, x17, -1",
         }
-        print("SLTIU: ", end='')
+        print("XORI: ", end='')
         self.check_instructions(mcode_asm)
         print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones ORI  (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_ori(self):
+
+        mcode_asm = {
+            0x064fef13:  "ori x30, x31, 100",
+            0x0c80e013:  "ori x0, x1, 200",
+            0x3e81e113:  "ori x2, x3, 1000",
+            0xf382e213:  "ori x4, x5, -200",
+            0xed43e313:  "ori x6, x7, -300",
+            0xe704e413:  "ori x8, x9, -400",
+        }
+        print("ORI: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # TODO:
+    # srli  # -- srai TODO
+    # andi
 
 
 if __name__ == "__main__":

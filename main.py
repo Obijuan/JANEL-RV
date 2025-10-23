@@ -220,6 +220,18 @@ def test_xori():
     print_inst(insts, 'XORI')
 
 
+def test_ori():
+    insts = [
+        0x064fef13,  # ori x30, x31, 100
+        0x0c80e013,  # ori x0, x1, 200
+        0x3e81e113,  # ori x2, x3, 1000
+        0xf382e213,  # ori x4, x5, -200
+        0xed43e313,  # ori x6, x7, -300
+        0xe704e413,  # ori x8, x9, -400
+    ]
+    print_inst(insts, 'ORI')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -229,3 +241,4 @@ test_slli()
 test_slti()
 test_sltiu()
 test_xori()
+test_ori()
