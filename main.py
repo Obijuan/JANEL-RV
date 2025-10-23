@@ -143,14 +143,35 @@ def test1():
         print_inst_tipo_I(inst)
 
 
+def test2():
+    ADD_X1_X2_X3 = 0x003100b3
+    inst = InstrRV(ADD_X1_X2_X3)
+    inst.debug()
+    print_inst_tipo_R_BW(inst)
+    print_inst_tipo_R(inst)
+    print()
+
+
+def test_addi():
+    inst_addi = [
+        0x0000_0013,  # addi x0, x0, 0
+        0x0031_0093,  # addi x1, x2, 3
+        0xfffa_0513,  # addi x10, x20, 0xFFF
+        0x7ff2_0193,  # addi x3, x4, 0x7FF
+        0x8003_0293,  # addi x5, x6, -2048
+    ]
+
+    print(ansi.BLUE, end='')
+    print(f"─────── ADDI ───────{ansi.RESET}")
+    for mcode in inst_addi:
+        inst = InstrRV(mcode)
+        inst.debug()
+
+    print()
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-ADD_X1_X2_X3 = 0x003100b3
-test1()
-inst = InstrRV(ADD_X1_X2_X3)
-inst.debug()
-print_inst_tipo_R_BW(inst)
-print_inst_tipo_R(inst)
-print()
+test_addi()

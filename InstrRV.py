@@ -1,3 +1,4 @@
+import ansi
 """
 ──────────────────────────────────────────────────────
   DOCUMENTACION SOBRE EL FORMATO DEL RISC-V
@@ -211,7 +212,6 @@ class InstrRV:
 
         # ─── Obtener el bit de signo (bit 11)
         sign = imm12 & (1 << 11)
-        print(f"Signo: {sign:b}")
         if sign == 0:
             return imm12
         else:
@@ -282,13 +282,23 @@ class InstrRV:
         imm12 = (self.mcode & InstrRV.IMM12_MASK) >> InstrRV.IMM12_POS
         return imm12
 
+    # ───────────────────────────────────────────────────────
+    #  Devolver la cadena con la instruccion en ensamblador
+    # ───────────────────────────────────────────────────────
+    def to_asm(self) -> str:
+        if self.type == InstrRV.TYPE_I_ARITH:
+            asm = f"{ansi.YELLOW}{self.nemonic} "\
+                  f"{ansi.CYAN}x{self.rd}"\
+                  f"{ansi.RESET}, "\
+                  f"{ansi.CYAN}x{self.rs1}"\
+                  f"{ansi.RESET}, "\
+                  f"{ansi.GREEN}{self.imm}{ansi.RESET}"
+            return asm
+        else:
+            return "UNKNOWN"
+
     # ────────────────────────────────
     #  DEBUG! Imprimir la instruccion
     # ────────────────────────────────
     def debug(self):
-        print(f"🟢 Instruccion: {self.mcode:#010x}")
-        print(f"  • {self.nemonic} x{self.rd}, x{self.rs1}, ", end='')
-        # print(f"{self.imm12:#05x}")
-        print(f"{self.imm}")
-        print(f"  • Tipo: {self.type}")
-        print()
+        print(f"🔸 {self.mcode:#010x}  {self.to_asm()}")
