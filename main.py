@@ -152,6 +152,16 @@ def test2():
     print()
 
 
+def print_inst(insts: list, name: str):
+
+    print(ansi.BLUE, end='')
+    print(f"─────── {name} ───────{ansi.RESET}")
+    for mcode in insts:
+        inst = InstrRV(mcode)
+        inst.debug()
+    print()
+
+
 def test_addi():
     inst_addi = [
         0x0000_0013,  # addi x0, x0, 0
@@ -160,14 +170,18 @@ def test_addi():
         0x7ff2_0193,  # addi x3, x4, 0x7FF
         0x8003_0293,  # addi x5, x6, -2048
     ]
+    print_inst(inst_addi, 'ADDI')
 
-    print(ansi.BLUE, end='')
-    print(f"─────── ADDI ───────{ansi.RESET}")
-    for mcode in inst_addi:
-        inst = InstrRV(mcode)
-        inst.debug()
 
-    print()
+def test_slli():
+    inst_slli = [
+        0x00009013,
+        0x00119113,
+        0x00329213,
+        0x010a1513,
+        0x01ff9f13,
+    ]
+    print_inst(inst_slli, 'SLLI')
 
 
 # ─────────────────
@@ -175,3 +189,4 @@ def test_addi():
 # ─────────────────
 print(ansi.CLS)
 test_addi()
+test_slli()

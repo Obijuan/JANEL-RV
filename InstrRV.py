@@ -166,6 +166,7 @@ class InstrRV:
     # ──────── de typo I aritmeticas a partir de func3
     type_i_arith_nemonic = {
         0b000: 'addi',
+        0b001: 'slli',
     }
 
     # ─────────────────────────────────────────────
