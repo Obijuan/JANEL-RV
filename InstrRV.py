@@ -285,7 +285,7 @@ class InstrRV:
     # ───────────────────────────────────────────────────────
     #  Devolver la cadena con la instruccion en ensamblador
     # ───────────────────────────────────────────────────────
-    def to_asm(self) -> str:
+    def to_asm(self, color=True) -> str:
         if self.type == InstrRV.TYPE_I_ARITH:
             asm = f"{ansi.YELLOW}{self.nemonic} "\
                   f"{ansi.CYAN}x{self.rd}"\
@@ -293,12 +293,13 @@ class InstrRV:
                   f"{ansi.CYAN}x{self.rs1}"\
                   f"{ansi.RESET}, "\
                   f"{ansi.GREEN}{self.imm}{ansi.RESET}"
-            return asm
+            asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+            return asm if color else asm_bw
         else:
             return "UNKNOWN"
 
     # ────────────────────────────────
     #  DEBUG! Imprimir la instruccion
     # ────────────────────────────────
-    def debug(self):
-        print(f"🔸 {self.mcode:#010x}  {self.to_asm()}")
+    def debug(self, color=True) -> None:
+        print(f"🔸 {self.mcode:#010x}  {self.to_asm(color=color)}")
