@@ -167,6 +167,8 @@ class InstrRV:
     type_i_arith_nemonic = {
         0b000: 'addi',
         0b001: 'slli',
+        0b010: 'slti',
+        0b011: 'sltiu',
     }
 
     # ─────────────────────────────────────────────

@@ -184,9 +184,35 @@ def test_slli():
     print_inst(inst_slli, 'SLLI')
 
 
+def test_slti():
+    insts = [
+        0x0000a013,
+        0x0011a113,
+        0x0032a213,
+        0x7ff62593,
+        0x80072693,
+        0xfff82793,
+    ]
+    print_inst(insts, 'SLTI')
+
+
+def test_sltiu():
+    insts = [
+        0x0073b313,
+        0x00f4b413,
+        0x0ff5b513,
+        0xff66b613,
+        0xf9c7b713,
+        0xfff8b813,
+    ]
+    print_inst(insts, 'SLTIU')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
 test_addi()
 test_slli()
+test_slti()
+test_sltiu()
