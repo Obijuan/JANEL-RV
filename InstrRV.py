@@ -225,6 +225,11 @@ class InstrRV:
         # ── Obtener el nemonico
         nemonic = self.type_i_arith_nemonic[func3]
 
+        # ── Caso especial: Instructiones SRLI y SRAI
+        # ── Solo importan los 5 bits de menor peso
+        if func3 == 0b101:
+            self.imm12 = self.imm12 & 0x1F
+
         # ── Caso especial: SRAI
         if func3 == 0b101 and imm12_bit10 == 1:
             nemonic = 'srai'

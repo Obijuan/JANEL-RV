@@ -257,6 +257,19 @@ def test_srli():
     print_inst(insts, 'SRLI')
 
 
+def test_srai():
+    insts = [
+        0x40035293,  # srai x5, x6, 0
+        0x40145393,  # srai x7, x8, 1
+        0x40255493,  # srai x9, x10, 2
+        0x40465593,  # srai x11, x12, 4
+        0x40875693,  # srai x13, x14, 8
+        0x41085793,  # srai x15, x16, 16
+        0x41f95893,  # srai x17, x18, 31
+    ]
+    print_inst(insts, 'SRAI')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -269,3 +282,4 @@ test_xori()
 test_ori()
 test_andi()
 test_srli()
+test_srai()
