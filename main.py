@@ -208,6 +208,18 @@ def test_sltiu():
     print_inst(insts, 'SLTIU')
 
 
+def test_xori():
+    insts = [
+        0x0009c913,  # xori x18, x19, 0
+        0x001aca13,  # xori x20, x21, 1
+        0x7ffbcb13,  # xori x22, x23, 0x7FF
+        0xfffccc13,  # xori x24, x25, -1
+        0xc18dcd13,  # xori x26, x27, -1000
+        0x830ece13,  # xori x28, x29, -2000
+    ]
+    print_inst(insts, 'XORI')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -216,3 +228,4 @@ test_addi()
 test_slli()
 test_slti()
 test_sltiu()
+test_xori()

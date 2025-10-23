@@ -4,6 +4,13 @@ from InstrRV import InstrRV
 
 class TestDisassemble(unittest.TestCase):
 
+    # ───────────────────────────────────────────────────────
+    #  Funcion auxiliar para comprobar instrucciones
+    #  ENTRADAS:
+    #    insts: diccionario con las instrucciones a probar
+    #           clave: codigo maquina
+    #           valor: ensamblador esperado
+    # ───────────────────────────────────────────────────────
     def check_instructions(self, insts: dict):
 
         # ── Recorrer las instrucciones en codigo máquina a probar
@@ -15,7 +22,6 @@ class TestDisassemble(unittest.TestCase):
             # ── Comprobar la instruccion en ensamblador
             self.assertEqual(inst.to_asm(color=False), insts[mcode])
             print("😀", end='', flush=True)
-            # ✅🟢🔵🔹🔸*️⃣😀
 
     # ───────────────────────────────────────────────────────
     #  Probar instrucciones ADDI  (TIPO I)
@@ -74,6 +80,23 @@ class TestDisassemble(unittest.TestCase):
     #  Probar instrucciones SLTIU  (TIPO I)
     # ───────────────────────────────────────────────────────
     def test_sltiu(self):
+
+        mcode_asm = {
+            0x0073b313: "sltiu x6, x7, 7",
+            0x00f4b413: "sltiu x8, x9, 15",
+            0x0ff5b513: "sltiu x10, x11, 255",
+            0xff66b613: "sltiu x12, x13, -10",
+            0xf9c7b713: "sltiu x14, x15, -100",
+            0xfff8b813: "sltiu x16, x17, -1",
+        }
+        print("SLTIU: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones XORI  (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_xori(self):
 
         mcode_asm = {
             0x0073b313: "sltiu x6, x7, 7",

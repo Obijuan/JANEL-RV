@@ -6,7 +6,8 @@ import ansi
 https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 
 
- TIPO I: Instrucciones aritméticas y de carga (Ex. addi, lw)
+ TIPO I: Instrucciones aritméticas y de carga
+ * addi, slli, slti, sltiu
 
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
@@ -169,6 +170,7 @@ class InstrRV:
         0b001: 'slli',
         0b010: 'slti',
         0b011: 'sltiu',
+        0b100: 'xori',
     }
 
     # ─────────────────────────────────────────────
