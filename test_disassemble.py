@@ -127,9 +127,25 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones ANDI  (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_andi(self):
+
+        mcode_asm = {
+            0x0015f513:  "andi x10, x11, 1",
+            0x0036f613:  "andi x12, x13, 3",
+            0x0077f713:  "andi x14, x15, 7",
+            0xe0c8f813:  "andi x16, x17, -500",
+            0xda89f913:  "andi x18, x19, -600",
+            0xd44afa13:  "andi x20, x21, -700",
+        }
+        print("ANDI: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
     # TODO:
     # srli  # -- srai TODO
-    # andi
 
 
 if __name__ == "__main__":

@@ -232,6 +232,18 @@ def test_ori():
     print_inst(insts, 'ORI')
 
 
+def test_andi():
+    insts = [
+        0x0015f513,  # andi x10, x11, 0x1
+        0x0036f613,  # andi x12, x13, 0x3
+        0x0077f713,  # andi x14, x15, 0x7
+        0xe0c8f813,  # andi x16, x17, -500
+        0xda89f913,  # andi x18, x19, -600
+        0xd44afa13,  # andi x20, x21, -700
+    ]
+    print_inst(insts, 'ANDI')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -242,3 +254,4 @@ test_slti()
 test_sltiu()
 test_xori()
 test_ori()
+test_andi()
