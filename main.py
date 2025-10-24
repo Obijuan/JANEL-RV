@@ -270,16 +270,42 @@ def test_srai():
     print_inst(insts, 'SRAI')
 
 
+def test_lb():
+    insts = [
+        0x00008003,  # lb x0, 0(x1)
+        0x00110083,  # lb x1, 1(x2)
+        0x00220183,  # lb x3, 2(x4)
+        0xfff30283,  # lb x5, -1(x6)
+        0xffe40383,  # lb x7, -2(x8)
+        0xffc50483,  # lb x9, -4(x10)
+    ]
+    print_inst(insts, 'LB')
+
+
+def test_lw():
+    insts = [
+        0x00462583,  # lw x11, 4(x12)
+        0x00872683,  # lw x13, 8(x14)
+        0x01082783,  # lw x15, 16(x16)
+        0xff892883,  # lw x17, -8(x18)
+        0xff0a2983,  # lw x19, -0x10(x20)
+        0xfe0b2a83,  # lw x21, -0x20(x22)
+    ]
+    print_inst(insts, 'LW')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-test_addi()
-test_slli()
-test_slti()
-test_sltiu()
-test_xori()
-test_ori()
-test_andi()
-test_srli()
-test_srai()
+# test_addi()
+# test_slli()
+# test_slti()
+# test_sltiu()
+# test_xori()
+# test_ori()
+# test_andi()
+# test_srli()
+# test_srai()
+test_lb()
+test_lw()

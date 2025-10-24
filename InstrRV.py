@@ -161,7 +161,7 @@ class InstrRV:
     TYPE = {
         0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
                                     # SLTI, SLTIU, SLLI, SRLI, SRAI
-        0b_00000_11: TYPE_I_LOAD,  # LB, LH, LW, LBU, LHU
+        0b_00000_11: TYPE_I_LOAD,   # LB, LH, LW, LD, LBU, LHU, LWU
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
@@ -175,6 +175,19 @@ class InstrRV:
         0b101: 'srli',  # -- y srai
         0b110: 'ori',
         0b111: 'andi',
+    }
+
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo I LOAD a partir de func3
+    type_i_load_nemonic = {
+        0b000: 'lb',
+        0b001: 'lh',
+        0b010: 'lw',
+        0b011: 'ld',
+        0b100: 'lbu',
+        0b101: 'lhu',
+        0b110: 'lwu',
+        0b111: 'UNKNOWN2'
     }
 
     # ─────────────────────────────────────────────
@@ -208,6 +221,26 @@ class InstrRV:
             # ── Obtener el nemonico
             self.nemonic = self.get_type_i_arith_nemonic(self.func3,
                                                          imm12_bit10)
+
+            # ── Obtener el registro destino
+            self.rd = self.get_rd()
+
+            # ── Obtener el registro fuente 1
+            self.rs1 = self.get_rs1()
+
+            # ── Obtener el valor inmediato como una palabra del sistema
+            self.imm = self.ext_sign12(self.imm12)
+
+        elif self.type == InstrRV.TYPE_I_LOAD:
+
+            # ── Obtener el campo func3
+            self.func3 = self.get_func3()
+
+            # ── Obtener el campo imm12
+            self.imm12 = self.get_imm12()
+
+            # ── Obtener el nemonico
+            self.nemonic = self.type_i_load_nemonic[self.func3]
 
             # ── Obtener el registro destino
             self.rd = self.get_rd()
@@ -327,8 +360,20 @@ class InstrRV:
                   f"{ansi.GREEN}{self.imm}{ansi.RESET}"
             asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, {self.imm}"
             return asm if color else asm_bw
+        if self.type == InstrRV.TYPE_I_LOAD:
+            asm = f"{ansi.YELLOW}{self.nemonic} "\
+                  f"{ansi.CYAN}x{self.rd}"\
+                  f"{ansi.RESET}, "\
+                  f"{ansi.GREEN}{self.imm}"\
+                  f"{ansi.RESET}("\
+                  f"{ansi.CYAN}x{self.rd}"\
+                  f"{ansi.RESET})"
+
+            asm_bw = f"{self.nemonic} x{self.rd}, {self.imm}(x{self.rs1})"
         else:
             return "UNKNOWN"
+
+        return asm if color else asm_bw
 
     # ────────────────────────────────
     #  DEBUG! Imprimir la instruccion

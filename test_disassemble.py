@@ -180,6 +180,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones LB (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_lb(self):
+
+        mcode_asm = {
+            0x00008003:  "lb x0, 0(x1)",
+            0x00110083:  "lb x1, 1(x2)",
+            0x00220183:  "lb x3, 2(x4)",
+            0xfff30283:  "lb x5, -1(x6)",
+            0xffe40383:  "lb x7, -2(x8)",
+            0xffc50483:  "lb x9, -4(x10)",
+        }
+        print("LB: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
