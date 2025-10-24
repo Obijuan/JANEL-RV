@@ -318,6 +318,18 @@ def test_lbu():
     print_inst(insts, 'LBU')
 
 
+def test_lhu():
+    insts = [
+        0x50085783,  # lhu x15, 0x500(x16)
+        0x60095883,  # lhu x17, 0x600(x18)
+        0x700a5983,  # lhu x19, 0x700(x20)
+        0xe00b5a83,  # lhu x21, -0x200(x22)
+        0xc00c5b83,  # lhu x23, -0x400(x24)
+        0x800d5c83,  # lhu x25, -0x800(x26)
+    ]
+    print_inst(insts, 'LHU')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -335,5 +347,4 @@ test_lb()
 test_lw()
 test_lh()
 test_lbu()
-
-# lhu
+test_lhu()

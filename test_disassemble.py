@@ -248,6 +248,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones LHU (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_lhu(self):
+
+        mcode_asm = {
+            0x50085783:  "lhu x15, 1280(x16)",
+            0x60095883:  "lhu x17, 1536(x18)",
+            0x700a5983:  "lhu x19, 1792(x20)",
+            0xe00b5a83:  "lhu x21, -512(x22)",
+            0xc00c5b83:  "lhu x23, -1024(x24)",
+            0x800d5c83:  "lhu x25, -2048(x26)",
+        }
+        print("LHU: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
