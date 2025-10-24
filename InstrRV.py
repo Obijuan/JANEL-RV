@@ -10,6 +10,8 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
  * addi, slli, slti, sltiu, xori, srli, srai, ori, andi
  * lb, lh, lw, ld, lbu, lhu, lwu
 
+ * addi rd, rs1, imm12  -->  rd = rs1 + ext(imm12)
+
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
@@ -18,7 +20,6 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 |<─────────────────────>|<───────>|<───>|<─────────>|<───────────>|
           12                 5       3        5           7
 
-* addi rd, rs1, imm12  -->  rd = rs1 + ext(imm12)
 
 
  TIPO R: Hay 3 registros (Ex. add, sub)
@@ -157,6 +158,7 @@ class InstrRV:
     # ──────── CONSTANTES PARA DEFINIR EL TIPO DE INSTRUCCION
     TYPE_I_ARITH = 'I_ARITH'  # Instrucciones tipo I aritmeticas
     TYPE_I_LOAD = 'I_LOAD'    # Instrucciones tipo I de carga
+    TYPE_R = 'R'              # Instrucciones tipo R
     TYPE_UNKNOWN = 'UNKNOWN'  # Tipo desconocido
     TYPE = {
         0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
@@ -190,6 +192,19 @@ class InstrRV:
         0b111: 'UNKNOWN2'
     }
 
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo I LOAD a partir de func3
+    type_r_nemonic = {
+        0b000: 'add',    # -- sub
+        0b001: 'sll',
+        0b010: 'slt',
+        0b011: 'sltu',
+        0b100: 'xor',
+        0b101: 'srl',    # -- sra
+        0b110: 'or',
+        0b111: 'and'
+    }
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -207,49 +222,60 @@ class InstrRV:
 
         # ── Obtener el resto de propiedades en funcion del
         # ── tipo de instrucción
-        if self.type == InstrRV.TYPE_I_ARITH:
+        match self.type:
+            case InstrRV.TYPE_I_ARITH:
 
-            # ── Obtener el campo func3
-            self.func3 = self.get_func3()
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
 
-            # ── Obtener el campo imm12
-            self.imm12 = self.get_imm12()
+                # ── Obtener el campo imm12
+                self.imm12 = self.get_imm12()
 
-            # ── Obtener el bit 10 del valor inmediato
-            imm12_bit10 = (self.imm12 >> 10) & 0b1
+                # ── Obtener el bit 10 del valor inmediato
+                imm12_bit10 = (self.imm12 >> 10) & 0b1
 
-            # ── Obtener el nemonico
-            self.nemonic = self.get_type_i_arith_nemonic(self.func3,
-                                                         imm12_bit10)
+                # ── Obtener el nemonico
+                self.nemonic = self.get_type_i_arith_nemonic(self.func3,
+                                                             imm12_bit10)
 
-            # ── Obtener el registro destino
-            self.rd = self.get_rd()
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
 
-            # ── Obtener el registro fuente 1
-            self.rs1 = self.get_rs1()
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
 
-            # ── Obtener el valor inmediato como una palabra del sistema
-            self.imm = self.ext_sign12(self.imm12)
+                # ── Obtener el valor inmediato como una palabra del sistema
+                self.imm = self.ext_sign12(self.imm12)
 
-        elif self.type == InstrRV.TYPE_I_LOAD:
+            case InstrRV.TYPE_I_LOAD:
 
-            # ── Obtener el campo func3
-            self.func3 = self.get_func3()
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
 
-            # ── Obtener el campo imm12
-            self.imm12 = self.get_imm12()
+                # ── Obtener el campo imm12
+                self.imm12 = self.get_imm12()
 
-            # ── Obtener el nemonico
-            self.nemonic = self.type_i_load_nemonic[self.func3]
+                # ── Obtener el nemonico
+                self.nemonic = self.type_i_load_nemonic[self.func3]
 
-            # ── Obtener el registro destino
-            self.rd = self.get_rd()
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
 
-            # ── Obtener el registro fuente 1
-            self.rs1 = self.get_rs1()
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
 
-            # ── Obtener el valor inmediato como una palabra del sistema
-            self.imm = self.ext_sign12(self.imm12)
+                # ── Obtener el valor inmediato como una palabra del sistema
+                self.imm = self.ext_sign12(self.imm12)
+
+            case InstrRV.TYPE_R:
+
+                # ── Obtener el campo func7
+                self.func3 = self.get_func7()
+
+                # -- TODO ---
+
+            case _:
+                print("-----> TODO <-------------")
 
     # ────────────────────────────────────────────────────────────
     #   Obtener el nemonico de la instruccion aritmetica de tipo I
@@ -299,6 +325,15 @@ class InstrRV:
         # ── Obtener el campo func3 y devolverlo
         func3 = (self.mcode & InstrRV.FUNC3_MASK) >> InstrRV.FUNC3_POS
         return func3
+
+    # ─────────────────────
+    #  Func7
+    # ─────────────────────
+    def get_func7(self) -> int:
+
+        # ── Obtener el campo func7 y devolverlo
+        func7 = (self.mcode & InstrRV.FUNC7_MASK) >> InstrRV.FUNC7_POS
+        return func7
 
     # ─────────────────────
     #  Func7

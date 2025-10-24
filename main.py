@@ -330,6 +330,13 @@ def test_lhu():
     print_inst(insts, 'LHU')
 
 
+def test_add():
+    insts = [
+
+    ]
+    print_inst(insts, 'ADD')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -343,8 +350,9 @@ print(ansi.CLS)
 # test_andi()
 # test_srli()
 # test_srai()
-test_lb()
-test_lw()
-test_lh()
-test_lbu()
+# test_lb()
+# test_lw()
+# test_lh()
+# test_lbu()
 test_lhu()
+test_add()
