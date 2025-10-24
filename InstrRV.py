@@ -366,7 +366,7 @@ class InstrRV:
                   f"{ansi.RESET}, "\
                   f"{ansi.GREEN}{self.imm}"\
                   f"{ansi.RESET}("\
-                  f"{ansi.CYAN}x{self.rd}"\
+                  f"{ansi.CYAN}x{self.rs1}"\
                   f"{ansi.RESET})"
 
             asm_bw = f"{self.nemonic} x{self.rd}, {self.imm}(x{self.rs1})"

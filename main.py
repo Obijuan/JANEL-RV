@@ -294,6 +294,18 @@ def test_lw():
     print_inst(insts, 'LW')
 
 
+def test_lh():
+    insts = [
+        0x020c1b83,  # lh x23, 0x20(x24)
+        0x040d1c83,  # lh x25, 0x40(x26)
+        0x080e1d83,  # lh x27, 0x80(x28)
+        0xff8f1e83,  # lh x29, -8(x30)
+        0xff001f83,  # lh x31, -0x10(x0)
+        0xfe011083,  # lh x1, -0x20(x2)
+    ]
+    print_inst(insts, 'LH')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -309,3 +321,9 @@ print(ansi.CLS)
 # test_srai()
 test_lb()
 test_lw()
+test_lh()
+
+# ld
+# lbu
+# lhu
+# lwu

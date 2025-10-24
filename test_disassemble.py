@@ -197,6 +197,40 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones LH (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_lh(self):
+
+        mcode_asm = {
+            0x020c1b83: "lh x23, 32(x24)",
+            0x040d1c83: "lh x25, 64(x26)",
+            0x080e1d83: "lh x27, 128(x28)",
+            0xff8f1e83: "lh x29, -8(x30)",
+            0xff001f83: "lh x31, -16(x0)",
+            0xfe011083: "lh x1, -32(x2)",
+        }
+        print("LH: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones LW (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_lw(self):
+
+        mcode_asm = {
+            0x00462583:  "lw x11, 4(x12)",
+            0x00872683:  "lw x13, 8(x14)",
+            0x01082783:  "lw x15, 16(x16)",
+            0xff892883:  "lw x17, -8(x18)",
+            0xff0a2983:  "lw x19, -16(x20)",
+            0xfe0b2a83:  "lw x21, -32(x22)",
+        }
+        print("LW: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
