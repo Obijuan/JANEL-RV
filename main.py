@@ -306,6 +306,18 @@ def test_lh():
     print_inst(insts, 'LH')
 
 
+def test_lbu():
+    insts = [
+        0x10024183,   # lbu x3, 0x100(x4)
+        0x20034283,   # lbu x5, 0x200(x6)
+        0x40044383,   # lbu x7, 0x400(x8)
+        0xfc054483,   # lbu x9, -0x40(x10)
+        0xf8064583,   # lbu x11, -0x80(x12)
+        0xf0074683,   # lbu x13, -0x100(x14)
+    ]
+    print_inst(insts, 'LBU')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -322,8 +334,6 @@ print(ansi.CLS)
 test_lb()
 test_lw()
 test_lh()
+test_lbu()
 
-# ld
-# lbu
 # lhu
-# lwu

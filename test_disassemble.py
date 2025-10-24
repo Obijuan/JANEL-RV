@@ -231,6 +231,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones LBU (TIPO I)
+    # ───────────────────────────────────────────────────────
+    def test_lbu(self):
+
+        mcode_asm = {
+            0x10024183:  "lbu x3, 256(x4)",
+            0x20034283:  "lbu x5, 512(x6)",
+            0x40044383:  "lbu x7, 1024(x8)",
+            0xfc054483:  "lbu x9, -64(x10)",
+            0xf8064583:  "lbu x11, -128(x12)",
+            0xf0074683:  "lbu x13, -256(x14)",
+        }
+        print("LBU: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
