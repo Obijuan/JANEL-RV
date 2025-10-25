@@ -297,6 +297,22 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SLL (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_sll(self):
+
+        mcode_asm = {
+            0x01cd9d33:  "sll x26, x27, x28",
+            0x01ff1eb3:  "sll x29, x30, x31",
+            0x00209033:  "sll x0, x1, x2",
+            0x005211b3:  "sll x3, x4, x5",
+            0x00839333:  "sll x6, x7, x8",
+        }
+        print("SUB: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

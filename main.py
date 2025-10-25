@@ -354,6 +354,11 @@ def test_sub():
 
 def test_sll():
     insts = [
+        0x01cd9d33,  # sll x26, x27, x28
+        0x01ff1eb3,  # sll x29, x30, x31
+        0x00209033,  # sll x0, x1, x2
+        0x005211b3,  # sll x3, x4, x5
+        0x00839333,  # sll x6, x7, x8
     ]
     print_inst(insts, 'SLL')
 
@@ -420,3 +425,4 @@ print(ansi.CLS)
 # test_lhu()
 test_add()
 test_sub()
+test_sll()
