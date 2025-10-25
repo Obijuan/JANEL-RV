@@ -159,11 +159,27 @@ class InstrRV:
     TYPE_I_ARITH = 'I_ARITH'  # Instrucciones tipo I aritmeticas
     TYPE_I_LOAD = 'I_LOAD'    # Instrucciones tipo I de carga
     TYPE_R = 'R'              # Instrucciones tipo R
+    TYPE_S = 'S'              # Instrucciones tipo S
+    TYPE_B = 'B'              # Instrucciones tipo B
+    TYPE_U_LUI = 'U_LUI'      # Instrucciones tipo U LUI
+    TYPE_U_AUIPC = 'U_AUIPC'  # Instrucciones tipo U AUIPC
+    TYPE_J_JAL = 'J_JAL'      # Instrucciones tipo J JAL
+    TYPE_J_JALR = 'J_JALR'    # Instrucciones tipo J JALR
+    TYPE_ECALL_EBREAK = 'ECALL'  # Instrucciones ECALL y EBREAK
     TYPE_UNKNOWN = 'UNKNOWN'  # Tipo desconocido
     TYPE = {
         0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
                                     # SLTI, SLTIU, SLLI, SRLI, SRAI
         0b_00000_11: TYPE_I_LOAD,   # LB, LH, LW, LD, LBU, LHU, LWU
+        0b_01100_11: TYPE_R,        # ADD, SUB, AND, OR, XOR,
+                                    # SLT, SLTU, SLL, SRL, SRA
+        0b_01000_11: TYPE_S,           # SW, SH, SB, SD
+        0b_11000_11: TYPE_B,           # BEQ, BNE, BLT, BGE, BLTU, BGEU
+        0b_01101_11: TYPE_U_LUI,       # LUI
+        0b_00101_11: TYPE_U_AUIPC,     # AUIPC
+        0b_11011_11: TYPE_J_JAL,       # JAL
+        0b_11001_11: TYPE_J_JALR,      # JALR
+        0b_11100_11: TYPE_ECALL_EBREAK,  # ECALL, EBREAK
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
@@ -270,7 +286,22 @@ class InstrRV:
             case InstrRV.TYPE_R:
 
                 # ── Obtener el campo func7
-                self.func3 = self.get_func7()
+                self.func7 = self.get_func7()
+
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
+
+                # ── Obtener el registro fuente 2
+                self.rs2 = self.get_rs2()
+
+                # ── Obtener el nemonico
+                self.nemonic = self.type_r_nemonic[self.func3]
 
                 # -- TODO ---
 
@@ -335,16 +366,6 @@ class InstrRV:
         func7 = (self.mcode & InstrRV.FUNC7_MASK) >> InstrRV.FUNC7_POS
         return func7
 
-    # ─────────────────────
-    #  Func7
-    # ─────────────────────
-    @property
-    def func7(self) -> int:
-
-        # ── Obtener el campo func7 y devolverlo
-        func7 = (self.mcode & InstrRV.FUNC7_MASK) >> InstrRV.FUNC7_POS
-        return func7
-
     # ────────────────────
     #  Registro destino
     # ────────────────────
@@ -366,10 +387,9 @@ class InstrRV:
     # ─────────────────────
     #  Registro fuente 2
     # ─────────────────────
-    @property
-    def rs2(self) -> int:
+    def get_rs2(self) -> int:
 
-        # ── Obtener el registro fuente 1 y devolverlo
+        # ── Obtener el registro fuente 2 y devolverlo
         rs2 = (self.mcode & InstrRV.RS2_MASK) >> InstrRV.RS2_POS
         return rs2
 
@@ -386,27 +406,41 @@ class InstrRV:
     #  Devolver la cadena con la instruccion en ensamblador
     # ───────────────────────────────────────────────────────
     def to_asm(self, color=True) -> str:
-        if self.type == InstrRV.TYPE_I_ARITH:
-            asm = f"{ansi.YELLOW}{self.nemonic} "\
-                  f"{ansi.CYAN}x{self.rd}"\
-                  f"{ansi.RESET}, "\
-                  f"{ansi.CYAN}x{self.rs1}"\
-                  f"{ansi.RESET}, "\
-                  f"{ansi.GREEN}{self.imm}{ansi.RESET}"
-            asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, {self.imm}"
-            return asm if color else asm_bw
-        if self.type == InstrRV.TYPE_I_LOAD:
-            asm = f"{ansi.YELLOW}{self.nemonic} "\
-                  f"{ansi.CYAN}x{self.rd}"\
-                  f"{ansi.RESET}, "\
-                  f"{ansi.GREEN}{self.imm}"\
-                  f"{ansi.RESET}("\
-                  f"{ansi.CYAN}x{self.rs1}"\
-                  f"{ansi.RESET})"
 
-            asm_bw = f"{self.nemonic} x{self.rd}, {self.imm}(x{self.rs1})"
-        else:
-            return "UNKNOWN"
+        match self.type:
+
+            case InstrRV.TYPE_I_ARITH:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.imm}{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+
+            case InstrRV.TYPE_I_LOAD:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.imm}"\
+                    f"{ansi.RESET}("\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET})"
+
+                asm_bw = f"{self.nemonic} x{self.rd}, {self.imm}(x{self.rs1})"
+
+            case InstrRV.TYPE_R:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.CYAN}x{self.rs2}"\
+                    f"{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
+
+            case _:
+                return "UNKNOWN"
 
         return asm if color else asm_bw
 

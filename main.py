@@ -332,7 +332,11 @@ def test_lhu():
 
 def test_add():
     insts = [
-
+        0x00000033,  # add x0, x0, x0
+        0x003100b3,  # add x1, x2, x3
+        0x00628233,  # add x4, x5, x6
+        0x009403b3,  # add x7, x8, x9
+        0x00a50533,  # add x10, x10, x10
     ]
     print_inst(insts, 'ADD')
 
@@ -354,5 +358,5 @@ print(ansi.CLS)
 # test_lw()
 # test_lh()
 # test_lbu()
-test_lhu()
+# test_lhu()
 test_add()

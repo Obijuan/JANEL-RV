@@ -265,6 +265,22 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones ADD (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_add(self):
+
+        mcode_asm = {
+            0x00000033:  "add x0, x0, x0",
+            0x003100b3:  "add x1, x2, x3",
+            0x00628233:  "add x4, x5, x6",
+            0x009403b3:  "add x7, x8, x9",
+            0x00a50533:  "add x10, x10, x10",
+        }
+        print("ADD: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
