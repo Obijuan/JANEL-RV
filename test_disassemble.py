@@ -442,6 +442,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SH (TIPO S)
+    # ───────────────────────────────────────────────────────
+    def test_sh(self):
+
+        mcode_asm = {
+            0x00c69223:  "sh x12, 4(x13)",
+            0x00e79423:  "sh x14, 8(x15)",
+            0x01089823:  "sh x16, 16(x17)",
+            0xff299c23:  "sh x18, -8(x19)",
+            0xff4a9823:  "sh x20, -16(x21)",
+            0xff6b9023:  "sh x22, -32(x23)",
+        }
+        print("SH: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -452,6 +452,24 @@ def test_sb():
     print_inst(insts, 'SB')
 
 
+def test_sh():
+    insts = [
+        0x00c69223,  # sh x12, 4(x13)
+        0x00e79423,  # sh x14, 8(x15)
+        0x01089823,  # sh x16, 0x10(x17)
+        0xff299c23,  # sh x18, -8(x19)
+        0xff4a9823,  # sh x20, -0x10(x21)
+        0xff6b9023,  # sh x22, -0x20(x23)
+    ]
+    print_inst(insts, 'SH')
+
+
+def test_sw():
+    insts = [
+    ]
+    print_inst(insts, 'SW')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -495,3 +513,5 @@ print(ansi.CLS)
 # test_tipo_I()
 # test_tipo_R()
 test_sb()
+test_sh()
+# sw
