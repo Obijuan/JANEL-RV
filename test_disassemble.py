@@ -377,6 +377,54 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones XOR (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_xor(self):
+
+        mcode_asm = {
+            0x007342b3:  "xor x5, x6, x7",
+            0x00a4c433:  "xor x8, x9, x10",
+            0x00d645b3:  "xor x11, x12, x13",
+            0x0107c733:  "xor x14, x15, x16",
+            0x013948b3:  "xor x17, x18, x19",
+        }
+        print("XOR: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones OR (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_or(self):
+
+        mcode_asm = {
+            0x016aea33:  "or x20, x21, x22",
+            0x019c6bb3:  "or x23, x24, x25",
+            0x01cded33:  "or x26, x27, x28",
+            0x01ff6eb3:  "or x29, x30, x31",
+            0x0020e033:  "or x0, x1, x2",
+        }
+        print("OR: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones AND (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_and(self):
+
+        mcode_asm = {
+            0x005271b3:  "and x3, x4, x5",
+            0x0083f333:  "and x6, x7, x8",
+            0x00b574b3:  "and x9, x10, x11",
+            0x00e6f633:  "and x12, x13, x14",
+            0x011877b3:  "and x15, x16, x17",
+        }
+        print("AND: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
