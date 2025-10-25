@@ -387,6 +387,11 @@ def test_sltu():
 
 def test_srl():
     insts = [
+        0x009453b3,  # srl x7, x8, x9
+        0x00c5d533,  # srl x10, x11, x12
+        0x00f756b3,  # srl x13, x14, x15
+        0x0128d833,  # srl x16, x17, x18
+        0x015a59b3,  # srl x19, x20, x21
     ]
     print_inst(insts, 'SRL')
 
@@ -445,3 +450,4 @@ test_sub()
 test_sll()
 test_slt()
 test_sltu()
+test_srl()
