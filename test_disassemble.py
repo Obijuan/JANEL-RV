@@ -281,6 +281,22 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SUB (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_sub(self):
+
+        mcode_asm = {
+            0x40d605b3:  "sub x11, x12, x13",
+            0x41078733:  "sub x14, x15, x16",
+            0x413908b3:  "sub x17, x18, x19",
+            0x416a8a33:  "sub x20, x21, x22",
+            0x419c0bb3:  "sub x23, x24, x25",
+        }
+        print("SUB: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

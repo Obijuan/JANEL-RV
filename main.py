@@ -341,6 +341,65 @@ def test_add():
     print_inst(insts, 'ADD')
 
 
+def test_sub():
+    insts = [
+        0x40d605b3,  # sub x11, x12, x13
+        0x41078733,  # sub x14, x15, x16
+        0x413908b3,  # sub x17, x18, x19
+        0x416a8a33,  # sub x20, x21, x22
+        0x419c0bb3,  # sub x23, x24, x25
+    ]
+    print_inst(insts, 'SUB')
+
+
+def test_sll():
+    insts = [
+    ]
+    print_inst(insts, 'SLL')
+
+
+def test_slt():
+    insts = [
+    ]
+    print_inst(insts, 'SLT')
+
+
+def test_sltu():
+    insts = [
+    ]
+    print_inst(insts, 'SLTU')
+
+
+def test_srl():
+    insts = [
+    ]
+    print_inst(insts, 'SRL')
+
+
+def test_sra():
+    insts = [
+    ]
+    print_inst(insts, 'SRA')
+
+
+def test_xor():
+    insts = [
+    ]
+    print_inst(insts, 'XOR')
+
+
+def test_or():
+    insts = [
+    ]
+    print_inst(insts, 'OR')
+
+
+def test_and():
+    insts = [
+    ]
+    print_inst(insts, 'AND')
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -360,3 +419,4 @@ print(ansi.CLS)
 # test_lbu()
 # test_lhu()
 test_add()
+test_sub()

@@ -301,9 +301,7 @@ class InstrRV:
                 self.rs2 = self.get_rs2()
 
                 # ── Obtener el nemonico
-                self.nemonic = self.type_r_nemonic[self.func3]
-
-                # -- TODO ---
+                self.nemonic = self.get_type_r_nemonic(self.func3, self.func7)
 
             case _:
                 print("-----> TODO <-------------")
@@ -324,6 +322,25 @@ class InstrRV:
         # ── Caso especial: SRAI
         if func3 == 0b101 and imm12_bit10 == 1:
             nemonic = 'srai'
+
+        return nemonic
+
+    # ────────────────────────────────────────────────────────────
+    #   Obtener el nemonico de la instruccion de tipo R
+    # ────────────────────────────────────────────────────────────
+    def get_type_r_nemonic(self, func3: int, func7: int) -> str:
+
+        # ── Obtener el nemonico
+        nemonic = self.type_r_nemonic[self.func3]
+
+        # ── Obtener el bit 5 de func7
+        especial = (func7 & (1 << 5)) >> 5
+
+        # ── Instrucciones definidas por func7
+        if especial == 1:
+            nemonic = 'sub' if func3 == 0b_000 else \
+                      'sra' if func3 == 0b_101 else \
+                      'UNKNOWN'
 
         return nemonic
 
