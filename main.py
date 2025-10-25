@@ -365,12 +365,22 @@ def test_sll():
 
 def test_slt():
     insts = [
+        0x00b524b3,  # slt x9, x10, x11
+        0x00e6a633,  # slt x12, x13, x14
+        0x011827b3,  # slt x15, x16, x17
+        0x0149a933,  # slt x18, x19, x20
+        0x017b2ab3,  # slt x21, x22, x23
     ]
     print_inst(insts, 'SLT')
 
 
 def test_sltu():
     insts = [
+        0x01acbc33,  # sltu x24, x25, x26
+        0x01de3db3,  # sltu x27, x28, x29
+        0x000fbf33,  # sltu x30, x31, x0
+        0x003130b3,  # sltu x1, x2, x3
+        0x0062b233,  # sltu x4, x5, x6
     ]
     print_inst(insts, 'SLTU')
 
@@ -405,24 +415,33 @@ def test_and():
     print_inst(insts, 'AND')
 
 
+# ────────────────────────────────────────────
+#   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
+# ────────────────────────────────────────────
+def test_tipo_I():
+    test_addi()
+    test_slli()
+    test_slti()
+    test_sltiu()
+    test_xori()
+    test_ori()
+    test_andi()
+    test_srli()
+    test_srai()
+    test_lb()
+    test_lw()
+    test_lh()
+    test_lbu()
+    test_lhu()
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-# test_addi()
-# test_slli()
-# test_slti()
-# test_sltiu()
-# test_xori()
-# test_ori()
-# test_andi()
-# test_srli()
-# test_srai()
-# test_lb()
-# test_lw()
-# test_lh()
-# test_lbu()
-# test_lhu()
+# test_tipo_I()
 test_add()
 test_sub()
 test_sll()
+test_slt()
+test_sltu()

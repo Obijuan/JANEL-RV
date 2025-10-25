@@ -309,7 +309,39 @@ class TestDisassemble(unittest.TestCase):
             0x005211b3:  "sll x3, x4, x5",
             0x00839333:  "sll x6, x7, x8",
         }
-        print("SUB: ", end='')
+        print("SLL: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SLT (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_slt(self):
+
+        mcode_asm = {
+            0x00b524b3:  "slt x9, x10, x11",
+            0x00e6a633:  "slt x12, x13, x14",
+            0x011827b3:  "slt x15, x16, x17",
+            0x0149a933:  "slt x18, x19, x20",
+            0x017b2ab3:  "slt x21, x22, x23",
+        }
+        print("SLT: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SLTU (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_sltu(self):
+
+        mcode_asm = {
+            0x01acbc33:  "sltu x24, x25, x26",
+            0x01de3db3:  "sltu x27, x28, x29",
+            0x000fbf33:  "sltu x30, x31, x0",
+            0x003130b3:  "sltu x1, x2, x3",
+            0x0062b233:  "sltu x4, x5, x6",
+        }
+        print("SLTU: ", end='')
         self.check_instructions(mcode_asm)
         print()
 
