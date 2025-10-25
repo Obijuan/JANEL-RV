@@ -459,6 +459,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SW (TIPO S)
+    # ───────────────────────────────────────────────────────
+    def test_sw(self):
+
+        mcode_asm = {
+            0x118ca023:  "sw x24, 256(x25)",
+            0x21ada023:  "sw x26, 512(x27)",
+            0x7fceafa3:  "sw x28, 2047(x29)",
+            0xf1efa023:  "sw x30, -256(x31)",
+            0xe000a023:  "sw x0, -512(x1)",
+            0x8021a023:  "sw x2, -2048(x3)",
+        }
+        print("SW: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -466,6 +466,12 @@ def test_sh():
 
 def test_sw():
     insts = [
+        0x118ca023,  # sw x24, 0x100(x25)
+        0x21ada023,  # sw x26, 0x200(x27)
+        0x7fceafa3,  # sw x28, 0x7FF(x29)
+        0xf1efa023,  # sw x30, -0x100(x31)
+        0xe000a023,  # sw x0, -0x200(x1)
+        0x8021a023,  # sw x2, -0x800(x3)
     ]
     print_inst(insts, 'SW')
 
@@ -514,4 +520,4 @@ print(ansi.CLS)
 # test_tipo_R()
 test_sb()
 test_sh()
-# sw
+test_sw()
