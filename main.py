@@ -398,6 +398,11 @@ def test_srl():
 
 def test_sra():
     insts = [
+        0x418bdb33,  # sra x22, x23, x24
+        0x41bd5cb3,  # sra x25, x26, x27
+        0x41eede33,  # sra x28, x29, x30
+        0x40105fb3,  # sra x31, x0, x1
+        0x4041d133,  # sra x2, x3, x4
     ]
     print_inst(insts, 'SRA')
 
@@ -451,3 +456,4 @@ test_sll()
 test_slt()
 test_sltu()
 test_srl()
+test_sra()

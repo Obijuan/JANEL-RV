@@ -361,6 +361,22 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SRA (TIPO R)
+    # ───────────────────────────────────────────────────────
+    def test_sra(self):
+
+        mcode_asm = {
+            0x418bdb33:  "sra x22, x23, x24",
+            0x41bd5cb3:  "sra x25, x26, x27",
+            0x41eede33:  "sra x28, x29, x30",
+            0x40105fb3:  "sra x31, x0, x1",
+            0x4041d133:  "sra x2, x3, x4",
+        }
+        print("SRA: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
