@@ -425,6 +425,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones SB (TIPO S)
+    # ───────────────────────────────────────────────────────
+    def test_sb(self):
+
+        mcode_asm = {
+            0x00008023:  "sb x0, 0(x1)",
+            0x002180a3:  "sb x2, 1(x3)",
+            0x00428123:  "sb x4, 2(x5)",
+            0xfe638fa3:  "sb x6, -1(x7)",
+            0xfe848f23:  "sb x8, -2(x9)",
+            0xfea58e23:  "sb x10, -4(x11)",
+        }
+        print("SB: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

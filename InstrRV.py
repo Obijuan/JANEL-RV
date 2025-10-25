@@ -22,7 +22,8 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 
 
 
- TIPO R: Hay 3 registros (Ex. add, sub)
+ TIPO R: Hay 3 registros
+* add, sub, sll, slt, sltu, srl, sra, xor, or, and
 
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
@@ -41,7 +42,10 @@ TIPO S: Instrucciones store (Ex. sw, sb....)
 │1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
 │ offset[11:5]│  rs2    |   rs1   |func3| off[4:0]  |   opcode    |
-╰─────────────┴─────────┴─────────┴─────┴───────────┴─────────────╯
+│ offset1     │         |         |     | offset0   |             |
+├─────────────┼─────────┼─────────┼─────┼───────────┼─────────────┤
+|<───────────>|<───────>|<───────>|<───>|<─────────>|<───────────>|
+       7           5         5       3        5            7
 
 
 TIPO B: Instrucciones de salto condicional (Ex. beq, blt...)
@@ -95,6 +99,7 @@ TIPO ECALL
     //-- fence
     //-- fence.i
     //-- sfence.vma
+
     //----RV64I
     //-- addiw
     //-- slliw
@@ -209,7 +214,7 @@ class InstrRV:
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
-    # ──────── de typo I LOAD a partir de func3
+    # ──────── de typo R a partir de func3
     type_r_nemonic = {
         0b000: 'add',    # -- sub
         0b001: 'sll',
@@ -219,6 +224,15 @@ class InstrRV:
         0b101: 'srl',    # -- sra
         0b110: 'or',
         0b111: 'and'
+    }
+
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo S a partir de func3
+    type_s_nemonic = {
+        0b000: 'sb',
+        0b001: 'sh',
+        0b010: 'sw',
+        0b011: 'sd',
     }
 
     # ─────────────────────────────────────────────
@@ -302,6 +316,32 @@ class InstrRV:
 
                 # ── Obtener el nemonico
                 self.nemonic = self.get_type_r_nemonic(self.func3, self.func7)
+
+            case InstrRV.TYPE_S:
+
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
+
+                # ── Obtener el nemonico
+                self.nemonic = self.type_s_nemonic[self.func3]
+
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
+
+                # ── Obtener el registro fuente 2
+                self.rs2 = self.get_rs2()
+
+                # ── Obtener el campo offset1
+                # ── (que ocupa los mismos bits que func7)
+                self.offset1 = self.get_func7()
+
+                # ── Obtener el campo offset0
+                # ─ (que ocupa los mismos bits que rd)
+                self.offset0 = self.get_rd()
+
+                # ── Calcular el offset completo
+                offset = self.offset1 << 5 | self.offset0
+                self.offset = self.ext_sign12(offset)
 
             case _:
                 print("-----> TODO <-------------")
@@ -455,6 +495,17 @@ class InstrRV:
                     f"{ansi.CYAN}x{self.rs2}"\
                     f"{ansi.RESET}"
                 asm_bw = f"{self.nemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
+
+            case InstrRV.TYPE_S:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rs2}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.offset}"\
+                    f"{ansi.RESET}("\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET})"
+                asm_bw = f"{self.nemonic} x{self.rs2}, "\
+                         f"{self.offset}(x{self.rs1})"
 
             case _:
                 return "UNKNOWN"

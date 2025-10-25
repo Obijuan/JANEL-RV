@@ -440,6 +440,18 @@ def test_and():
     print_inst(insts, 'AND')
 
 
+def test_sb():
+    insts = [
+        0x00008023,  # sb x0, 0(x1)
+        0x002180a3,  # sb x2, 1(x3)
+        0x00428123,  # sb x4, 2(x5)
+        0xfe638fa3,  # sb x6, -1(x7)
+        0xfe848f23,  # sb x8, -2(x9)
+        0xfea58e23,  # sb x10, -4(x11)
+    ]
+    print_inst(insts, 'SB')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -460,18 +472,26 @@ def test_tipo_I():
     test_lhu()
 
 
+# ────────────────────────────────────────────
+#   PROBAR TODAS LAS INSTRUCCIONES DE TIPO R
+# ────────────────────────────────────────────
+def test_tipo_R():
+    test_add()
+    test_sub()
+    test_sll()
+    test_slt()
+    test_sltu()
+    test_srl()
+    test_sra()
+    test_xor()
+    test_or()
+    test_and()
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
 # test_tipo_I()
-test_add()
-test_sub()
-test_sll()
-test_slt()
-test_sltu()
-test_srl()
-test_sra()
-test_xor()
-test_or()
-test_and()
+# test_tipo_R()
+test_sb()
