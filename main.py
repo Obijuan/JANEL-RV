@@ -588,9 +588,31 @@ def test_tipo_R():
 #   PROBAR LAS INSTRUCCIONES DE TIPO S
 # ────────────────────────────────────────────
 def test_tipo_S():
+    print(f"{ansi.LCYAN}", end='')
+    print("─────────────────────────────────────────")
+    print("──       INSTRUCCIONES TIPO S         ───")
+    print("─────────────────────────────────────────")
+    print(ansi.RESET, end='')
     test_sb()
     test_sh()
     test_sw()
+
+
+# ────────────────────────────────────────────
+#   PROBAR LAS INSTRUCCIONES DE TIPO B
+# ────────────────────────────────────────────
+def test_tipo_B():
+    print(f"{ansi.LCYAN}", end='')
+    print("─────────────────────────────────────────")
+    print("──       INSTRUCCIONES TIPO B         ───")
+    print("─────────────────────────────────────────")
+    print(ansi.RESET, end='')
+    test_beq()
+    test_bne()
+    test_blt()
+    test_bge()
+    test_bltu()
+    test_bgeu()
 
 
 # ─────────────────
@@ -599,10 +621,5 @@ def test_tipo_S():
 print(ansi.CLS)
 # test_tipo_I()
 # test_tipo_R()
-# test_tipo_S()
-test_beq()
-test_bne()
-test_blt()
-test_bge()
-test_bltu()
-test_bgeu()
+test_tipo_S()
+test_tipo_B()
