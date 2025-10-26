@@ -561,6 +561,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones BGEU (TIPO B)
+    # ───────────────────────────────────────────────────────
+    def test_bgeu(self):
+
+        mcode_asm = {
+            0xff9c78e3:  "bgeu x24, x25, -16",
+            0xffbd70e3:  "bgeu x26, x27, -32",
+            0xfdde70e3:  "bgeu x28, x29, -64",
+            0x03ff7063:  "bgeu x30, x31, 32",
+            0x04107063:  "bgeu x0, x1, 64",
+            0x08317063:  "bgeu x2, x3, 128",
+        }
+        print("BGEU: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
