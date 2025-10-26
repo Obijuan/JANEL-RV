@@ -552,6 +552,11 @@ def test_bgeu():
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
 def test_tipo_I():
+    print(f"{ansi.LCYAN}", end='')
+    print("─────────────────────────────────────────")
+    print("──       INSTRUCCIONES TIPO I         ───")
+    print("─────────────────────────────────────────")
+    print(ansi.RESET, end='')
     test_addi()
     test_slli()
     test_slti()
@@ -572,6 +577,11 @@ def test_tipo_I():
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO R
 # ────────────────────────────────────────────
 def test_tipo_R():
+    print(f"{ansi.LCYAN}", end='')
+    print("─────────────────────────────────────────")
+    print("──       INSTRUCCIONES TIPO R         ───")
+    print("─────────────────────────────────────────")
+    print(ansi.RESET, end='')
     test_add()
     test_sub()
     test_sll()
@@ -619,7 +629,7 @@ def test_tipo_B():
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-# test_tipo_I()
-# test_tipo_R()
+test_tipo_I()
+test_tipo_R()
 test_tipo_S()
 test_tipo_B()
