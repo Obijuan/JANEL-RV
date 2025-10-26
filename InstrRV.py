@@ -56,7 +56,9 @@ TIPO B: Instrucciones de salto condicional (Ex. beq, blt...)
 ├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
 │ off[12|10:5]│  rs2    |   rs1   |func3|off[4:1|11]|   opcode    |
 │ offset1     │         |         |     | offset0   |             |
-╰─────────────┴─────────┴─────────┴─────┴───────────┴─────────────╯
+├─────────────┼─────────┼─────────┼─────┼───────────┼─────────────┤
+|<───────────>|<───────>|<───────>|<───>|<─────────>|<───────────>|
+       7           5         5       3        5            7
 
 
 TIPO U: Instrucciones de tipo UPPER (Ex. lui, auipc)
@@ -64,9 +66,10 @@ TIPO U: Instrucciones de tipo UPPER (Ex. lui, auipc)
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
-│              imm[31:12]               |    rd     |    opcode   |
-╰───────────────────────────────────────┴───────────┴─────────────╯
-
+│            imm20[31:12]               |    rd     |    opcode   |
+├───────────────────────────────────────┼───────────┼─────────────┤
+|<─────────────────────────────────────>|<─────────>|<───────────>|
+                 20                           5            7
 
 TIPO J: Salto incondicional (Ex. jal)
 
@@ -161,6 +164,11 @@ class InstrRV:
     IMM12_POS = 20
     IMM12_SIZE = 0b1111_1111_1111
     IMM12_MASK = IMM12_SIZE << IMM12_POS
+
+    # ── IMM20: Inmediato de 20 bits
+    IMM20_POS = 12
+    IMM20_SIZE = 0xFFFFF
+    IMM20_MASK = IMM20_SIZE << IMM20_POS
 
     # ──────── CONSTANTES PARA DEFINIR EL TIPO DE INSTRUCCION
     TYPE_I_ARITH = 'I_ARITH'  # Instrucciones tipo I aritmeticas
@@ -381,6 +389,16 @@ class InstrRV:
                 # ── Construir el offset final a partir de las partes
                 self.offset = self.get_offset_b()
 
+            case InstrRV.TYPE_U_LUI:
+                # ── Obtener el nemonico
+                self.nemonic = 'lui'
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el valor inmediato de 20 bits
+                self.imm20 = self.get_imm20()
+
             case _:
                 print("-----> TODO <-------------")
 
@@ -533,6 +551,15 @@ class InstrRV:
         # ── Obtener el immediato de 12 bits y devolverlo
         imm12 = (self.mcode & InstrRV.IMM12_MASK) >> InstrRV.IMM12_POS
         return imm12
+
+    # ──────────────────────────────
+    #  Valor immediato de 20 bits
+    # ──────────────────────────────
+    def get_imm20(self) -> int:
+
+        # ── Obtener el immediato de 12 bits y devolverlo
+        imm20 = (self.mcode & InstrRV.IMM20_MASK) >> InstrRV.IMM20_POS
+        return imm20
 
     # ───────────────────────────────────────────────────────
     #  Devolver la cadena con la instruccion en ensamblador
