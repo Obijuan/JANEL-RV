@@ -527,6 +527,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones BGE (TIPO B)
+    # ───────────────────────────────────────────────────────
+    def test_bge(self):
+
+        mcode_asm = {
+            0xc01050e3:  "bge x0, x1, -1024",
+            0x803152e3:  "bge x2, x3, -2044",
+            0x805250e3:  "bge x4, x5, -2048",
+            0x7e735e63:  "bge x6, x7, 2044",
+            0x7e945c63:  "bge x8, x9, 2040",
+            0x7eb55a63:  "bge x10, x11, 2036",
+        }
+        print("BGE: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
