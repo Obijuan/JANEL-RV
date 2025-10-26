@@ -544,6 +544,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones BLTU (TIPO B)
+    # ───────────────────────────────────────────────────────
+    def test_bltu(self):
+
+        mcode_asm = {
+            0x00d66063:  "bltu x12, x13, 0",
+            0xfef76ee3:  "bltu x14, x15, -4",
+            0xff186ce3:  "bltu x16, x17, -8",
+            0x01396263:  "bltu x18, x19, 4",
+            0x015a6463:  "bltu x20, x21, 8",
+            0x017b6863:  "bltu x22, x23, 16",
+        }
+        print("BLTU: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
