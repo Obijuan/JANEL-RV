@@ -476,6 +476,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instrucciones BEQ (TIPO B)
+    # ───────────────────────────────────────────────────────
+    def test_beq(self):
+
+        mcode_asm = {
+            0x00000063:  "beq x0, x0, 0",
+            0xfe100ee3:  "beq x0, x1, -4",
+            0xfe208ce3:  "beq x1, x2, -8",
+            0x00418263:  "beq x3, x4, 4",
+            0x00628463:  "beq x5, x6, 8",
+            0x00838663:  "beq x7, x8, 12",
+        }
+        print("BEQ: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

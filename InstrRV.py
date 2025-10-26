@@ -37,6 +37,7 @@ https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
 
 
 TIPO S: Instrucciones store (Ex. sw, sb....)
+* sw, sh, sb, sd
 
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
@@ -54,6 +55,7 @@ TIPO B: Instrucciones de salto condicional (Ex. beq, blt...)
 │1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
 │ off[12|10:5]│  rs2    |   rs1   |func3|off[4:1|11]|   opcode    |
+│ offset1     │         |         |     | offset0   |             |
 ╰─────────────┴─────────┴─────────┴─────┴───────────┴─────────────╯
 
 
@@ -235,6 +237,17 @@ class InstrRV:
         0b011: 'sd',
     }
 
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo S a partir de func3
+    type_b_nemonic = {
+        0b000: 'beq',
+        0b001: 'bne',
+        0b100: 'blt',
+        0b101: 'bge',
+        0b110: 'bltu',
+        0b111: 'bgeu',
+    }
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -343,8 +356,58 @@ class InstrRV:
                 offset = self.offset1 << 5 | self.offset0
                 self.offset = self.ext_sign12(offset)
 
+            case InstrRV.TYPE_B:
+
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
+
+                # ── Obtener el nemonico
+                self.nemonic = self.type_b_nemonic[self.func3]
+
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
+
+                # ── Obtener el registro fuente 2
+                self.rs2 = self.get_rs2()
+
+                # ── Obtener el campo offset1
+                # ── (que ocupa los mismos bits que func7)
+                self.offset1 = self.get_func7()
+
+                # ── Obtener el campo offset0
+                # ─ (que ocupa los mismos bits que rd)
+                self.offset0 = self.get_rd()
+
+                # ── Construir el offset final a partir de las partes
+                self.offset = self.get_offset_b()
+
             case _:
                 print("-----> TODO <-------------")
+
+    # ────────────────────────────────────────────────────────────
+    #   Obtener el campo offset de las instrucciones B
+    # ────────────────────────────────────────────────────────────
+    def get_offset_b(self) -> int:
+
+        # ── Extraer el bit de signo
+        sign = (self.offset1 & 0b100_0000) >> 6
+
+        # ── Extraer el bit 11 (bit 0 de offset0)
+        b11 = (self.offset0 & 0b0000_0001) >> 0
+
+        # ── Extraer bits 10:5 (6 bits)
+        bit10_5 = (self.offset1 & 0b011_1111)
+
+        # ── Extraer bits 4:1 (4 bits)
+        bit4_1 = self.offset0 >> 1
+
+        # ── Construir el offset final
+        offset = (sign << 12) | (b11 << 11) | (bit10_5 << 5) | (bit4_1) << 1
+
+        # ── Extender el signo
+        offset = self.ext_sign13(offset)
+
+        return offset
 
     # ────────────────────────────────────────────────────────────
     #   Obtener el nemonico de la instruccion aritmetica de tipo I
@@ -395,6 +458,18 @@ class InstrRV:
             return imm12
         else:
             return imm12 - (2 ** 12)
+
+    # ────────────────────────────────────────────────────────────
+    #   Extension de signo de un numero de 13 bits
+    # ────────────────────────────────────────────────────────────
+    def ext_sign13(self, value13) -> int:
+
+        # ─── Obtener el bit de signo (bit 12)
+        sign = value13 & (1 << 12)
+        if sign == 0:
+            return value13
+        else:
+            return value13 - (2 ** 13)
 
     # ────────────────────────────────────────────────────────────
     #   opcode de una instrucción en código máquina
@@ -506,6 +581,17 @@ class InstrRV:
                     f"{ansi.RESET})"
                 asm_bw = f"{self.nemonic} x{self.rs2}, "\
                          f"{self.offset}(x{self.rs1})"
+
+            case InstrRV.TYPE_B:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.CYAN}x{self.rs2}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.offset}"\
+                    f"{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rs1}, "\
+                         f"x{self.rs2}, {self.offset}"
 
             case _:
                 return "UNKNOWN"
