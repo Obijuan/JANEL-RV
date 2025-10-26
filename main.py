@@ -490,7 +490,12 @@ def test_beq():
 
 def test_bne():
     insts = [
-
+        0xfea498e3,  # bne x9, x10, -16
+        0xfec590e3,  # bne x11, x12, -32
+        0xfce690e3,  # bne x13, x14, -64
+        0x03079063,  # bne x15, x16, 32
+        0x05289063,  # bne x17, x18, 64
+        0x09499063,  # bne x19, x20, 128
     ]
     print_inst(insts, 'BNE')
 
@@ -576,7 +581,8 @@ print(ansi.CLS)
 # test_tipo_R()
 # test_tipo_S()
 test_beq()
-# bne
+test_bne()
+
 # blt
 # bge
 # bltu
