@@ -560,6 +560,18 @@ def test_lui():
     print_inst(insts, 'LUI')
 
 
+def test_auipc():
+    insts = [
+        0x00000317,  # auipc x6, 0x0
+        0x0000a397,  # auipc x7, 0xA
+        0x000aa417,  # auipc x8, 0xAA
+        0x00aaa497,  # auipc x9, 0xAAA
+        0x0aaaa517,  # auipc x10, 0xAAAA
+        0xaaaaa597,  # auipc x11, 0xAAAAA
+    ]
+    print_inst(insts, 'AUIPC')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -646,3 +658,4 @@ print(ansi.CLS)
 # test_tipo_S()
 # test_tipo_B()
 test_lui()
+test_auipc()

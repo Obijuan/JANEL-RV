@@ -595,6 +595,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion AUIPC (TIPO U)
+    # ───────────────────────────────────────────────────────
+    def test_auipc(self):
+
+        mcode_asm = {
+            0x00000317:  "auipc x6, 0x0",
+            0x0000a397:  "auipc x7, 0xA",
+            0x000aa417:  "auipc x8, 0xAA",
+            0x00aaa497:  "auipc x9, 0xAAA",
+            0x0aaaa517:  "auipc x10, 0xAAAA",
+            0xaaaaa597:  "auipc x11, 0xAAAAA",
+        }
+        print("AUIPC: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

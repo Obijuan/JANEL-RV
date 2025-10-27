@@ -399,6 +399,16 @@ class InstrRV:
                 # ── Obtener el valor inmediato de 20 bits
                 self.imm20 = self.get_imm20()
 
+            case InstrRV.TYPE_U_AUIPC:
+                # ── Obtener el nemonico
+                self.nemonic = 'auipc'
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el valor inmediato de 20 bits
+                self.imm20 = self.get_imm20()
+
             case _:
                 print("-----> TODO <-------------")
 
@@ -621,6 +631,14 @@ class InstrRV:
                          f"x{self.rs2}, {self.offset}"
 
             case InstrRV.TYPE_U_LUI:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}0x{self.imm20:X}"\
+                    f"{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rd}, 0x{self.imm20:X}"
+
+            case InstrRV.TYPE_U_AUIPC:
                 asm = f"{ansi.YELLOW}{self.nemonic} "\
                     f"{ansi.CYAN}x{self.rd}"\
                     f"{ansi.RESET}, "\
