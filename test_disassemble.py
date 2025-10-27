@@ -578,6 +578,23 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion LUI (TIPO U)
+    # ───────────────────────────────────────────────────────
+    def test_lui(self):
+
+        mcode_asm = {
+            0x00000037:  "lui x0, 0x0",
+            0x0000f0b7:  "lui x1, 0xF",
+            0x000ff137:  "lui x2, 0xFF",
+            0x00fff1b7:  "lui x3, 0xFFF",
+            0x0ffff237:  "lui x4, 0xFFFF",
+            0xfffff2b7:  "lui x5, 0xFFFFF",
+        }
+        print("LUI: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

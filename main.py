@@ -548,6 +548,18 @@ def test_bgeu():
     print_inst(insts, 'BGEU')
 
 
+def test_lui():
+    insts = [
+        0x00000037,  # lui x0, 0x0
+        0x0000f0b7,  # lui x1, 0xF
+        0x000ff137,  # lui x2, 0xFF
+        0x00fff1b7,  # lui x3, 0xFFF
+        0x0ffff237,  # lui x4, 0xFFFF
+        0xfffff2b7,  # lui x5, 0xFFFFF
+    ]
+    print_inst(insts, 'LUI')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -629,7 +641,8 @@ def test_tipo_B():
 #   MAIN
 # ─────────────────
 print(ansi.CLS)
-test_tipo_I()
-test_tipo_R()
-test_tipo_S()
-test_tipo_B()
+# test_tipo_I()
+# test_tipo_R()
+# test_tipo_S()
+# test_tipo_B()
+test_lui()

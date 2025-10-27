@@ -620,6 +620,14 @@ class InstrRV:
                 asm_bw = f"{self.nemonic} x{self.rs1}, "\
                          f"x{self.rs2}, {self.offset}"
 
+            case InstrRV.TYPE_U_LUI:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}0x{self.imm20:X}"\
+                    f"{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rd}, 0x{self.imm20:X}"
+
             case _:
                 return "UNKNOWN"
 
