@@ -647,6 +647,38 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion JALR (TIPO J)
+    # ───────────────────────────────────────────────────────
+    def test_jalr(self):
+
+        mcode_asm = {
+            0x00000067:  "jalr x0, 0(x0)",
+            0x00408067:  "jalr x0, 4(x1)",
+            0x00818167:  "jalr x2, 8(x3)",
+            0x01028267:  "jalr x4, 16(x5)",
+            0x02038367:  "jalr x6, 32(x7)",
+            0x04048467:  "jalr x8, 64(x9)",
+            0x08058567:  "jalr x10, 128(x11)",
+            0x10068667:  "jalr x12, 256(x13)",
+            0x20078767:  "jalr x14, 512(x15)",
+            0x40088867:  "jalr x16, 1024(x17)",
+            0x7ff98967:  "jalr x18, 2047(x19)",
+            0xffca8a67:  "jalr x20, -4(x21)",
+            0xff8b8b67:  "jalr x22, -8(x23)",
+            0xff0c8c67:  "jalr x24, -16(x25)",
+            0xfe0d8d67:  "jalr x26, -32(x27)",
+            0xfc0e8e67:  "jalr x28, -64(x29)",
+            0xf80f8f67:  "jalr x30, -128(x31)",
+            0xf0008067:  "jalr x0, -256(x1)",
+            0xe0018167:  "jalr x2, -512(x3)",
+            0xc0028267:  "jalr x4, -1024(x5)",
+            0x80038367:  "jalr x6, -2048(x7)",
+        }
+        print("JALR: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()

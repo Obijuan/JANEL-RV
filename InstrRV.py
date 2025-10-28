@@ -87,7 +87,8 @@ TIPO JALR: Salto incondicional a registro + offset (Ex. jalr)
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
-│      offset           |   rs1   | 000 |   rd      |    opcode   |
+│      offset           |   rs1   |func3|   rd      |    opcode   |
+│                       |         | 000 |           |             |
 ├───────────────────────┼─────────┼─────┼───────────┼─────────────┤
 |<─────────────────────>|<───────>|<───>|<─────────>|<───────────>|
           12                 5       3        5           7
@@ -269,6 +270,12 @@ class InstrRV:
         0b111: 'bgeu',
     }
 
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de typo J a partir de func3
+    type_j_nemonic = {
+        0b000: 'jalr',
+    }
+
     # ─────────────────────────────────────────────
     #   CONSTRUCTOR a partir del codigo maquina
     # ─────────────────────────────────────────────
@@ -432,6 +439,26 @@ class InstrRV:
                 # ── Obtener el valor inmediato de 20 bits,
                 # ── con signo extendido
                 self.offset_jal = self.get_offset_jal()
+
+            case InstrRV.TYPE_J_JALR:
+
+                # ── Obtener el campo func3
+                self.func3 = self.get_func3()
+
+                # ── Obtener el nemonico
+                self.nemonic = self.type_j_nemonic[self.func3]
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
+
+                # ── Obtener el campo imm12
+                self.imm12 = self.get_imm12()
+
+                # ── Obtener el valor inmediato como una palabra del sistema
+                self.offset = self.ext_sign12(self.imm12)
 
             case _:
                 print("-----> TODO <-------------")
@@ -735,6 +762,17 @@ class InstrRV:
                     f"{ansi.GREEN}{self.offset_jal}"\
                     f"{ansi.RESET}"
                 asm_bw = f"{self.nemonic} x{self.rd}, {self.offset_jal}"
+
+            case InstrRV.TYPE_J_JALR:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.offset}"\
+                    f"{ansi.RESET}("\
+                    f"{ansi.CYAN}x{self.rs1}"\
+                    f"{ansi.RESET})"
+                asm_bw = f"{self.nemonic} x{self.rd}, "\
+                         f"{self.offset}(x{self.rs1})"
 
             case _:
                 return "UNKNOWN"

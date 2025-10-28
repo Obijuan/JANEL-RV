@@ -602,6 +602,33 @@ def test_jal():
     print_inst(insts, 'JAL')
 
 
+def test_jalr():
+    insts = [
+        0x00000067,  # jalr x0, x0, 0
+        0x00408067,  # jalr x0, x1, 4
+        0x00818167,  # jalr x2, x3, 8
+        0x01028267,  # jalr x4, x5, 0x10
+        0x02038367,  # jalr x6, x7, 0x20
+        0x04048467,  # jalr x8, x9, 0x40
+        0x08058567,  # jalr x10, x11, 0x80
+        0x10068667,  # jalr x12, x13, 0x100
+        0x20078767,  # jalr x14, x15, 0x200
+        0x40088867,  # jalr x16, x17, 0x400
+        0x7ff98967,  # jalr x18, x19, 0x7FF
+        0xffca8a67,  # jalr x20, x21, -4
+        0xff8b8b67,  # jalr x22, x23, -8
+        0xff0c8c67,  # jalr x24, x25, -0x10
+        0xfe0d8d67,  # jalr x26, x27, -0x20
+        0xfc0e8e67,  # jalr x28, x29, -0x40
+        0xf80f8f67,  # jalr x30, x31, -0x80
+        0xf0008067,  # jalr x0, x1, -0x100
+        0xe0018167,  # jalr x2, x3, -0x200
+        0xc0028267,  # jalr x4, x5, -0x400
+        0x80038367,  # jalr x6, x7, -0x800
+    ]
+    print_inst(insts, 'JALR')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -689,4 +716,5 @@ print(ansi.CLS)
 # test_tipo_B()
 # test_lui()
 # test_auipc()
-test_jal()
+# test_jal()
+test_jalr()
