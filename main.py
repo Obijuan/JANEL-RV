@@ -572,6 +572,36 @@ def test_auipc():
     print_inst(insts, 'AUIPC')
 
 
+def test_jal():
+    insts = [
+        0xffdff0ef,  # jal x1, -4
+        0xff9ff16f,  # jal x2, -8
+        0xff1ff1ef,  # jal x3, -16
+        0xfe1ff26f,  # jal x4, -32
+        0xfc1ff2ef,  # jal x5, -64
+        0xf81ff36f,  # jal x6, -128
+        0xf01ff3ef,  # jal x7, -256
+        0xe01ff46f,  # jal x8, -512
+        0xc01ff4ef,  # jal x9, -1024
+        0x801ff56f,  # jal x10, -2048
+        0x800ff5ef,  # jal x11, -4096
+        0x800fe66f,  # jal x12, -8192
+        0x000026ef,  # jal x13, 8192
+        0x0000176f,  # jal x14, 4096
+        0x001007ef,  # jal x15, 2048
+        0x4000086f,  # jal x16, 1024
+        0x200008ef,  # jal x17, 512
+        0x1000096f,  # jal x18, 256
+        0x080009ef,  # jal x19, 128
+        0x04000a6f,  # jal x20, 64
+        0x02000aef,  # jal x21, 32
+        0x01000b6f,  # jal x22, 16
+        0x00800bef,  # jal x23, 8
+        0x00400c6f,  # jal x24, 4
+    ]
+    print_inst(insts, 'JAL')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -657,5 +687,6 @@ print(ansi.CLS)
 # test_tipo_R()
 # test_tipo_S()
 # test_tipo_B()
-test_lui()
-test_auipc()
+# test_lui()
+# test_auipc()
+test_jal()

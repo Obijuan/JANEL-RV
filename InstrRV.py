@@ -1,10 +1,11 @@
 import ansi
 """
+Ensamblador RISCV online: https://riscvasm.lucasteske.dev/
+
 ──────────────────────────────────────────────────────
   DOCUMENTACION SOBRE EL FORMATO DEL RISC-V
 ──────────────────────────────────────────────────────
 https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html
-
 
  TIPO I: Instrucciones aritméticas y de carga
  * addi, slli, slti, sltiu, xori, srli, srai, ori, andi
@@ -77,7 +78,19 @@ TIPO J: Salto incondicional (Ex. jal)
 │1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2│1 0 9 8  7 │6 5 4 3 2 1 0│
 ├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴──┴──┼─┴─┴─┴─┴─┴─┴─┤
 │        offset[20|10:1|11|19:12]       |    rd     |    opcode   |
-╰───────────────────────────────────────┴───────────┴─────────────╯
+├───────────────────────────────────────┼───────────┼─────────────┤
+|<─────────────────────────────────────>|<─────────>|<───────────>|
+                 20                           5            7
+
+TIPO JALR: Salto incondicional a registro + offset (Ex. jalr)
+
+ 3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+│1 0 9 8 7 6 5 4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
+├─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
+│      offset           |   rs1   | 000 |   rd      |    opcode   |
+├───────────────────────┼─────────┼─────┼───────────┼─────────────┤
+|<─────────────────────>|<───────>|<───>|<─────────>|<───────────>|
+          12                 5       3        5           7
 
 
 TIPO ECALL
@@ -409,6 +422,17 @@ class InstrRV:
                 # ── Obtener el valor inmediato de 20 bits
                 self.imm20 = self.get_imm20()
 
+            case InstrRV.TYPE_J_JAL:
+                # ── Obtener el nemonico
+                self.nemonic = 'jal'
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el valor inmediato de 20 bits,
+                # ── con signo extendido
+                self.offset_jal = self.get_offset_jal()
+
             case _:
                 print("-----> TODO <-------------")
 
@@ -500,6 +524,30 @@ class InstrRV:
             return value13 - (2 ** 13)
 
     # ────────────────────────────────────────────────────────────
+    #   Extension de signo de un numero de 20 bits
+    # ────────────────────────────────────────────────────────────
+    def ext_sign20(self, value20) -> int:
+
+        # ─── Obtener el bit de signo (bit 12)
+        sign = value20 & (1 << 19)
+        if sign == 0:
+            return value20
+        else:
+            return value20 - (2 ** 20)
+
+    # ────────────────────────────────────────────────────────────
+    #   Extension de signo de un numero de 21 bits
+    # ────────────────────────────────────────────────────────────
+    def ext_sign21(self, value21) -> int:
+
+        # ─── Obtener el bit de signo (bit 20)
+        sign = value21 & (1 << 20)
+        if sign == 0:
+            return value21
+        else:
+            return value21 - (2 ** 21)
+
+    # ────────────────────────────────────────────────────────────
     #   opcode de una instrucción en código máquina
     # ────────────────────────────────────────────────────────────
     def get_opcode(self) -> int:
@@ -570,6 +618,40 @@ class InstrRV:
         # ── Obtener el immediato de 12 bits y devolverlo
         imm20 = (self.mcode & InstrRV.IMM20_MASK) >> InstrRV.IMM20_POS
         return imm20
+
+    # ──────────────────────────────
+    #  Valor immediato de 20 bits
+    #  Construir el offset para instrucciones JAL
+    #  offset[20|10:1|11|19:12]
+    #
+    #  | 19  | 18 - 9 | 8  | 7   0 |
+    #  | 20  |   10:1 | 11 | 19:12 |
+    # ──────────────────────────────
+    def get_offset_jal(self) -> int:
+
+        # ── Obtener el campo desordenado
+        field = (self.mcode & InstrRV.IMM20_MASK) >> InstrRV.IMM20_POS
+
+        # ── Extraer el bit de signo
+        b20 = (field >> 19) & 1
+
+        # ── Extraer los bits 10-1
+        b10_1 = (field >> 9) & 0x3FF
+
+        # ── Extraer el bit 11
+        b11 = (field >> 8) & 0x1
+
+        # ── Extraer los bits 19-12
+        b19_12 = field & 0xFF
+
+        # ── Construir el offset final a partir de todos sus componentes
+        # ── Se obtiene un valor de 21 bits (incluido el bit de signo)
+        offset = (b20 << 20) | (b19_12 << 12) | (b11 << 11) | (b10_1 << 1)
+
+        # ── Extender el signo y devolver el valor
+        offset = self.ext_sign21(offset)
+
+        return offset
 
     # ───────────────────────────────────────────────────────
     #  Devolver la cadena con la instruccion en ensamblador
@@ -645,6 +727,14 @@ class InstrRV:
                     f"{ansi.GREEN}0x{self.imm20:X}"\
                     f"{ansi.RESET}"
                 asm_bw = f"{self.nemonic} x{self.rd}, 0x{self.imm20:X}"
+
+            case InstrRV.TYPE_J_JAL:
+                asm = f"{ansi.YELLOW}{self.nemonic} "\
+                    f"{ansi.CYAN}x{self.rd}"\
+                    f"{ansi.RESET}, "\
+                    f"{ansi.GREEN}{self.offset_jal}"\
+                    f"{ansi.RESET}"
+                asm_bw = f"{self.nemonic} x{self.rd}, {self.offset_jal}"
 
             case _:
                 return "UNKNOWN"
