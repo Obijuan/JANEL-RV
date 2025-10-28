@@ -629,6 +629,14 @@ def test_jalr():
     print_inst(insts, 'JALR')
 
 
+def test_ecall():
+    insts = [
+        0x00000073,   # ecall
+        0x00100073,   # ebreak
+    ]
+    print_inst(insts, 'ECALL')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -717,4 +725,5 @@ print(ansi.CLS)
 # test_lui()
 # test_auipc()
 # test_jal()
-test_jalr()
+# test_jalr()
+test_ecall()

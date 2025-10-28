@@ -97,11 +97,15 @@ TIPO JALR: Salto incondicional a registro + offset (Ex. jalr)
 TIPO ECALL
 
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
-│1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7│6 5 4 3 2 1 0│
-├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┴─┴─┤
-│    0        │  func5  |    0    | 0   |   0     |   opcode    |
-╰─────────────┴─────────┴─────────┴─────┴─────────┴─────────────╯
+│1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
+├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
+│    0        │  0      |    0    | 0   |     0     |   opcode    |
+├─────────────┼─────────┼─────────┼─────┼───────────┼─────────────┤
+|<───────────>|<───────>|<───────>|<───>|<─────────>|<───────────>|
+       7           5         5       3        5           7
+
 """
+
 """
     //-- TODO
     //----- Modo privilegiado
@@ -260,7 +264,7 @@ class InstrRV:
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
-    # ──────── de typo S a partir de func3
+    # ──────── de tipo S a partir de func3
     type_b_nemonic = {
         0b000: 'beq',
         0b001: 'bne',
@@ -271,9 +275,16 @@ class InstrRV:
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
-    # ──────── de typo J a partir de func3
+    # ──────── de tipo J a partir de func3
     type_j_nemonic = {
         0b000: 'jalr',
+    }
+
+    # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
+    # ──────── de tipo System a partir de imm12
+    type_ecall = {
+        0x000: 'ecall',
+        0x001: 'ebreak',
     }
 
     # ─────────────────────────────────────────────
@@ -459,6 +470,14 @@ class InstrRV:
 
                 # ── Obtener el valor inmediato como una palabra del sistema
                 self.offset = self.ext_sign12(self.imm12)
+
+            case InstrRV.TYPE_ECALL_EBREAK:
+
+                # ── Obtener el campo imm12
+                self.imm12 = self.get_imm12()
+
+                # ── Obtener el nemonico
+                self.nemonic = self.type_ecall[self.imm12]
 
             case _:
                 print("-----> TODO <-------------")
@@ -773,6 +792,10 @@ class InstrRV:
                     f"{ansi.RESET})"
                 asm_bw = f"{self.nemonic} x{self.rd}, "\
                          f"{self.offset}(x{self.rs1})"
+
+            case InstrRV.TYPE_ECALL_EBREAK:
+                asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET}"
+                asm_bw = f"{self.nemonic}"
 
             case _:
                 return "UNKNOWN"

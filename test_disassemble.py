@@ -679,6 +679,19 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion ECALL
+    # ───────────────────────────────────────────────────────
+    def test_ecall(self):
+
+        mcode_asm = {
+            0x00000073:   "ecall",
+            0x00100073:   "ebreak",
+        }
+        print("ECALL: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
