@@ -813,7 +813,7 @@ class InstrRV:
     # ────────────────────────────────────────────────────────────────────────
     def _print_isa_tipo_I_BW(self) -> None:
 
-        print(" 31      20 19   15 14   12 11   7 6      0")
+        print(" 31      20 19   15 14   12 11    7 6      0")
         print("├──────────┼───────┼───────┼───────┼────────┤")
         print("│ imm12    │ rs1   │ func3 │  rd   │ opcode │")
         print(f"│ {self.imm12:#05x}    │ {self.rs1:02}    │ ", end='')
@@ -838,7 +838,7 @@ class InstrRV:
         # -- Color para los campos
         C2 = ansi.LYELLOW
 
-        print(f"{C0} 31      20 19   15 14   12 11   7 6      0")
+        print(f"{C0} 31      20 19   15 14   12 11    7 6      0")
         print(f"{C1}├──────────┼───────┼───────┼───────┼────────┤")
         print("│ imm12    │ rs1   │ func3 │  rd   │ opcode │")
         print(f"{C1}│ ", end='')
@@ -878,11 +878,84 @@ class InstrRV:
             self._print_isa_tipo_I_BW()
 
     # ─────────────────────────────────────────────────────────
+    #  Imprimir el formato de una instruccion de tipo R en BW
+    # ─────────────────────────────────────────────────────────
+    def _print_isa_tipo_R_BW(self):
+        print(" 31      25 24   20 19   15 14   12 11    7 6      0")
+        print("├──────────┼───────┼───────┼───────┼───────┼────────┤")
+        print("│ func7    │  rs2  │  rs1  │ func3 │  rd   │ opcode │")
+        print(f"│ {self.func7:#04x}     ", end='')
+        print(f"│  {self.rs2:02}   ", end='')
+        print(f"│  {self.rs1:02}   ", end='')
+        print(f"│  {self.func3}    ", end='')
+        print(f"│  {self.rd:02}   ", end='')
+        print(f"│  {self.opcode:#04x}  │")
+        print("├──────────┼───────┼───────┼───────┼───────┼────────┤")
+        print("│ᐊ────────ᐅ│ᐊ─────ᐅ│ᐊ─────ᐅ│ᐊ─────ᐅ│ᐊ─────ᐅ│ᐊ──────ᐅ│")
+        print("      7        5       5       3       5       7")
+        print()
+
+    # ──────────────────────────────────────────────────────────────
+    #  Imprimir el formato de una instruccion de tipo R en color
+    # ──────────────────────────────────────────────────────────────
+    def _print_isa_tipo_R_color(self):
+        # ----- Alias para los colores
+        # -- Color para los numeros de bits y tamaños
+        C0 = ansi.LWHITE
+
+        # -- Color para las líneas
+        C1 = ansi.BLUE
+
+        # -- Color para los campos
+        C2 = ansi.LYELLOW
+
+        print(f"{C0} 31      25 24   20 19   15 14   12 11    7 6      0")
+        print(f"{C1}├──────────┼───────┼───────┼───────┼───────┼────────┤")
+        print("│ ", end='')
+        print("func7    │  rs2  │  rs1  │ func3 │  rd   │ opcode │")
+        print("│ ", end='')
+        print(f"{C2}{self.func7:#04x}     ", end='')
+        print(f"{C1}│{C2}  {self.rs2:02}   ", end='')
+        print(f"{C1}│{C2}  {self.rs1:02}   ", end='')
+        print(f"{C1}│{C2}  {self.func3}    ", end='')
+        print(f"{C1}│{C2}  {self.rd:02}   ", end='')
+        print(f"{C1}│{C2}  {self.opcode:#04x}  {C1}│")
+        print("├──────────┼───────┼───────┼───────┼───────┼────────┤")
+        print("│", end='')
+        print(f"{C0}ᐊ────────ᐅ", end='')
+        print(f"{C1}│", end='')
+        print(f"{C0}ᐊ─────ᐅ", end='')
+        print(f"{C1}│", end='')
+        print(f"{C0}ᐊ─────ᐅ", end='')
+        print(f"{C1}│", end='')
+        print(f"{C0}ᐊ─────ᐅ", end='')
+        print(f"{C1}│", end='')
+        print(f"{C0}ᐊ─────ᐅ", end='')
+        print(f"{C1}│", end='')
+        print(f"{C0}ᐊ──────ᐅ", end='')
+        print(f"{C1}│")
+        print(f"{C0}      7        5       5       3       5       7")
+        print()
+
+    # ─────────────────────────────────────────────────────────
+    #  Imprimir el formato de una instruccion de tipo R
+    # ─────────────────────────────────────────────────────────
+    def _print_isa_tipo_R(self, color: bool = True):
+        if color:
+            self._print_isa_tipo_R_color()
+        else:
+            self._print_isa_tipo_R_BW()
+
+    # ─────────────────────────────────────────────────────────
     #  Imprimir el formato de una instruccion
     # ─────────────────────────────────────────────────────────
     def print_isa(self, color: bool = True):
         match self.type:
             case InstrRV.TYPE_I_ARITH | InstrRV.TYPE_I_LOAD:
                 self._print_isa_tipo_I(color=color)
+
+            case InstrRV.TYPE_R:
+                self._print_isa_tipo_R(color=color)
+
             case _:
                 print("-----> TODO <-------------")
