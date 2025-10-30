@@ -178,16 +178,6 @@ csrrci:
 """
     //-- TODO
     //----- Modo privilegiado
-    //-- csrrw
-    //-- csrrs
-    //-- csrrc
-    //-- csrrwi
-    //-- csrrsi
-    //-- csrrci
-    //-- uret
-    //-- sret
-    //-- mret
-    //-- wfi
     //-- fence
     //-- fence.i
     //-- sfence.vma
