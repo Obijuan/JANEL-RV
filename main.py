@@ -703,6 +703,19 @@ def test_tipo_J():
     test_jalr()
 
 
+# ────────────────────────────────────────────
+#   PROBAR LAS INSTRUCCIONES PRIVILEGIADAS
+# ────────────────────────────────────────────
+def test_system():
+    test_ecall()
+    test_csrrw()
+    test_csrrs()
+    test_csrrc()
+    test_csrrwi()
+    test_csrrsi()
+    test_csrrci()
+
+
 # ─────────────────
 #   MAIN
 # ─────────────────
@@ -713,13 +726,7 @@ print(ansi.CLS)
 # test_tipo_B()
 # test_tipo_U()
 # test_tipo_J()
-test_ecall()
-test_csrrw()
-test_csrrs()
-test_csrrc()
-test_csrrwi()
-test_csrrsi()
-test_csrrci()
+test_system()
 
 # test1()
 
