@@ -772,6 +772,22 @@ class TestDisassemble(unittest.TestCase):
         self.check_instructions(mcode_asm)
         print()
 
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion CSRRSI
+    # ───────────────────────────────────────────────────────
+    def test_csrrsi(self):
+
+        mcode_asm = {
+            0x0100e3f3:  "csrrsi x7, 0x010, 0x01",
+            0x0111e473:  "csrrsi x8, 0x011, 0x03",
+            0x0123e4f3:  "csrrsi x9, 0x012, 0x07",
+            0x0137e573:  "csrrsi x10, 0x013, 0x0F",
+            0x014fe5f3:  "csrrsi x11, 0x014, 0x1F",
+        }
+        print("CSRRSI: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
 
 if __name__ == "__main__":
     unittest.main()
