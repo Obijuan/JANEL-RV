@@ -687,6 +687,10 @@ class TestDisassemble(unittest.TestCase):
         mcode_asm = {
             0x00000073:   "ecall",
             0x00100073:   "ebreak",
+            0x00200073:   "uret",
+            0x10200073:   "sret",
+            0x30200073:   "mret",
+            0x10500073:   "wfi",
         }
         print("ECALL: ", end='')
         self.check_instructions(mcode_asm)

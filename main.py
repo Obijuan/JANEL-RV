@@ -514,6 +514,10 @@ def test_ecall():
     insts = [
         0x00000073,   # ecall
         0x00100073,   # ebreak
+        0x00200073,   # uret
+        0x10200073,   # sret
+        0x30200073,   # mret
+        0x10500073,   # wfi
     ]
     print_inst(insts, 'ECALL')
 
@@ -631,7 +635,7 @@ print(ansi.CLS)
 # test_tipo_B()
 # test_tipo_U()
 # test_tipo_J()
-# test_ecall()
+test_ecall()
 
 # test1()
 
@@ -645,9 +649,9 @@ print(ansi.CLS)
 # i.print_isa()
 # i.print_isa(color=False)
 
-i = InstrRV(0x00000033)
-i.debug()
-i.print_isa()
-i.print_isa(color=False)
+# i = InstrRV(0x00000033)
+# i.debug()
+# i.print_isa()
+# i.print_isa(color=False)
 
-test2()
+# test2()

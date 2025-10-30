@@ -94,16 +94,85 @@ TIPO JALR: Salto incondicional a registro + offset (Ex. jalr)
           12                 5       3        5           7
 
 
-TIPO ECALL
+TIPO SYSTEM: ecall, ebreak...
 
  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 │1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
-├─┴─┴─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
-│    0        │  0      |    0    | 0   |     0     |   opcode    |
-├─────────────┼─────────┼─────────┼─────┼───────────┼─────────────┤
-|<───────────>|<───────>|<───────>|<───>|<─────────>|<───────────>|
-       7           5         5       3        5           7
+├─┴─┴─┴─┴─┼─┴─┼─┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
+│func5    │f2 │  rs2    |   rs1   |func3|    rd     |   opcode    |
+├─────────┼───┼─────────┼─────────┼─────┼───────────┼─────────────┤
+|<───────>|<─>|<───────>|<───────>|<───>|<─────────>|<───────────>|
+     5      2     5         5       3        5           7
 
+Ecall:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00000   │00 │  00000  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+Ebreak:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00000   │00 │  00001  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+uret:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00000   │00 │  00010  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+sret:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00010   │00 │  00010  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+mret:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00110   │00 │  00010  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+wfi:
+┌─────────┬───┬─────────┬─────────┬─────┬───────────┬─────────────┐
+│ 00010   │00 │  00101  |  00000  | 000 |   00000   |   1110011   |
+└─────────┴───┴─────────┴─────────┴─────┴───────────┴─────────────┘
+
+TIPO CSR: csrrw, csrrs, csrrc...
+
+ 3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+│1 0 9 8 7 6 5│4 3 2 1 0│9 8 7 6 5│4 3 2│1 0 9 8 7  │6 5 4 3 2 1 0│
+├─┴─┴─┴─┴─┴─────┴─┴─┴─┴─┼─┴─┴─┴─┴─┼─┴─┴─┼─┴─┴─┴─┴───┼─┴─┴─┴─┴─┴─┴─┤
+│        imm12          |   rs1   |func3|    rd     |   opcode    |
+├───────────────────────┼─────────┼─────┼───────────┼─────────────┤
+|<─────────────────────>|<───────>|<───>|<─────────>|<───────────>|
+           12                 5       3        5           7
+
+csrrw:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  rs1    | 001 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
+
+csrrs:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  rs1    | 010 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
+
+csrrc:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  rs1    | 011 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
+
+csrrwi:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  uimm   | 101 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
+
+csrrsi:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  uimm   | 110 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
+
+csrrci:
+┌───────────────────────┬─────────┬─────┬───────────┬─────────────┐
+│      csr              |  uimm   | 111 |   rd      |   1110011   |
+└───────────────────────┴─────────┴─────┴───────────┴─────────────┘
 """
 
 """
@@ -158,6 +227,11 @@ class InstrRV:
     FUNC3_SIZE = 0b111
     FUNC3_MASK = FUNC3_SIZE << FUNC3_POS
 
+    # ── FUNC5
+    FUNC5_POS = 27
+    FUNC5_SIZE = 0b11111
+    FUNC5_MASK = FUNC5_SIZE << FUNC5_POS
+
     # ── FUNC7
     FUNC7_POS = 25
     FUNC7_SIZE = 0b111_1111
@@ -198,7 +272,7 @@ class InstrRV:
     TYPE_U_AUIPC = 'U_AUIPC'  # Instrucciones tipo U AUIPC
     TYPE_J_JAL = 'J_JAL'      # Instrucciones tipo J JAL
     TYPE_J_JALR = 'J_JALR'    # Instrucciones tipo J JALR
-    TYPE_ECALL_EBREAK = 'ECALL'  # Instrucciones ECALL y EBREAK
+    TYPE_ECALL = 'ECALL'      # Instrucciones ECALL, EBREAK, URET...
     TYPE_UNKNOWN = 'UNKNOWN'  # Tipo desconocido
     TYPE = {
         0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
@@ -212,7 +286,7 @@ class InstrRV:
         0b_00101_11: TYPE_U_AUIPC,     # AUIPC
         0b_11011_11: TYPE_J_JAL,       # JAL
         0b_11001_11: TYPE_J_JALR,      # JALR
-        0b_11100_11: TYPE_ECALL_EBREAK,  # ECALL, EBREAK
+        0b_11100_11: TYPE_ECALL,      # ECALL, EBREAK
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
@@ -281,10 +355,19 @@ class InstrRV:
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
-    # ──────── de tipo System a partir de imm12
+    # ──────── de tipo System a partir del campo rs2
     type_ecall = {
-        0x000: 'ecall',
-        0x001: 'ebreak',
+        0x00: 'ecall',
+        0x01: 'ebreak',
+        0x02: '*ret',
+        0x05: 'wfi',
+    }
+
+    # ── Instrucciones de retorno de ECALL
+    type_ecall_ret = {
+        0x00: 'uret',
+        0x02: 'sret',
+        0x06: 'mret',
     }
 
     # ─────────────────────────────────────────────
@@ -471,13 +554,20 @@ class InstrRV:
                 # ── Obtener el valor inmediato como una palabra del sistema
                 self.offset = self.ext_sign12(self.imm12)
 
-            case InstrRV.TYPE_ECALL_EBREAK:
+            case InstrRV.TYPE_ECALL:
 
-                # ── Obtener el campo imm12
-                self.imm12 = self.get_imm12()
+                # ── Obtener el campo rs2
+                # -- No es ningun registro. Este campo codifica el
+                # -- tipo de instruccion (ecall, ebreak, wfi...)
+                self.rs2 = self.get_rs2()
+
+                # ── Obtener el campo func5
+                # -- Este campo determina que tipo de instruccion
+                # -- de retorno es: uret, sret, mret
+                func5 = self.get_func5()
 
                 # ── Obtener el nemonico
-                self.nemonic = self.type_ecall[self.imm12]
+                self.nemonic = self.get_type_ecall(func5)
 
             case _:
                 print("-----> TODO <-------------")
@@ -546,6 +636,19 @@ class InstrRV:
         return nemonic
 
     # ────────────────────────────────────────────────────────────
+    #   Obtener el nemonico de las instrucciones de tipo ECALL
+    # ────────────────────────────────────────────────────────────
+    def get_type_ecall(self, func5: int) -> str:
+
+        # -- Es una instruccion de retorno: uret, sret, mret
+        if self.rs2 == 0x02:
+            nemonic = self.type_ecall_ret[func5]
+        else:
+            # -- Es otra intruccion diferente de *ret
+            nemonic = self.type_ecall[self.rs2]
+        return nemonic
+
+    # ────────────────────────────────────────────────────────────
     #   Extension de signo del imm12
     # ────────────────────────────────────────────────────────────
     def ext_sign12(self, imm12) -> int:
@@ -610,6 +713,15 @@ class InstrRV:
         # ── Obtener el campo func3 y devolverlo
         func3 = (self.mcode & InstrRV.FUNC3_MASK) >> InstrRV.FUNC3_POS
         return func3
+
+    # ─────────────────────
+    #  Func5
+    # ─────────────────────
+    def get_func5(self) -> int:
+
+        # ── Obtener el campo func5 y devolverlo
+        func5 = (self.mcode & InstrRV.FUNC5_MASK) >> InstrRV.FUNC5_POS
+        return func5
 
     # ─────────────────────
     #  Func7
@@ -793,7 +905,7 @@ class InstrRV:
                 asm_bw = f"{self.nemonic} x{self.rd}, "\
                          f"{self.offset}(x{self.rs1})"
 
-            case InstrRV.TYPE_ECALL_EBREAK:
+            case InstrRV.TYPE_ECALL:
                 asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET}"
                 asm_bw = f"{self.nemonic}"
 
