@@ -541,6 +541,18 @@ def test_csrrw():
     print_inst(insts, 'CSRRW')
 
 
+def test_csrrs():
+    insts = [
+        0x001d2cf3,  # csrrs x25, 0x001, x26
+        0x010e2df3,  # csrrs x27, 0x010, x28
+        0x100faf73,  # csrrs x30, 0x100, x31
+        0x2000a073,  # csrrs x0, 0x200, x1
+        0x4001a173,  # csrrs x2, 0x400, x3
+        0x8002a273,  # csrrs x4, 0x800, x5
+    ]
+    print_inst(insts, 'CSRRS')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -656,6 +668,7 @@ print(ansi.CLS)
 # test_tipo_J()
 test_ecall()
 test_csrrw()
+test_csrrs()
 
 # test1()
 
