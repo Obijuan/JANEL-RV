@@ -956,15 +956,28 @@ class InstrRV:
 
                 # -- Resto de instrucciones del sistema
                 else:
+
+                    # -- El tercer operando puede ser bien un registro o
+                    # -- bien un valor inmediato, segun el valor del bit 2
+                    # -- de func3
+                    is_imm = True if (self.func3 & 0b100) > 0 else False
+
+                    # -- Obtener el operando como cadena, segun si es inmediato
+                    # -- o bien un registro
+                    if is_imm:
+                        op3 = f"0x{self.rs1:02X}"
+                    else:
+                        op3 = f"x{self.rs1}"
+
                     asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET} "\
                           f"{ansi.CYAN}x{self.rd}"\
                           f"{ansi.RESET}, "\
                           f"{ansi.GREEN}0x{self.imm12:03X}"\
                           f"{ansi.RESET}, "\
-                          f"{ansi.CYAN}x{self.rs1}"\
+                          f"{op3}"\
                           f"{ansi.RESET}"
                     asm_bw = f"{self.nemonic} x{self.rd}, "\
-                             f"0x{self.imm12:03X}, x{self.rs1}"
+                             f"0x{self.imm12:03X}, {op3}"
 
             case _:
                 return "UNKNOWN"

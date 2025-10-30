@@ -721,7 +721,7 @@ class TestDisassemble(unittest.TestCase):
         print()
 
     # ───────────────────────────────────────────────────────
-    #  Probar instruccion CSRRW
+    #  Probar instruccion CSRRS
     # ───────────────────────────────────────────────────────
     def test_csrrs(self):
 
@@ -738,7 +738,7 @@ class TestDisassemble(unittest.TestCase):
         print()
 
     # ───────────────────────────────────────────────────────
-    #  Probar instruccion CSRRW
+    #  Probar instruccion CSRRC
     # ───────────────────────────────────────────────────────
     def test_csrrc(self):
 
@@ -751,6 +751,24 @@ class TestDisassemble(unittest.TestCase):
             0xc038b873:  "csrrc x16, 0xC03, x17",
         }
         print("CSRRC: ", end='')
+        self.check_instructions(mcode_asm)
+        print()
+
+    # ───────────────────────────────────────────────────────
+    #  Probar instruccion CSRRWI
+    # ───────────────────────────────────────────────────────
+    def test_csrrwi(self):
+
+        mcode_asm = {
+            0x00005073:  "csrrwi x0, 0x000, 0x00",
+            0x0010d0f3:  "csrrwi x1, 0x001, 0x01",
+            0x00215173:  "csrrwi x2, 0x002, 0x02",
+            0x003251f3:  "csrrwi x3, 0x003, 0x04",
+            0x00445273:  "csrrwi x4, 0x004, 0x08",
+            0x005852f3:  "csrrwi x5, 0x005, 0x10",
+            0x006fd373:  "csrrwi x6, 0x006, 0x1F",
+        }
+        print("CSRRWI: ", end='')
         self.check_instructions(mcode_asm)
         print()
 

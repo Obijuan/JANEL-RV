@@ -565,6 +565,19 @@ def test_csrrc():
     print_inst(insts, 'CSRRC')
 
 
+def test_csrrwi():
+    insts = [
+        0x00005073,  # csrrwi x0, 0x000, 0x00
+        0x0010d0f3,  # csrrwi x1, 0x001, 0x01
+        0x00215173,  # csrrwi x2, 0x002, 0x02
+        0x003251f3,  # csrrwi x3, 0x003, 0x04
+        0x00445273,  # csrrwi x4, 0x004, 0x08
+        0x005852f3,  # csrrwi x5, 0x005, 0x10
+        0x006fd373,  # csrrwi x6, 0x006, 0x1F
+    ]
+    print_inst(insts, 'CSRRWI')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -682,6 +695,7 @@ test_ecall()
 test_csrrw()
 test_csrrs()
 test_csrrc()
+test_csrrwi()
 
 # test1()
 
