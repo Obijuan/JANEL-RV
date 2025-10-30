@@ -522,6 +522,25 @@ def test_ecall():
     print_inst(insts, 'ECALL')
 
 
+def test_csrrw():
+    insts = [
+        0x00001073,  # csrrw x0, 0x000, x0
+        0x001110f3,  # csrrw x1, 0x001, x2
+        0x002211f3,  # csrrw x3, 0x002, x4
+        0x004312f3,  # csrrw x5, 0x004, x6
+        0x008413f3,  # csrrw x7, 0x008, x8
+        0x010514f3,  # csrrw x9, 0x010, x10
+        0x040615f3,  # csrrw x11, 0x040, x12
+        0x080716f3,  # csrrw x13, 0x080, x14
+        0x100817f3,  # csrrw x15, 0x100, x16
+        0x400918f3,  # csrrw x17, 0x400, x18
+        0x800a19f3,  # csrrw x19, 0x800, x20
+        0xc00b1af3,  # csrrw x21, 0xC00, x22
+        0xfffc1bf3,  # csrrw x23, 0xFFF, x24
+    ]
+    print_inst(insts, 'CSRRW')
+
+
 # ────────────────────────────────────────────
 #   PROBAR TODAS LAS INSTRUCCIONES DE TIPO I
 # ────────────────────────────────────────────
@@ -636,6 +655,7 @@ print(ansi.CLS)
 # test_tipo_U()
 # test_tipo_J()
 test_ecall()
+test_csrrw()
 
 # test1()
 

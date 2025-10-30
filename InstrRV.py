@@ -222,6 +222,11 @@ class InstrRV:
     OPCODE_SIZE = 0b111_1111
     OPCODE_MASK = OPCODE_SIZE << OPCODE_POS
 
+    # ── FUNC2
+    FUNC2_POS = 25
+    FUNC2_SIZE = 0b11
+    FUNC2_MASK = FUNC2_SIZE << FUNC2_POS
+
     # ── FUNC3
     FUNC3_POS = 12
     FUNC3_SIZE = 0b111
@@ -272,7 +277,7 @@ class InstrRV:
     TYPE_U_AUIPC = 'U_AUIPC'  # Instrucciones tipo U AUIPC
     TYPE_J_JAL = 'J_JAL'      # Instrucciones tipo J JAL
     TYPE_J_JALR = 'J_JALR'    # Instrucciones tipo J JALR
-    TYPE_ECALL = 'ECALL'      # Instrucciones ECALL, EBREAK, URET...
+    TYPE_SYSTEM = 'SYSTEM'      # Instrucciones ECALL, EBREAK, URET...
     TYPE_UNKNOWN = 'UNKNOWN'  # Tipo desconocido
     TYPE = {
         0b_00100_11: TYPE_I_ARITH,  # ADDI, ANDI, XORI, ORI,
@@ -286,7 +291,7 @@ class InstrRV:
         0b_00101_11: TYPE_U_AUIPC,     # AUIPC
         0b_11011_11: TYPE_J_JAL,       # JAL
         0b_11001_11: TYPE_J_JALR,      # JALR
-        0b_11100_11: TYPE_ECALL,      # ECALL, EBREAK
+        0b_11100_11: TYPE_SYSTEM,      # ECALL, EBREAK
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
@@ -352,6 +357,18 @@ class InstrRV:
     # ──────── de tipo J a partir de func3
     type_j_nemonic = {
         0b000: 'jalr',
+    }
+
+    # ── Instrucciones del sistema (privilegiadas)
+    # ── Las familias se diferencias por func3
+    type_system = {
+        0x00: '*ecall',  # -- Familia ecall: ecall, ebreak, uret...
+        0x01: 'csrrw',
+        0x02: 'csrrs',
+        0x03: 'csrrc',
+        0x05: 'csrrwi',
+        0x06: 'csrrsi',
+        0x07: 'csrrci'
     }
 
     # ──────── DICCIONARIO PARA OBTENER el nemonico de las instrucciones
@@ -554,20 +571,36 @@ class InstrRV:
                 # ── Obtener el valor inmediato como una palabra del sistema
                 self.offset = self.ext_sign12(self.imm12)
 
-            case InstrRV.TYPE_ECALL:
+            case InstrRV.TYPE_SYSTEM:
 
-                # ── Obtener el campo rs2
-                # -- No es ningun registro. Este campo codifica el
-                # -- tipo de instruccion (ecall, ebreak, wfi...)
+                # ── Obtener el campo func3
+                # ── Determina el tipo de instruccion del sistema
+                # ── func3 == 000 es la familia de ecall: ebreak,uret,sret...
+                self.func3 = self.get_func3()
+
+                # ── Obtener el registro destino
+                self.rd = self.get_rd()
+
+                # ── Obtener el registro fuente 1
+                self.rs1 = self.get_rs1()
+
+                # ── Obtener el registro fuente 2
                 self.rs2 = self.get_rs2()
 
                 # ── Obtener el campo func5
-                # -- Este campo determina que tipo de instruccion
-                # -- de retorno es: uret, sret, mret
-                func5 = self.get_func5()
+                self.func5 = self.get_func5()
 
-                # ── Obtener el nemonico
-                self.nemonic = self.get_type_ecall(func5)
+                # ── Obtener el campo func2
+                self.func2 = self.get_func2()
+
+                # ── Obtener el campo imm12
+                self.imm12 = self.get_imm12()
+
+                if self.func3 == 0:
+                    # ── Obtener el nemonico
+                    self.nemonic = self.get_type_ecall(self.func5)
+                else:
+                    self.nemonic = self.type_system[self.func3]
 
             case _:
                 print("-----> TODO <-------------")
@@ -704,6 +737,15 @@ class InstrRV:
         # ── Obtener el codigo de operacion y devolverlo
         opcode = (self.mcode & InstrRV.OPCODE_MASK) >> InstrRV.OPCODE_POS
         return opcode
+
+    # ─────────────────────
+    #  Func2
+    # ─────────────────────
+    def get_func2(self) -> int:
+
+        # ── Obtener el campo func2 y devolverlo
+        func2 = (self.mcode & InstrRV.FUNC2_MASK) >> InstrRV.FUNC2_POS
+        return func2
 
     # ─────────────────────
     #  Func3
@@ -905,9 +947,24 @@ class InstrRV:
                 asm_bw = f"{self.nemonic} x{self.rd}, "\
                          f"{self.offset}(x{self.rs1})"
 
-            case InstrRV.TYPE_ECALL:
-                asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET}"
-                asm_bw = f"{self.nemonic}"
+            case InstrRV.TYPE_SYSTEM:
+
+                # -- Instrucciones de la familia ecall
+                if self.func3 == 0:
+                    asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET}"
+                    asm_bw = f"{self.nemonic}"
+
+                # -- Resto de instrucciones del sistema
+                else:
+                    asm = f"{ansi.YELLOW}{self.nemonic}{ansi.RESET} "\
+                          f"{ansi.CYAN}x{self.rd}"\
+                          f"{ansi.RESET}, "\
+                          f"{ansi.GREEN}0x{self.imm12:03X}"\
+                          f"{ansi.RESET}, "\
+                          f"{ansi.CYAN}x{self.rs1}"\
+                          f"{ansi.RESET}"
+                    asm_bw = f"{self.nemonic} x{self.rd}, "\
+                             f"0x{self.imm12:03X}, x{self.rs1}"
 
             case _:
                 return "UNKNOWN"
