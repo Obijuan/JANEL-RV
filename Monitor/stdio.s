@@ -3,44 +3,135 @@
 	#-- Longitud maxima de las cadenas
 	.eqv MAX 255
 
+	#-- Numero maximo de unarios a imprimir
+	.eqv MAX_UNARY 5
+
 	#-- Servicios del sistema operativo del RARs
 	.include "rars_so.s"
-	.eqv EXIT 10
 
 		.data
 dst:	.space MAX
-msg1:	.string "Holi!"
-msg2:   .string "Manoli!"
-msg3:   .string "--->ok!\n"
+msg1:	.string "Unario: "
 
 #-- Implementado como programa principal de momento
-	.text
-	
-	#-- Prueba de impresion
-	la a0, dst
+	.text   
+
+	#-- Prueba de SPRINT
+	jal sprint_test1
+
+
+	#-- Prueba de SPRINT_UNARY
+	li s0, 0
+
+next:
+	la a0, dst  #-- Puntero a cadena destino
 	la a1, msg1
 	jal sprint
+
+	#-- Imprimir un numero en unario
+	mv a1, s0  #-- Numero a imprimir
+	li a2, '1'  #-- Marca a usar
+	jal sprint_unary
 	
+	#-- Imprimir cadena resultante
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+	li t0, MAX_UNARY
+    beq s0, t0, fin
+
+	#-- Incrementar numero unario
+	addi s0, s0, 1
+	j next
+
+fin:	
+
+	#-- Terminar
+	EXIT
+	
+
+
+#--------------------------------------
+#-- Prueba para SPRINTS
+#-- Imprimiendo cadenas
+#--------------------------------------
+	.data
+test1_msg1:	.string "Holi!"
+test1_msg2:   .string "Manoli!"
+test1_msg3:   .string "--->ok!\n"
+
+	.text	
+sprint_test1:
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+
+	#-- Copiar msg1 en dst
+	la a0, dst
+	la a1, test1_msg1
+	jal sprint
+
 	#-- Cadena 2
-	la a1, msg2
+	la a1, test1_msg2
 	jal sprint
 	
 	#-- Cadena 3
-	la a1, msg3
+	la a1, test1_msg3
 	jal sprint
-	
+
 	#-- Imprimir la cadena creada
-	la a0, dst
-	li a7, PRINT_STRING
-	ecall
-	
-	
+	PRINT_STRINGL(dst)
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16
+
 	#-- Terminar
-	li a7, EXIT
-	ecall
-	
-	
-	
+	ret
+
+#--------------------------------------------------
+# SPRINT_UNARY(dst, n, mark)
+#-- Imprimir un numero en unario
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (n): Numero a imprimir en unario
+#--   - a2 (mark): Marca a usar
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de marcas impresas
+#--------------------------------------------------
+sprint_unary:
+	#-- Contador de marcas
+	li t0, 0
+
+sprint_unary_bucle:
+
+	#-- Si t0==0, terminar. No hay marcas que imprimir
+	beq a1, zero, sprint_unary_end
+
+	#-- Imprimir marca
+	sb a2, 0(a0)
+
+	#-- Decrementar contador
+	addi a1, a1, -1
+
+	#-- Incrementar puntero de cadena
+	addi a0, a0, 1
+
+	#-- Repetir
+	j sprint_unary_bucle
+
+sprint_unary_end:
+	sb zero, 0(a0)  #-- Cadena terminada
+
+	#-- a1: Contador de caracteres
+	mv a1, t0 
+	ret
+
+
 #--------------------------------------------------
 #-- SPRINT(dst, src)
 #-- Imprimir una cadena en una cadena destino
