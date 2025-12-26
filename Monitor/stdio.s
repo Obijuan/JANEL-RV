@@ -12,7 +12,9 @@
 		.data
 dst:	.space MAX
 
-#-- Implementado como programa principal de momento
+#-----------
+#-- MAIN
+#----------- 
 	.text   
 
 	#-- Prueba de SPRINT
@@ -22,10 +24,9 @@ dst:	.space MAX
 	jal sprint_test2
 
 	#-- Terminar
+	PRINT_CHARI('\n')
 	EXIT
 	
-
-
 
 
 #--------------------------------------
