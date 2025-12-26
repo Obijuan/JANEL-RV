@@ -11,7 +11,6 @@
 
 		.data
 dst:	.space MAX
-msg1:	.string "Unario: "
 
 #-- Implementado como programa principal de momento
 	.text   
@@ -19,13 +18,39 @@ msg1:	.string "Unario: "
 	#-- Prueba de SPRINT
 	jal sprint_test1
 
-
 	#-- Prueba de SPRINT_UNARY
+	jal sprint_test2
+
+	#-- Terminar
+	EXIT
+	
+
+
+
+
+#--------------------------------------
+#-- Pruebas para SPRINT_UNARY
+#-- Imprimiendo numeros en unario
+#--------------------------------------
+	.data
+test2_msg1: .string "Unario: "
+
+	.text
+sprint_test2:
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 8(sp)
+
+	PRINT_STRINGI("\n* TEST 2:\n")
+
+	#-- Inicializar contador de unarios
 	li s0, 0
 
-next:
+sprint_test2_next:
+	#-- Imprimir cadena
 	la a0, dst  #-- Puntero a cadena destino
-	la a1, msg1
+	la a1, test2_msg1
 	jal sprint
 
 	#-- Imprimir un numero en unario
@@ -42,14 +67,20 @@ next:
 
 	#-- Incrementar numero unario
 	addi s0, s0, 1
-	j next
+	j sprint_test2_next
 
 fin:	
 
-	#-- Terminar
-	EXIT
-	
 
+
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16
+
+	#-- Terminar
+	ret
 
 #--------------------------------------
 #-- Prueba para SPRINTS
@@ -67,6 +98,7 @@ sprint_test1:
 	addi sp, sp, -16
 	sw ra, 12(sp)
 
+	PRINT_STRINGI("* TEST 1:\n")
 
 	#-- Copiar msg1 en dst
 	la a0, dst
