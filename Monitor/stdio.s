@@ -23,18 +23,23 @@ dst:	.space MAX
 	#-- Prueba de SPRINT_UNARY
 	jal sprint_test2
 
-	#-- Prueba de SPRINT_BIN1
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 1 bit
 	jal sprint_test3
 
-	#-- Prueba de SPRINT_BIN2
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 2 bits
 	jal sprint_test4
 
-	#-- Prueba de SPRINT_BIN3
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 3 bits
 	jal sprint_test5
 
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 4 bits
+	jal sprint_test6
 
 	#-- TODO: 
-	#-- sprint_bin4
 	#-- sprint_bin8
 	#-- sprint_bin16
 	#-- sprint_bin32
@@ -44,81 +49,145 @@ dst:	.space MAX
 	EXIT
 
 
-sprint_test5:
+
+
+sprint_test6:
  #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN3
- #-- Imprimiendo numeros binarios de 3 bits
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 4 bits
  #------------------------------------------
-	.data
- test5_msg1: .string "Bin3: "	
-
-	.eqv MAX_BIN3 8
-
 	.text
+
 	#-- Crear pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
-	sw s0, 8(sp)
 
-	PRINT_STRINGI("\n* TEST 5:\n")
-	li s0, 0  #-- Numero a imprimir
+	PRINT_STRINGI("\n* TEST 6:\n")
 
- sprint_test5_next:	
-	#-- Imprimir mensaje
-	la a0, dst
-	la a1, test5_msg1
-	jal sprint
-
-	#-- Imprimir el numero binario
-	mv a1, s0
-	jal sprint_bin3
-
-	#-- Imprimir la cadena resultante
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
-	#-- Siguiente numero
-	addi s0, s0, 1
-
-	#-- Hemos alcanzado el maximo?
-	li t1, MAX_BIN3
-    blt s0, t1, sprint_test5_next
+	#-- Imprimir 16 numeros de 4 bits
+	li a0, 16
+	li a1, 4
+	jal test_bin1
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
+
+sprint_test5:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 3 bits
+ #------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 5:\n")
+
+	#-- Imprimir 8 numeros de 3 bits
+	li a0, 8
+	li a1, 3
+	jal test_bin1
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
 
 
 sprint_test4:
  #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN2
- #-- Imprimiendo numeros binarios de 2 bits
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 2 bits
  #------------------------------------------
-	.data
- test4_msg1: .string "Bin2: "	
-
-	.eqv MAX_BIN2 4
-
 	.text
+
 	#-- Crear pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
-	sw s0, 8(sp)
-	PRINT_STRINGI("\n* TEST 4:\n")
-	li s0, 0  #-- Numero a imprimir
 
-  sprint_test4_next:	
+	PRINT_STRINGI("\n* TEST 4:\n")
+
+	#-- Imprimir 4 numeros de 2 bits
+	li a0, 4
+	li a1, 2
+	jal test_bin1
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
+
+
+sprint_test3:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 1 bit
+ #------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 3:\n")
+
+	#-- Imprimir 2 numeros de 1 bit
+	li a0, 2
+	li a1, 1
+	jal test_bin1
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
+
+
+test_bin1:
+ #-----------------------------------------------------
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros en binario desde 0 
+ #--   hasta el valor maximo indicado (max)
+ #--
+ #-- ENTRADAS:
+ #--   - a0: Valor maximo a imprimir
+ #--   - a1: Tamaño en bits de los numeros a imprimir
+ #-----------------------------------------------------
+	.data
+ test_bin1_msg: .string "Bin: "	
+
+	.text
+
+ 	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 8(sp)
+	sw a1, 4(sp)
+	sw a2, 0(sp)
+	
+	#-- Contador de numeros
+	li s0, 0
+
+	#-- Valor maximo del numero a mostrar
+	mv s1, a0
+
+	#-- Tamaño en bits
+	mv s2, a1
+
+ test_bin1_next:	
 	#-- Imprimir mensaje
 	la a0, dst
-	la a1, test4_msg1
+	la a1, test_bin1_msg
 	jal sprint
 
 	#-- Imprimir el numero binario
 	mv a1, s0
-	jal sprint_bin2
+	mv a2, s2
+	jal sprint_bin
 
 	#-- Imprimir la cadena resultante
 	PRINT_STRINGL(dst)
@@ -128,60 +197,16 @@ sprint_test4:
 	addi s0, s0, 1
 
 	#-- Hemos alcanzado el maximo?
-	li t1, MAX_BIN2
-    blt s0, t1, sprint_test4_next
+    blt s0, s1, test_bin1_next
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
 	lw s0, 8(sp)
+	lw s1, 4(sp)
+	lw s2, 0(sp)
 	addi sp, sp, 16	
 	ret
 
-sprint_test3:
- #--------------------------------------
- #-- Pruebas para SPRINT_BIN1
- #-- Imprimiendo numeros binarios de 1 bit
- #--------------------------------------
-	.data
- test3_msg1: .string "Bit: "
-
-	.eqv MAX_BIN1 2
-
-	.text
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-	sw s0, 8(sp)
-
-	PRINT_STRINGI("\n* TEST 3:\n")
-    
-	li s0, 0  #-- Numero a imprimir
-
-  sprint_test3_next:
-
-	#-- Imprimir mensaje
-	la a0, dst
-	la a1, test3_msg1
-	jal sprint
-
-	mv a1, s0
-	jal sprint_bin1
-
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
-	#-- Siguiente numero
-	addi s0, s0, 1
-
-	#-- Hemos alcanzado el maximo?
-	li t1, MAX_BIN1
-    blt s0, t1, sprint_test3_next
-
-	#-- Restaurar pila
-	lw ra, 12(sp)
-	lw s0, 8(sp)
-	addi sp, sp, 16	
-	ret
 
 sprint_test2:
  #--------------------------------------
@@ -278,14 +303,18 @@ sprint_test1:
 	#-- Terminar
 	ret
 
-sprint_bin3:
+
+
+
+sprint_bin:
  #--------------------------------------------------
- #-- SPRINT_BIN3(dst, n)
- #-- Imprimir un numero binario de 3 bits
+ #-- SPRINT_BIN(dst, n, tam)
+ #-- Imprimir un numero binario de n bits
  #--
  #--  ENTRADAS:
  #--   - a0 (dst): Puntero a cadena destino
  #--   - a1 (n): Numero a imprimir
+ #--   - a2 (tam): Tamaño del numero a imprimir
  #--  SALIDA:
  #--   - a0: Puntero al final de la cadena destino
  #--   - a1: (Opcional) Nº de bits impresos
@@ -295,73 +324,45 @@ sprint_bin3:
 	addi sp, sp, -16
 	sw ra, 12(sp)
 	sw s0, 8(sp)
+	sw s1, 4(sp)
+	sw s2, 0(sp)
 
-	#-- Quedarse solo con los 3 bits de menor peso
+	#-- Quedarse solo con los n bits de menor peso
 	#-- Del numero
-	andi a1, a1, 0x07
+	#-- Calcular mascara: (1<<tam)-1
+	li t0, 1
+	sll t0, t0, a2
+	addi t0, t0, -1
+
+	#-- Aplicar la máscara!
+	and a1, a1, t0
+
+	#-- Rotaciones a la derecha a realizar (tam-1)
+	addi s1, a2, -1
 
 	#-- Guardar agumentos
 	mv s0, a1  #-- Numero a imprimir
 
-	#-- Imprimir bit 2
-	srli a1, s0, 2
+ sprint_bin_next:
+
+	#-- Imprimir bit que toca
+	#-- Empezando por el mas significativo
+	srl a1, s0, s1
 	jal sprint_bin1
 
-	#-- Imprimir bit 1
-	srli a1, s0, 1
-	jal sprint_bin1
+    #-- Una rotacion menos por hacer
+	addi s1, s1, -1
 
-	#-- Imprimir bit 0
-	mv a1, s0
-	jal sprint_bin1
+	#-- Hemos impreso los n bits?
+	bge s1, zero, sprint_bin_next
 
-	li a1, 3  #-- Tres bits impresos
+	addi a1, s1, 1  #-- n bits impresos
 
 	#-- Liberar la pila
 	lw ra, 12(sp)
 	lw s0, 8(sp)
-	addi sp, sp, 16
-	ret
-
-
-sprint_bin2:
- #--------------------------------------------------
- #-- SPRINT_BIN2(dst, n)
- #-- Imprimir un numero binario de 2 bits
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bits impresos
- #--------------------------------------------------
-
-	#-- Crear la pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-	sw s0, 8(sp)
-
-	#-- Quedarse solo con los 2 bits de menor peso
-	#-- Del numero
-	andi a1, a1, 0x03
-
-	#-- Guardar agumentos
-	mv s0, a1  #-- Numero a imprimir
-
-	#-- Imprimir bit 1
-	srli a1, s0, 1
-	jal sprint_bin1
-
-	#-- Imprimir bit 0
-	mv a1, s0
-	jal sprint_bin1
-
-	li a1, 2  #-- Dos bits impresos
-
-	#-- Liberar la pila
-	lw ra, 12(sp)
-	lw s0, 8(sp)
+	lw s1, 4(sp)
+	lw s2, 0(sp)
 	addi sp, sp, 16
 	ret
 
