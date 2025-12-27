@@ -26,9 +26,11 @@ dst:	.space MAX
 	#-- Prueba de SPRINT_BIN1
 	jal sprint_test3
 
+	#-- Prueba de SPRINT_BIN2
+	jal sprint_test4
+
 
 	#-- TODO: 
-	#-- sprint_bin2
 	#-- sprint_bin3
 	#-- sprint_bin4
 	#-- sprint_bin8
@@ -39,17 +41,62 @@ dst:	.space MAX
 	PRINT_CHARI('\n')
 	EXIT
 	
-#--------------------------------------
-#-- Pruebas para SPRINT_BIN1
-#-- Imprimiendo numeros binarios de 1 bit
-#--------------------------------------
+sprint_test4:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN2
+ #-- Imprimiendo numeros binarios de 2 bits
+ #------------------------------------------
 	.data
-test3_msg1: .string "Bit: "
+ test4_msg1: .string "Binario: "	
+
+	.eqv MAX_BIN2 4
+
+	.text
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 8(sp)
+	PRINT_STRINGI("\n* TEST 4:\n")
+	li s0, 0  #-- Numero a imprimir
+
+  sprint_test4_next:	
+	#-- Imprimir mensaje
+	la a0, dst
+	la a1, test4_msg1
+	jal sprint
+
+	#-- Imprimir el numero binario
+	mv a1, s0
+	jal sprint_bin2
+
+	#-- Imprimir la cadena resultante
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+	#-- Siguiente numero
+	addi s0, s0, 1
+
+	#-- Hemos alcanzado el maximo?
+	li t1, MAX_BIN2
+    blt s0, t1, sprint_test4_next
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+sprint_test3:
+ #--------------------------------------
+ #-- Pruebas para SPRINT_BIN1
+ #-- Imprimiendo numeros binarios de 1 bit
+ #--------------------------------------
+	.data
+ test3_msg1: .string "Bit: "
 
 	.eqv MAX_BIN1 2
 
 	.text
-sprint_test3:
 	#-- Crear pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
@@ -85,18 +132,18 @@ sprint_test3:
 	addi sp, sp, 16	
 	ret
 
-#--------------------------------------
-#-- Pruebas para SPRINT_UNARY
-#-- Imprimiendo numeros en unario
-#--------------------------------------
+sprint_test2:
+ #--------------------------------------
+ #-- Pruebas para SPRINT_UNARY
+ #-- Imprimiendo numeros en unario
+ #--------------------------------------
 	.data
-test2_msg1: .string "Unario: "
+ test2_msg1: .string "Unario: "
 
 	#-- Numero maximo de unarios a imprimir
 	.eqv MAX_UNARY 5
 
 	.text
-sprint_test2:
 	#-- Crear pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
@@ -107,7 +154,7 @@ sprint_test2:
 	#-- Inicializar contador de unarios
 	li s0, 0
 
-sprint_test2_next:
+ sprint_test2_next:
 	#-- Imprimir cadena
 	la a0, dst  #-- Puntero a cadena destino
 	la a1, test2_msg1
@@ -129,7 +176,7 @@ sprint_test2_next:
 	addi s0, s0, 1
 	j sprint_test2_next
 
-sprint_test2_fin:	
+ sprint_test2_fin:	
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
@@ -139,17 +186,17 @@ sprint_test2_fin:
 	#-- Terminar
 	ret
 
-#--------------------------------------
-#-- Prueba para SPRINTS
-#-- Imprimiendo cadenas
-#--------------------------------------
+sprint_test1:
+ #--------------------------------------
+ #-- Prueba para SPRINTS
+ #-- Imprimiendo cadenas
+ #--------------------------------------
 	.data
-test1_msg1:	.string "Holi!"
-test1_msg2:   .string "Manoli!"
-test1_msg3:   .string "--->ok!\n"
+ test1_msg1:	.string "Holi!"
+ test1_msg2:   .string "Manoli!"
+ test1_msg3:   .string "--->ok!\n"
 
 	.text	
-sprint_test1:
 
 	#-- Crear pila
 	addi sp, sp, -16
@@ -180,18 +227,60 @@ sprint_test1:
 	#-- Terminar
 	ret
 
-#--------------------------------------------------
-#-- SPRINT_BIN1(dst, n)
-#-- Imprimir un numero binario de 1 bit
-#--
-#--  ENTRADAS:
-#--   - a0 (dst): Puntero a cadena destino
-#--   - a1 (n): Numero a imprimir
-#--  SALIDA:
-#--   - a0: Puntero al final de la cadena destino
-#--   - a1: (Opcional) Nº de bits impresos
-#--------------------------------------------------
+sprint_bin2:
+ #--------------------------------------------------
+ #-- SPRINT_BIN2(dst, n)
+ #-- Imprimir un numero binario de 2 bits
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
+	#-- Crear la pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 8(sp)
+
+	#-- Quedarse solo con los 2 bits de menor peso
+	#-- Del numero
+	andi a1, a1, 0x03
+
+	#-- Guardar agumentos
+	mv s0, a1  #-- Numero a imprimir
+
+	#-- Imprimir bit 1
+	srli a1, s0, 1
+	jal sprint_bin1
+
+	#-- Imprimir bit 0
+	mv a1, s0
+	jal sprint_bin1
+
+	li a1, 2  #-- Dos bits impresos
+
+	#-- Liberar la pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16
+	ret
+
 sprint_bin1:
+ #--------------------------------------------------
+ #-- SPRINT_BIN1(dst, n)
+ #-- Imprimir un numero binario de 1 bit
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
 	#-- Quedarse con el bit 0
 	andi a1, a1, BIT0
 
@@ -210,19 +299,20 @@ sprint_bin1:
 	li a1, 1  #-- Un bit impreso
 	ret
 
-#--------------------------------------------------
-# SPRINT_UNARY(dst, n, mark)
-#-- Imprimir un numero en unario
-#--
-#--  ENTRADAS:
-#--   - a0 (dst): Puntero a cadena destino
-#--   - a1 (n): Numero a imprimir en unario
-#--   - a2 (mark): Marca a usar
-#--  SALIDA:
-#--   - a0: Puntero al final de la cadena destino
-#--   - a1: (Opcional) Nº de marcas impresas
-#--------------------------------------------------
 sprint_unary:
+ #--------------------------------------------------
+ # SPRINT_UNARY(dst, n, mark)
+ #-- Imprimir un numero en unario
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir en unario
+ #--   - a2 (mark): Marca a usar
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de marcas impresas
+ #--------------------------------------------------
+
 	#-- Contador de marcas
 	li t0, 0
 
@@ -250,20 +340,20 @@ sprint_unary:
 	mv a1, t0 
 	ret
 
-
-#--------------------------------------------------
-#-- SPRINT(dst, src)
-#-- Imprimir una cadena en una cadena destino
-#--
-#--
-#--  ENTRADAS:
-#--   - a0 (dst): Puntero a cadena destino
-#--   - a1 (src): Puntero a cadena fuente
-#--  SALIDA:
-#--   - a0: Puntero al final de la cadena destino
-#--   - a1: (Opcional) Nº de bytes copiados
-#--------------------------------------------------
 sprint:
+ #--------------------------------------------------
+ #-- SPRINT(dst, src)
+ #-- Imprimir una cadena en una cadena destino
+ #--
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (src): Puntero a cadena fuente
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bytes copiados
+ #--------------------------------------------------
+
 	#-- Contador de caracteres
 	li t0, 0
 	
