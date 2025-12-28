@@ -14,6 +14,8 @@ dst:	.space MAX
 msg1:	.string "Bin: "
 data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 data16: .word 0x0003, 0x000C, 0x0030, 0x00C0, 0x0300, 0x0C00, 0x3000, 0xC000
+data32: .word 0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000, 
+			  0x000F0000, 0x00F00000, 0x0F000000, 0xF0000000
 
 #-----------
 #-- MAIN
@@ -50,13 +52,37 @@ data16: .word 0x0003, 0x000C, 0x0030, 0x00C0, 0x0300, 0x0C00, 0x3000, 0xC000
 	#-- Numeros binarios de 16 bits
 	jal sprint_test8
 
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 32 bits
+	jal sprint_test9
 
-	#-- TODO: 
-	#-- sprint_bin32
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+sprint_test9:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 32 bits
+ #------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 9:\n")
+
+	#-- Imprimir 8 numeros de 32 bits
+	la a0, data32
+	li a1, 32
+	jal test_print_block_binary
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
 
 sprint_test8:
  #------------------------------------------ 
@@ -119,9 +145,9 @@ test_print_block_binary:
 	addi sp, sp, -32
 	sw ra, 28(sp)
 	sw s0, 0(sp)
-	sw s1, 8(sp)
-	sw s2, 12(sp)
-	sw s3, 16(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
 
 	#-- Guardar los parametros
 	mv s0, a0  #-- Puntero al bloque de datos
@@ -163,7 +189,7 @@ test_print_block_binary:
 	lw s0, 0(sp)
 	lw s1, 4(sp)
 	lw s2, 8(sp)
-	lw s3, 16(sp)
+	lw s3, 12(sp)
 	addi sp, sp, 32	
 	ret
 
@@ -446,11 +472,22 @@ sprint_bin:
 
 	#-- Quedarse solo con los n bits de menor peso
 	#-- Del numero
-	#-- Calcular mascara: (1<<tam)-1
+	#-- Calcular mascara: (1<<tam)-1  Cuando tam<32
+	#--   si tam=32, la mascara es 0xFFFFFFFF
+	li t0, 32
+	blt a2, t0, mask1
+
+	#-- Tamaño: 32 bits
+	li t0, -1  #-- mascara 0xFFFFFFFF
+	j cont
+
+ mask1:
+	#-- Tamaño < 32 bits
 	li t0, 1
 	sll t0, t0, a2
 	addi t0, t0, -1
 
+ cont:
 	#-- Aplicar la máscara!
 	and a1, a1, t0
 
