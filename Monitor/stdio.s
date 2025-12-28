@@ -11,6 +11,9 @@
 
 		.data
 dst:	.space MAX
+msg1:	.string "Bin: "
+data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
+		.word 0xAA, 0x55, 0xFF, 0xF0, 0xE1, 0xD2, 0xC3, 0xB4
 
 #-----------
 #-- MAIN
@@ -39,6 +42,11 @@ dst:	.space MAX
 	#-- Numeros binarios de 4 bits
 	jal sprint_test6
 
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 8 bits
+	jal sprint_test7
+
+
 	#-- TODO: 
 	#-- sprint_bin8
 	#-- sprint_bin16
@@ -49,6 +57,90 @@ dst:	.space MAX
 	EXIT
 
 
+sprint_test7:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 8 bits
+ #------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 7:\n")
+
+	#-- Imprimir 8 numeros de 8 bits
+	la a0, data8
+	li a1, 8
+	jal test_print_block_binary
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
+test_print_block_binary:
+ #------------------------------------------- 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir un bloque de 8 numeros BINARIOS
+ #-- 
+ #-- ENTRADAS:
+ #--   - a0: Puntero al bloque de datos
+ #--   - a1: Tamaño del numero binario (en bits)
+ #-------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+	sw s0, 0(sp)
+	sw s1, 8(sp)
+	sw s2, 12(sp)
+	sw s3, 16(sp)
+
+	#-- Guardar los parametros
+	mv s0, a0  #-- Puntero al bloque de datos
+	mv s1, a1  #-- Tamaño del numero binario (en bits)
+	li s2, 8  #-- Contador de numeros a imprimir
+
+ test_print_block_binary_next:
+	beq s2, zero, fin
+
+	#-- Leer dato
+	lw s3, 0(s0)
+
+	#-- Incrementar puntero
+	addi s0, s0, 4
+
+	#-- Decrementar contador
+	addi s2, s2, -1
+
+	#----- Imprimir numero
+	#-- 1: Cadena "Bin: "
+	la a0, dst
+	la a1, msg1
+	jal sprint
+
+	#-- 2: Numero binario
+	mv a1, s3  #-- Numero a imprimir
+	mv a2, s1  #-- Tamaño en bits
+	jal sprint_bin
+
+	#-- 3: Sacar por la consola
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+	j test_print_block_binary_next
+
+ fin:
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 16(sp)
+	addi sp, sp, 16	
+	ret
 
 
 sprint_test6:
