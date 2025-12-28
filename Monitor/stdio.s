@@ -12,8 +12,8 @@
 		.data
 dst:	.space MAX
 msg1:	.string "Bin: "
-data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
-		.word 0xAA, 0x55, 0xFF, 0xF0, 0xE1, 0xD2, 0xC3, 0xB4
+data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+data16: .word 0x0003, 0x000C, 0x0030, 0x00C0, 0x0300, 0x0C00, 0x3000, 0xC000
 
 #-----------
 #-- MAIN
@@ -46,15 +46,40 @@ data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
 	#-- Numeros binarios de 8 bits
 	jal sprint_test7
 
+	#-- Prueba de SPRINT_BIN
+	#-- Numeros binarios de 16 bits
+	jal sprint_test8
+
 
 	#-- TODO: 
-	#-- sprint_bin8
-	#-- sprint_bin16
 	#-- sprint_bin32
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+sprint_test8:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_BIN
+ #-- Imprimir numeros BINARIOS de 16 bits
+ #------------------------------------------
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 8:\n")
+
+	#-- Imprimir 8 numeros de 16 bits
+	la a0, data16
+	li a1, 16
+	jal test_print_block_binary
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	addi sp, sp, 16	
+	ret
 
 
 sprint_test7:
@@ -134,12 +159,12 @@ test_print_block_binary:
 
  fin:
 	#-- Restaurar pila
-	lw ra, 12(sp)
+	lw ra, 28(sp)
 	lw s0, 0(sp)
 	lw s1, 4(sp)
 	lw s2, 8(sp)
 	lw s3, 16(sp)
-	addi sp, sp, 16	
+	addi sp, sp, 32	
 	ret
 
 
