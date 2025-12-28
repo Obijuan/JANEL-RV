@@ -56,10 +56,55 @@ data32: .word 0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000,
 	#-- Numeros binarios de 32 bits
 	jal sprint_test9
 
+	#-- Prueba de SPRINT_OCT3
+	jal sprint_test10
+	
+	
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+sprint_test10:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_OCT3
+ #-- Imprimir numeros OCTALES de 3 bits
+ #------------------------------------------
+	.data
+sprint_test10_msg1:  .string "Oct: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 8(sp)
+
+	PRINT_STRINGI("\n* TEST 10:\n")
+
+	li s0, 0  #-- Contador de numeros octales
+
+sprint_test10_next:
+	la a0, dst  #-- Puntero a cadena destino
+	la a1, sprint_test10_msg1  #-- Cadena "Oct: "
+	jal sprint
+
+	mv a1, s0  #-- Numero a imprimir 
+	jal sprint_oct3
+
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+
+	addi s0, s0, 1  #-- Siguiente numero
+	li t0, 8
+	blt s0, t0, sprint_test10_next
+
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
 
 sprint_test9:
  #------------------------------------------ 
@@ -447,6 +492,37 @@ sprint_test1:
 	ret
 
 
+
+sprint_oct3:
+ #--------------------------------------------------
+ #-- SPRINT_OCT3(dst, n)
+ #-- Imprimir un numero octal de 3 bits
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
+	#-- Quedarse con los 3 bits menos significativos
+	andi a1, a1, 0x07
+
+	#-- Convertir a caracter '0'...'7'
+	addi a1, a1, '0'
+
+	#-- Almacenar caracter en cadena destino
+	sb a1, 0(a0)
+
+	#-- Incrementar puntero de cadena destino
+	addi a0, a0, 1
+
+	#-- Cadena terminada
+	sb zero, 0(a0)
+
+	li a1, 3  #-- 3 bits impresos
+	ret
 
 
 sprint_bin:
