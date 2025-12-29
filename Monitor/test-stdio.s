@@ -17,6 +17,12 @@ data_oct6: .word 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x0F
 data_oct9: .word 0x0, 0x7, 0x38, 0x1c0, 0x53, 0xd1, 0xdb, 0x1ff
 data_oct12: .word 0x7, 0x38, 0x1c0, 0xe00, 0xe07, 0xe38, 0xfc0, 0xfc7
 
+data_hex4: .word 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7
+data_hex4_2: .word 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+data_hex8: .word 0x00, 0x0A, 0xA0, 0xAA, 0xBE, 0xBA, 0xCA, 0xFE
+data_hex16: .word 0x0123, 0x4567, 0x89AB, 0xCDEF, 0xBEBE, 0xCAFE, 0xBACA, 0xCACA
+data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE, 
+            .word 0xCAFECACA, 0xFFFFAAAA, 0xAAAA5555, 0xF0F0EFEF
 
 #-----------
 #-- MAIN
@@ -73,9 +79,204 @@ data_oct12: .word 0x7, 0x38, 0x1c0, 0xe00, 0xe07, 0xe38, 0xfc0, 0xfc7
 	#-- Numeros octales de 4 digitos
 	jal sprint_test13
 
+    #-- Prueba de SPRINT_HEX
+	#-- Numeros hexadecimales de 1 digito
+	jal sprint_test14
+
+    #-- Prueba de SPRINT_HEX
+	#-- Numeros hexadecimales de 2 digito
+	jal sprint_test15
+
+    #-- Prueba de SPRINT_HEX
+	#-- Numeros hexadecimales de 4 digito
+	jal sprint_test16
+
+    #-- Prueba de SPRINT_HEX
+	#-- Numeros hexadecimales de 8 digito
+	jal sprint_test17
+
+
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+
+sprint_test17:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_HEX
+ #-- Imprimir numeros HEXADECIMALES de 8 digitos
+ #------------------------------------------
+	.data
+ sprint_test17_msg1:  .string "Hex: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 17:\n")
+
+	la a0, data_hex32
+	li a1, 8
+	jal test_print_block_hex
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+
+sprint_test16:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_HEX
+ #-- Imprimir numeros HEXADECIMALES de 4 digitos
+ #------------------------------------------
+	.data
+ sprint_test16_msg1:  .string "Hex: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 16:\n")
+
+	la a0, data_hex16
+	li a1, 4
+	jal test_print_block_hex
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+sprint_test15:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_HEX
+ #-- Imprimir numeros HEXADECIMALES de 2 digitos
+ #------------------------------------------
+	.data
+ sprint_test15_msg1:  .string "Hex: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 15:\n")
+
+	la a0, data_hex8
+	li a1, 2
+	jal test_print_block_hex
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+
+sprint_test14:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_HEX
+ #-- Imprimir numeros HEXADECIMALES de 1 digito
+ #------------------------------------------
+	.data
+ sprint_test14_msg1:  .string "Hex: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 14:\n")
+
+	la a0, data_hex4
+	li a1, 1
+	jal test_print_block_hex
+
+    la a0, data_hex4_2
+	li a1, 1
+	jal test_print_block_hex
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+test_print_block_hex:
+ #------------------------------------------- 
+ #-- Pruebas para SPRINT_HEX
+ #-- Imprimir un bloque de 8 numeros HEXADECIMALES
+ #-- 
+ #-- ENTRADAS:
+ #--   - a0: Puntero al bloque de datos
+ #--   - a1: Tamaño del numero hexadecimal (en digitos)
+ #-------------------------------------------
+	.data
+ base_hex: .string "Hex: "
+
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+
+	#-- Guardar los parametros
+	mv s0, a0  #-- Puntero al bloque de datos
+	mv s1, a1  #-- Tamaño del numero hexa (en digitos)
+	li s2, 8  #-- Contador de numeros a imprimir
+
+ test_print_block_hex_next:
+	beq s2, zero, test_print_block_hex_fin
+
+	#-- Leer dato
+	lw s3, 0(s0)
+
+	#-- Incrementar puntero
+	addi s0, s0, 4
+
+	#-- Decrementar contador
+	addi s2, s2, -1
+
+	#----- Imprimir numero
+	#-- 1: Cadena "Oct: "
+	la a0, dst
+	la a1, base_hex
+	jal sprint
+
+	#-- 2: Numero octal
+	mv a1, s3  #-- Numero a imprimir
+	mv a2, s1  #-- Tamaño en digitos
+	jal sprint_hex
+
+	#-- 3: Sacar por la consola
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+	j test_print_block_hex_next
+
+ test_print_block_hex_fin:
+	#-- Restaurar pila
+	lw ra, 28(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)
+	addi sp, sp, 32	
+	ret
+
 
 sprint_test13:
  #------------------------------------------ 

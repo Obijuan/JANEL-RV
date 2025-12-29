@@ -5,6 +5,128 @@
 #-- Mascaras para BITs
 	.eqv BIT0 0x01 
 
+
+
+.global sprint_hex
+sprint_hex:
+ #--------------------------------------------------
+ #-- SPRINT_HEX(dst, n, tam)
+ #-- Imprimir un numero hexadecimal de n digitos
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--   - a2 (tam): Tamaño del numero a imprimir (en digitos)
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
+	#-- Crear la pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+
+
+	#-- Guardar argumentos
+	mv s0, a0  #-- Puntero a cadena destino
+	mv s1, a1  #-- Numero a imprimir
+	mv s2, a2  #-- Tamaño en digitos
+
+	#------- Calcular el numero de bits a desplazar hacia la derecha
+	#------ (tam - 1) * 3
+	#-- s3 = tam - 1
+	addi s3, s2, -1
+
+	#-- s3 = (tam - 1) * 4
+	slli s3, s3, 2  #-- * 2
+
+
+	#-- Imprimir digito a digito
+ sprint_hex_next:
+
+
+	#-- Extraer el digito que toca
+	srl a1, s1, s3
+
+	#-- Imprimir el digito octal!
+	jal sprint_hex4
+
+
+	#-- Un digito menos por imprimir
+	addi s2, s2, -1
+
+	#-- 4 bits menos por desplazar
+	addi s3, s3, -4
+
+	#-- Hemos impreso los n bits?
+	bgt s2, zero, sprint_hex_next
+
+	#-- n bits impresos
+	#-- TODO
+
+	#-- Liberar la pila
+	lw ra, 28(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)
+	addi sp, sp, 32
+	ret
+
+
+
+
+
+
+.global sprint_hex4
+sprint_hex4:
+ #--------------------------------------------------
+ #-- SPRINT_HEX4(dst, n)
+ #-- Imprimir un numero hexadecimal de 4 bits
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
+	#-- Quedarse con los 4 bits menos significativos
+	andi a1, a1, 0x0F
+
+	#-- Convertir a caracter '0'...'9' - 'A'...'F'
+	#-- Si n < 10, sumar '0'. Es un digito '0' - '9'
+	#-- sino, sumar ('A'-10) = 0x37
+	li t0, 10
+	blt a1, t0, digit_0_9
+
+	#-- Digito 'A'...'F'
+	addi a1, a1, 0x37
+	j sprint_hex4_next
+
+ digit_0_9:
+	addi a1, a1, '0' 
+
+ sprint_hex4_next:
+
+	#-- Almacenar caracter en cadena destino
+	sb a1, 0(a0)
+
+	#-- Incrementar puntero de cadena destino
+	addi a0, a0, 1
+
+	#-- Cadena terminada
+	sb zero, 0(a0)
+
+	li a1, 4  #-- 4 bits impresos
+	ret
+
+
 .global sprint_oct
 sprint_oct:
  #--------------------------------------------------
