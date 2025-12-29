@@ -17,6 +17,8 @@ data32: .word 0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000,
 			  0x000F0000, 0x00F00000, 0x0F000000, 0xF0000000
 data_oct3: .word 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7
 data_oct6: .word 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x0F
+data_oct9: .word 0x0, 0x7, 0x38, 0x1c0, 0x53, 0xd1, 0xdb, 0x1ff
+data_oct12: .word 0x7, 0x38, 0x1c0, 0xe00, 0xe07, 0xe38, 0xfc0, 0xfc7
 
 
 #-----------
@@ -66,9 +68,69 @@ data_oct6: .word 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x0F
 	#-- Numeros octales de 2 digitos
 	jal sprint_test11
 
+	#-- Prueba de SPRINT_OCT
+	#-- Numeros octales de 3 digitos
+	jal sprint_test12
+
+	#-- Prueba de SPRINT_OCT
+	#-- Numeros octales de 4 digitos
+	jal sprint_test13
+
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+sprint_test13:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_OCT
+ #-- Imprimir numeros OCTALES de 4 digitos
+ #------------------------------------------
+	.data
+ sprint_test13_msg1:  .string "Oct: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 13:\n")
+
+	la a0, data_oct12
+	li a1, 4
+	jal test_print_block_octal
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+sprint_test12:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_OCT
+ #-- Imprimir numeros OCTALES de 3 digitos
+ #------------------------------------------
+	.data
+ sprint_test12_msg1:  .string "Oct: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 12:\n")
+
+	la a0, data_oct9
+	li a1, 3
+	jal test_print_block_octal
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
 
 sprint_test11:
  #------------------------------------------ 
