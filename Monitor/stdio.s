@@ -11,11 +11,13 @@
 
 		.data
 dst:	.space MAX
-msg1:	.string "Bin: "
 data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 data16: .word 0x0003, 0x000C, 0x0030, 0x00C0, 0x0300, 0x0C00, 0x3000, 0xC000
 data32: .word 0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000, 
 			  0x000F0000, 0x00F00000, 0x0F000000, 0xF0000000
+data_oct3: .word 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7
+data_oct6: .word 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x0F
+
 
 #-----------
 #-- MAIN
@@ -56,55 +58,135 @@ data32: .word 0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000,
 	#-- Numeros binarios de 32 bits
 	jal sprint_test9
 
-	#-- Prueba de SPRINT_OCT3
+	#-- Prueba de SPRINT_OCT
+	#-- Numeros octales de 1 digito
 	jal sprint_test10
-	
-	
+
+	#-- Prueba de SPRINT_OCT
+	#-- Numeros octales de 2 digitos
+	jal sprint_test11
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
 
-sprint_test10:
+sprint_test11:
  #------------------------------------------ 
- #-- Pruebas para SPRINT_OCT3
- #-- Imprimir numeros OCTALES de 3 bits
+ #-- Pruebas para SPRINT_OCT
+ #-- Imprimir numeros OCTALES de 2 digito
  #------------------------------------------
 	.data
-sprint_test10_msg1:  .string "Oct: "
+ sprint_test11_msg1:  .string "Oct: "
 	.text
 
 	#-- Crear pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
-	sw s0, 8(sp)
 
-	PRINT_STRINGI("\n* TEST 10:\n")
+	PRINT_STRINGI("\n* TEST 11:\n")
 
-	li s0, 0  #-- Contador de numeros octales
-
-sprint_test10_next:
-	la a0, dst  #-- Puntero a cadena destino
-	la a1, sprint_test10_msg1  #-- Cadena "Oct: "
-	jal sprint
-
-	mv a1, s0  #-- Numero a imprimir 
-	jal sprint_oct3
-
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
-
-	addi s0, s0, 1  #-- Siguiente numero
-	li t0, 8
-	blt s0, t0, sprint_test10_next
-
+	la a0, data_oct6
+	li a1, 2
+	jal test_print_block_octal
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
 	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
+
+sprint_test10:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_OCT
+ #-- Imprimir numeros OCTALES de 1 digito
+ #------------------------------------------
+	.data
+ sprint_test10_msg1:  .string "Oct: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+
+	PRINT_STRINGI("\n* TEST 10:\n")
+
+	la a0, data_oct3
+	li a1, 1
+	jal test_print_block_octal
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+	lw s0, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+test_print_block_octal:
+ #------------------------------------------- 
+ #-- Pruebas para SPRINT_OCT
+ #-- Imprimir un bloque de 8 numeros OCTALES
+ #-- 
+ #-- ENTRADAS:
+ #--   - a0: Puntero al bloque de datos
+ #--   - a1: Tamaño del numero octal (en digitos)
+ #-------------------------------------------
+	.data
+ base_oct: .string "Oct: "
+
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+
+	#-- Guardar los parametros
+	mv s0, a0  #-- Puntero al bloque de datos
+	mv s1, a1  #-- Tamaño del numero octal (en digitos)
+	li s2, 8  #-- Contador de numeros a imprimir
+
+ test_print_block_octal_next:
+	beq s2, zero, fin
+
+	#-- Leer dato
+	lw s3, 0(s0)
+
+	#-- Incrementar puntero
+	addi s0, s0, 4
+
+	#-- Decrementar contador
+	addi s2, s2, -1
+
+	#----- Imprimir numero
+	#-- 1: Cadena "Oct: "
+	la a0, dst
+	la a1, base_oct
+	jal sprint
+
+	#-- 2: Numero octal
+	mv a1, s3  #-- Numero a imprimir
+	mv a2, s1  #-- Tamaño en digitos
+	jal sprint_oct
+
+	#-- 3: Sacar por la consola
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
+	j test_print_block_octal_next
+
+ fin:
+	#-- Restaurar pila
+	lw ra, 28(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)
+	addi sp, sp, 32	
+	ret
+
 
 sprint_test9:
  #------------------------------------------ 
@@ -184,6 +266,9 @@ test_print_block_binary:
  #--   - a0: Puntero al bloque de datos
  #--   - a1: Tamaño del numero binario (en bits)
  #-------------------------------------------
+	.data
+ base_bin: .string "Bin: "
+
 	.text
 
 	#-- Crear pila
@@ -200,7 +285,7 @@ test_print_block_binary:
 	li s2, 8  #-- Contador de numeros a imprimir
 
  test_print_block_binary_next:
-	beq s2, zero, fin
+	beq s2, zero, test_print_block_binary_fin
 
 	#-- Leer dato
 	lw s3, 0(s0)
@@ -214,7 +299,7 @@ test_print_block_binary:
 	#----- Imprimir numero
 	#-- 1: Cadena "Bin: "
 	la a0, dst
-	la a1, msg1
+	la a1, base_bin
 	jal sprint
 
 	#-- 2: Numero binario
@@ -228,7 +313,7 @@ test_print_block_binary:
 
 	j test_print_block_binary_next
 
- fin:
+ test_print_block_binary_fin:
 	#-- Restaurar pila
 	lw ra, 28(sp)
 	lw s0, 0(sp)
@@ -491,6 +576,76 @@ sprint_test1:
 	#-- Terminar
 	ret
 
+
+sprint_oct:
+ #--------------------------------------------------
+ #-- SPRINT_OCT(dst, n, tam)
+ #-- Imprimir un numero octar de n digitos
+ #--
+ #--  ENTRADAS:
+ #--   - a0 (dst): Puntero a cadena destino
+ #--   - a1 (n): Numero a imprimir
+ #--   - a2 (tam): Tamaño del numero a imprimir (en digitos)
+ #--  SALIDA:
+ #--   - a0: Puntero al final de la cadena destino
+ #--   - a1: (Opcional) Nº de bits impresos
+ #--------------------------------------------------
+
+	#-- Crear la pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+
+
+	#-- Guardar argumentos
+	mv s0, a0  #-- Puntero a cadena destino
+	mv s1, a1  #-- Numero a imprimir
+	mv s2, a2  #-- Tamaño en digitos
+
+	#------- Calcular el numero de bits a desplazar hacia la derecha
+	#------ (tam - 1) * 3
+	#-- s3 = tam - 1
+	addi s3, s2, -1
+
+	#-- s3 = (tam - 1) * 3
+	slli t0, s3, 1  #-- * 2
+	add s3, t0, s3  #-- * 3
+
+
+	#-- Imprimir digito a digito
+ sprint_oct_next:
+
+
+	#-- Extraer el digito que toca
+	srl a1, s1, s3
+
+	#-- Imprimir el digito octal!
+	jal sprint_oct3
+
+
+	#-- Un digito menos por imprimir
+	addi s2, s2, -1
+
+	#-- 3 bits menos por desplazar
+	addi s3, s3, -3
+
+	#-- Hemos impreso los n bits?
+	bgt s2, zero, sprint_oct_next
+
+	#-- n bits impresos
+	#-- TODO
+
+	#-- Liberar la pila
+	lw ra, 28(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)
+	addi sp, sp, 32
+	ret
 
 
 sprint_oct3:
