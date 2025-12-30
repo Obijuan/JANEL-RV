@@ -212,103 +212,66 @@ sprint_uint4:
 	#-- Crear la pila
 	addi sp, sp, -16
 	sw ra, 12(sp)
-	sw s1, 8(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+
+	#-- Guardar los parámetros
+	mv s0, a0  #-- Cadena destino
+	#-- s1: Registro bcd
 
 	#-- Estado inicial: Poner dig1 y dig0 a 0
-	andi a1, a1, 0xF
+	andi s1, a1, 0xF
 
 	#-- Primera fase: Desplazar a1 3 bits hacia la izquierda
-	slli a1, a1, 3
+	slli s1, s1, 3
 	#  +-------------------------------+
 	#  |  Dig1    |  Dig0    |    n    |
 	#  | 0 0 0 0  | 0 a b c  | d 0 0 0 |
 	#  +-------------------------------+
 
-	#-- Obtener dig1
-	li t2, DIG1_MASK
-	and t1, a1, t2
-	srli t1, t1, DIG1_POS
+	#-- Actualizar campo Dig1
+	mv a0, s1  #-- Registro bcd
+	li a1, 1   #-- Numero de digito bcd
+	li a2, 4   #-- Tamaño de 4 bits
+	jal uint_update_bcd
 
-	#-- Si t1 > 4, t1 = t1 + 3
-	#-- Implementamos la contraria (si t1<=4, no hacer nada)
-	li t4, 4
-	ble t1, t4, sprint_uint4_next1
-
-	#-- Sumar 3
-	addi t1, t1, 3  
-
- sprint_uint4_next1:
-
-	#-- Colocar dig1 en su posicion
-	slli t1, t1, DIG1_POS
-
-	#------ Añadir el nuevo campo en a1
-	#-- Poner a 0 todos los bits de ese campo en a1
-	li t0, DIG1_MASK
-	xori t0, t0, -1
-	and a1, a1, t0  #-- Campo DIG1 a 0
-
-	#-- Añadir CAMPO DIG1
-	or a1, a1, t1
-
-	#-- Obtener dig0
-	andi t0, a1, DIG0_MASK
-	srli t0, t0, DIG0_POS
-
-	#-- Si t0 > 4, t0 = t0 + 3
-	#-- Implementamos la contraria (si t0<=4, no hacer nada)
-	li t4, 4
-	ble t0, t4, sprint_uint4_next2
-
-	#-- Sumar 3
-	addi t0, t0, 3  
-
- sprint_uint4_next2:
-
-	#-- Colocar dig0 en su posicion
-	slli t0, t0, DIG0_POS
-
-	#------ Añadir el nuevo campo en a1
-	#-- Poner a 0 todos los bits de ese campo en a1
-	li t1, DIG0_MASK
-	xori t1, t1, -1
-	and a1, a1, t1  #-- Campo DIG0 a 0
-
-	#-- Añadir CAMPO DIG0
-	or a1, a1, t0
+	#-- Actualizar campo Dig0
+	li a1, 0   #-- Numero de digito bcd
+	li a2, 4   #-- Tamaño de 4 bits
+	jal uint_update_bcd
 
 	#-- Desplazamiento a la izquierda 1 bit: Fin!
 	#-- Ya tenemos en dig1 y dig0 el numero en BCD
-	slli a1, a1, 1
+	slli a0, a0, 1
+
+	#-- Guardar registro bcd
+	mv s1, a0
 
 	#-- Obtener dig1
 	li t2, DIG1_MASK
-	and t1, a1, t2
+	and t1, s1, t2
 	srli t1, t1, DIG1_POS  #-- t1 = dig1
 
-	#-- Guardar dig1 para no perderlo
-	mv s1, a1
-
 	#-- Imprimir dig1!
+	mv a0, s0
 	mv a1, t1
 	jal sprint_hex4
 
 	#-- Obtener dig0
-	mv a1, s1  #-- Recuperar a1
 	li t2, DIG0_MASK
-	and t0, a1, t2
+	and t0, s1, t2
 	srli t0, t0, DIG0_POS  #-- t0 = dig0
 
-	#-- Imprimir dig0!
+	#-- Imprimir  dig0!
 	mv a1, t0
 	jal sprint_hex4
 
 	#-- Liberar la pila
 	lw ra, 12(sp)
-	lw s1, 8(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
 	addi sp, sp, 16
 	ret
-
 
 
 
