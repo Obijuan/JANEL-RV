@@ -5,6 +5,172 @@
 #-- Mascaras para BITs
 	.eqv BIT0 0x01 
 
+.include "rars_so.s"
+
+.global sprint_uint8
+sprint_uint8:
+#----------------------------------------------------------------
+#-- SPRINT_UINT8(dst, n)
+#--
+#-- Imprimir un numero decimal sin signo, de 8 bits (3 digitos)
+#--
+#-- ENTRADA:
+#--   - a0 (dst): Dirección de la cadena destino
+#--   - a1 (n): Numero de 8 bits a imprimir
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------------
+#-- Registro de calculo para hacer los desplazamientos: a1
+#  +----------------------------------------------------------+
+#  |  Dig2    |  Dig1    | Dig 0   |            n             |
+#  | 0 0 0 0  | 0 0 0 0  | 0 0 0 0 | d7 d6 d5 d4 d3 d2 d1 d0  |
+#  +----------------------------------------------------------+
+#
+# La posicion de cada campo es: pos(digi) = i*4 + tam(n)
+
+	#-- Crear la pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+
+	#-- Guardar direccion de la cadena destino
+	mv s0, a0
+
+	#-- Poner a 0 todos los digitos BCD
+	andi a1, a1, 0xFF
+
+	#-- Desplazar 3 bits a la izquierda. A partir de eso comienza
+	#-- el algoritmo
+	slli a1, a1, 3
+
+ #  +----------------------------------------------------------+
+ #  |  Dig2    |  Dig1    | Dig 0      |            n          |
+ #  | 0 0 0 0  | 0 0 0 0  | 0 d7 d6 d5 | d4 d3 d2 d1 d0 0 0 0  |
+ #  +----------------------------------------------------------+
+
+	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
+	#-- Ya hemos hecho 3, quedan 5 (en total son 8)
+	li s1, 5
+
+	mv a0, a1  #-- Registro bcd
+
+next:
+
+    #-- Actualizar campo Dig2
+	
+	li a1, 2   #-- Numero de digito
+	li a2, 8   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig1
+	li a1, 1
+	li a2, 8
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig0
+	li a1, 0
+	li a2, 8
+	jal uint_update_bcd
+	#-- a0: Registro bcd actualizado
+
+	#-- Desplazamiento a la izquierda
+	slli a0, a0, 1
+
+	#-- Queda un desplazamiento menos por hacer
+	addi s1, s1, -1
+
+	bgt s1, zero, next
+
+	#-- s1: Registro bcd
+	mv s1, a0
+
+	#-- Obtener Dig2
+	li t0, 0xF0000
+	and a1, s1, t0
+	srli a1, a1, 16
+
+	#-- Imprimir dig2!
+	mv a0, s0
+	jal sprint_hex4
+
+	#-- Obtener Dig1 e imprimirlo
+	li t0, 0xF000
+	and a1, s1, t0
+	srli a1, a1, 12
+	jal sprint_hex4
+
+	#-- Obtener Dig0 e imprimirlo
+	li t0, 0xF00
+	and a1, s1, t0
+	srli a1, a1, 12
+	jal sprint_hex4
+
+
+	#-- Liberar la pila
+	lw ra, 12(sp)
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	addi sp, sp, 16
+	ret
+
+
+uint_update_bcd:
+#--------------------------------------------------------------------
+#-- uint_update_bcd(reg_bcd, i, n)
+#--
+#--  Actualizar el campo Digi del registro BCD
+#--  Esta actualizacion consiste en sumar 3 si el valor de este
+#--  campo es estrictamente mayor a 4
+#--
+#-- ENTRADAS:
+#--
+#--  a0: Registro bcd
+#--  a1: Numero de digito (0-i)
+#--  a2: Tamaño de n (en bits)
+#--
+#-- SALIDA:
+#--   a0: Valor actualizado del registro BCD
+#----------------------------------------------------------------------
+
+	#-- Obtener la posicion del campo
+	#-- t0: pos(a1, a2) = a1*4 + a2
+	slli a1, a1, 2   #-- a1 = a1*4
+	add t0, a1, a2   #-- t0 = a1*4 + a2: Posicion del campo dig
+
+	#-- t1: Obtener la mascara
+	li t1, 0xF
+	sll t1, t1, t0
+
+	#-- t2: Obtener el campo especificado
+	and t2, a0, t1  #-- Aislar el campo usando la mascara
+	srl t2, t2, t0  #-- Llevarlo a los bits de menor peso
+
+	#-- Si t2 > 4, t2 = t2 + 3
+	li t4, 4
+	ble t2, t4, uint_update_bcd_cont
+
+	#-- Sumar 3
+	addi t2, t2, 3
+
+ uint_update_bcd_cont:
+	
+	#-- Llevar el campo a su posicion original
+	sll t2, t2, t0
+
+	#-- Poner a 0 el campo correspondiente del registro bcd
+	xori t3, t1, -1
+	and a0, a0, t3
+
+	#-- Añadir el nuevo campo al registro bcd!
+	or a0, a0, t2
+
+	#-- a0: Registro bcd actualizado
+	ret
+
+
 
 .global sprint_uint4
 sprint_uint4:
@@ -71,7 +237,7 @@ sprint_uint4:
 	#-- Sumar 3
 	addi t1, t1, 3  
 
-sprint_uint4_next1:
+ sprint_uint4_next1:
 
 	#-- Colocar dig1 en su posicion
 	slli t1, t1, DIG1_POS
@@ -97,7 +263,7 @@ sprint_uint4_next1:
 	#-- Sumar 3
 	addi t0, t0, 3  
 
-sprint_uint4_next2:
+ sprint_uint4_next2:
 
 	#-- Colocar dig0 en su posicion
 	slli t0, t0, DIG0_POS

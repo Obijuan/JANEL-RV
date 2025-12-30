@@ -95,9 +95,18 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
 	#-- Numeros hexadecimales de 8 digito
 	jal sprint_test17
 
-    #-- Prueba de SPRINT_HEX
+    #-- Prueba de SPRINT_UINT4
 	#-- Numeros decimales de 4 bits
 	jal sprint_test18
+
+    #-- Prueba de SPRINT_UINT8
+    #-- Numeros decimales de 8 bits
+    la a0, dst
+    li a1, 0xF0
+    jal sprint_uint8
+
+    PRINT_STRINGL(dst)
+    PRINT_CHARI('\n')
 
     #-- TODO
     #-- sprint_uint8
