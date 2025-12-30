@@ -95,10 +95,63 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
 	#-- Numeros hexadecimales de 8 digito
 	jal sprint_test17
 
+    #-- Prueba de SPRINT_HEX
+	#-- Numeros decimales de 4 bits
+	jal sprint_test18
+
+    #-- TODO
+    #-- sprint_uint8
+    #-- sprint_uint16
+    #-- sprint_uint32
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+
+sprint_test18:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_UINT4
+ #-- Imprimir numeros DECIMALES de 4 bits
+ #------------------------------------------
+ 	.data
+ sprint_test18_msg1:  .string "Dec: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+    sw s0, 0(sp)
+
+	PRINT_STRINGI("\n* TEST 18:\n")
+
+   #-- Contador
+    li s0, 0
+
+ sprint_test18_repeat:
+
+    la a0, dst
+    la a1, sprint_test18_msg1
+    jal sprint
+
+    mv a1, s0
+    jal sprint_uint4
+
+    PRINT_STRINGL(dst)
+    PRINT_CHARI('\n')
+
+    #-- Increment counter
+    addi s0, s0, 1
+
+    li t0, 16
+    blt s0, t0, sprint_test18_repeat
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+    lw s0, 0(sp)
+	addi sp, sp, 16	
+	ret
+
 
 
 sprint_test17:
@@ -122,7 +175,6 @@ sprint_test17:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -149,7 +201,6 @@ sprint_test16:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -175,7 +226,6 @@ sprint_test15:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -206,7 +256,6 @@ sprint_test14:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -299,7 +348,6 @@ sprint_test13:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -325,7 +373,6 @@ sprint_test12:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -351,7 +398,6 @@ sprint_test11:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 
@@ -376,7 +422,6 @@ sprint_test10:
 
 	#-- Restaurar pila
 	lw ra, 12(sp)
-	lw s0, 8(sp)
 	addi sp, sp, 16	
 	ret
 

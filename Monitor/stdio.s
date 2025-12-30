@@ -6,6 +6,145 @@
 	.eqv BIT0 0x01 
 
 
+.global sprint_uint4
+sprint_uint4:
+#----------------------------------------------------------------
+#-- SPRINT_UINT4(dst, n)
+#--
+#-- Imprimir un numero decimal sin signo, de 4 bits (2 digitos)
+#--
+#-- ENTRADA:
+#--   - a0 (dst): Dirección de la cadena destino
+#--   - a1 (n): Numero de 4 bits a imprimir
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------------
+
+	#-- Mascara para obtener el campo Dig1
+	.eqv DIG1_MASK 0xF00 
+
+	#-- Posicion del campo Dig1
+	.eqv DIG1_POS 8
+
+	#-- Mascara para obtener el campo Dig0
+	.eqv DIG0_MASK 0x0F0
+
+	#-- Posicion del campo Dig0
+	.eqv DIG0_POS 4
+
+	#-- Algoritmo Doubble Dabble
+	#-- https://en.wikipedia.org/wiki/Double_dabble
+
+	#-- Registro de calculo: a1
+	#  +-------------------------------+
+	#  |  Dig1    |  Dig0    |    n    |
+	#  | 0 0 0 0  | 0 0 0 0  | a b c d |
+	#  +-------------------------------+
+
+	#-- Crear la pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+	sw s1, 8(sp)
+
+	#-- Estado inicial: Poner dig1 y dig0 a 0
+	andi a1, a1, 0xF
+
+	#-- Primera fase: Desplazar a1 3 bits hacia la izquierda
+	slli a1, a1, 3
+	#  +-------------------------------+
+	#  |  Dig1    |  Dig0    |    n    |
+	#  | 0 0 0 0  | 0 a b c  | d 0 0 0 |
+	#  +-------------------------------+
+
+	#-- Obtener dig1
+	li t2, DIG1_MASK
+	and t1, a1, t2
+	srli t1, t1, DIG1_POS
+
+	#-- Si t1 > 4, t1 = t1 + 3
+	#-- Implementamos la contraria (si t1<=4, no hacer nada)
+	li t4, 4
+	ble t1, t4, sprint_uint4_next1
+
+	#-- Sumar 3
+	addi t1, t1, 3  
+
+sprint_uint4_next1:
+
+	#-- Colocar dig1 en su posicion
+	slli t1, t1, DIG1_POS
+
+	#------ Añadir el nuevo campo en a1
+	#-- Poner a 0 todos los bits de ese campo en a1
+	li t0, DIG1_MASK
+	xori t0, t0, -1
+	and a1, a1, t0  #-- Campo DIG1 a 0
+
+	#-- Añadir CAMPO DIG1
+	or a1, a1, t1
+
+	#-- Obtener dig0
+	andi t0, a1, DIG0_MASK
+	srli t0, t0, DIG0_POS
+
+	#-- Si t0 > 4, t0 = t0 + 3
+	#-- Implementamos la contraria (si t0<=4, no hacer nada)
+	li t4, 4
+	ble t0, t4, sprint_uint4_next2
+
+	#-- Sumar 3
+	addi t0, t0, 3  
+
+sprint_uint4_next2:
+
+	#-- Colocar dig0 en su posicion
+	slli t0, t0, DIG0_POS
+
+	#------ Añadir el nuevo campo en a1
+	#-- Poner a 0 todos los bits de ese campo en a1
+	li t1, DIG0_MASK
+	xori t1, t1, -1
+	and a1, a1, t1  #-- Campo DIG0 a 0
+
+	#-- Añadir CAMPO DIG0
+	or a1, a1, t0
+
+	#-- Desplazamiento a la izquierda 1 bit: Fin!
+	#-- Ya tenemos en dig1 y dig0 el numero en BCD
+	slli a1, a1, 1
+
+	#-- Obtener dig1
+	li t2, DIG1_MASK
+	and t1, a1, t2
+	srli t1, t1, DIG1_POS  #-- t1 = dig1
+
+	#-- Guardar dig1 para no perderlo
+	mv s1, a1
+
+	#-- Imprimir dig1!
+	mv a1, t1
+	jal sprint_hex4
+
+	#-- Obtener dig0
+	mv a1, s1  #-- Recuperar a1
+	li t2, DIG0_MASK
+	and t0, a1, t2
+	srli t0, t0, DIG0_POS  #-- t0 = dig0
+
+	#-- Imprimir dig0!
+	mv a1, t0
+	jal sprint_hex4
+
+	#-- Liberar la pila
+	lw ra, 12(sp)
+	lw s1, 8(sp)
+	addi sp, sp, 16
+	ret
+
+
+
 
 .global sprint_hex
 sprint_hex:
