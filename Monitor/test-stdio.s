@@ -109,7 +109,6 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
     PRINT_CHARI('\n')
 
     #-- TODO
-    #-- sprint_uint8
     #-- sprint_uint16
     #-- sprint_uint32
 
