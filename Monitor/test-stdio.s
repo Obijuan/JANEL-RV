@@ -23,6 +23,7 @@ data_hex8: .word 0x00, 0x0A, 0xA0, 0xAA, 0xBE, 0xBA, 0xCA, 0xFE
 data_hex16: .word 0x0123, 0x4567, 0x89AB, 0xCDEF, 0xBEBE, 0xCAFE, 0xBACA, 0xCACA
 data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE, 
             .word 0xCAFECACA, 0xFFFFAAAA, 0xAAAA5555, 0xF0F0EFEF
+data_dec8: .word 0, 1, 10, 100, 123, 200, 250, 255 
 
 #-----------
 #-- MAIN
@@ -101,12 +102,7 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
 
     #-- Prueba de SPRINT_UINT8
     #-- Numeros decimales de 8 bits
-    la a0, dst
-    li a1, 0xF0
-    jal sprint_uint8
-
-    PRINT_STRINGL(dst)
-    PRINT_CHARI('\n')
+    jal sprint_test19
 
     #-- TODO
     #-- sprint_uint16
@@ -115,6 +111,68 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+
+sprint_test19:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_UINT8
+ #-- Imprimir numeros DECIMALES de 8 bits
+ #------------------------------------------
+ 	.data
+ sprint_test19_msg1:  .string "Dec: "
+	.text
+
+	#-- Crear pila
+	addi sp, sp, -16
+	sw ra, 12(sp)
+    sw s0, 0(sp)
+    sw s1, 4(sp)
+    sw s2, 8(sp)
+
+	PRINT_STRINGI("\n* TEST 19:\n")
+
+    #-- Puntero a datos
+    la s0, data_dec8
+
+    #-- Cantidad de datos a mostrar
+    li s1, 8
+
+    #-- Puntero a cadena destino
+    la s2, dst
+
+ sprint_test19_repeat:
+
+    mv a0, s2
+    la a1, sprint_test19_msg1
+    jal sprint
+
+    #-- Leer dato e imprimirlo
+    lw a1, 0(s0)
+    jal sprint_uint8
+
+    PRINT_STRINGL(dst)
+    PRINT_CHARI('\n')
+
+    #-- Apuntar al siguiente dato
+    addi s0, s0, 4
+
+    #-- Decrementar contador
+    addi s1, s1, -1
+
+    #-- Repetir mientras queden datos
+    bgt s1, zero, sprint_test19_repeat
+
+
+	#-- Restaurar pila
+	lw ra, 12(sp)
+    lw s0, 0(sp)
+    lw s1, 4(sp)
+    lw s2, 8(sp)
+	addi sp, sp, 16	
+	ret
+
+
+
 
 
 sprint_test18:

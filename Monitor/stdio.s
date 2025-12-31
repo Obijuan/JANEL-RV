@@ -105,7 +105,7 @@ next:
 	#-- Obtener Dig0 e imprimirlo
 	li t0, 0xF00
 	and a1, s1, t0
-	srli a1, a1, 12
+	srli a1, a1, 8
 	jal sprint_hex4
 
 
