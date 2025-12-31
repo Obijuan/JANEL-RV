@@ -104,6 +104,13 @@ data_dec8: .word 0, 1, 10, 100, 123, 200, 250, 255
     #-- Numeros decimales de 8 bits
     jal sprint_test19
 
+    la a0, dst
+    li a1, 0xFFFF
+    jal sprint_uint16
+
+    PRINT_STRINGL(dst)
+    PRINT_CHARI('\n')
+
     #-- TODO
     #-- sprint_uint16
     #-- sprint_uint32

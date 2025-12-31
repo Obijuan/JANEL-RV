@@ -7,6 +7,170 @@
 
 .include "rars_so.s"
 
+
+.global sprint_uint16
+sprint_uint16:
+#----------------------------------------------------------------
+#-- SPRINT_UINT16(dst, n)
+#--
+#-- Imprimir un numero decimal sin signo, de 16 bits (5 digitos)
+#--
+#-- ENTRADA:
+#--   - a0 (dst): Dirección de la cadena destino
+#--   - a1 (n): Numero de 16 bits a imprimir
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------------
+#-- Registro de calculo para hacer los desplazamientos:
+#
+#  -Parte alta (s2)
+#    31                                                  3       0
+#  +---------------------------------------------------------------+
+#  |                                                   |   Dig4    |
+#  |                                                   |  0 0 0 0  |
+#  +---------------------------------------------------------------+
+#
+#  -Parte baja (s1):
+#   31     28 27     24 23     20  19    16  15                  0
+#  +---------------------------------------------------------------+
+#  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
+#  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
+#  +---------------------------------------------------------------+
+	#-- Crear la pila
+	addi sp, sp, -32
+	sw ra, 28(sp)
+
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+
+	#-- Guardar direccion de la cadena destino
+	mv s0, a0
+
+	#-- S2: Registro bcd. Parte alta
+	li s2, 0
+
+	#-- S1: Registro bcd. Parte baja
+	li t0, 0x0000FFFF
+	and s1, a1, t0
+	
+	#-- Estado inicial. Desplazar parte baja 3 bits a la izquierda
+	#-- La parte alta se queda como está, a 0
+	slli s1, s1, 3
+
+	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
+	#-- Ya hemos hecho 3, quedan 16-3 = 13
+	li s3, 13
+
+ sprint_uint16_next:
+
+	#-- Actualizar campo Dig4
+	mv a0, s2
+	li a1, 0   #-- Numero de digito
+	li a2, 0   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+	mv s2, a0
+
+	#-- Actualizar campo Dig3
+	mv a0, s1
+	li a1, 3   #-- Numero de digito
+	li a2, 16   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig2
+	li a1, 2   #-- Numero de digito
+	li a2, 16   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig1
+	li a1, 1   #-- Numero de digito
+	li a2, 16   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig0
+	li a1, 0   #-- Numero de digito
+	li a2, 16   #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+	mv s1, a0
+
+	#-- Desplazamiento a la izquierda del registro s2-s1
+	#-- 1. Desplazar S2 a la izquierda
+	slli s2, s2, 1
+
+	#-- 2. Leer bit mas significativo de s1
+	slt t0, s1, zero
+
+	#-- 3. Añadir BMS de s1 a s2
+	add s2, s2, t0
+
+	#-- 4. Desplazar s1 a la izquierda
+	slli s1, s1, 1
+
+	#-- Queda un desplazamiento menos por hacer
+	addi s3, s3, -1
+
+	#-- Repetir el algoritmo si todavía toca
+	bgt s3, zero, sprint_uint16_next
+
+	#-- Obtener Dig4
+	li t0, 0xF
+	and a1, s2, t0
+
+	#-- Imprimir dig4!
+	mv a0, s0
+	jal sprint_hex4
+
+	#-- Obtener Dig3
+	li t0, 0xF0000000
+	and a1, s1, t0
+	srli a1, a1, 28
+
+	#-- Imprimir dig3!
+	jal sprint_hex4
+
+	#-- Obtener Dig2
+	li t0, 0x0F000000
+	and a1, s1, t0
+	srli a1, a1, 24
+
+	#-- Imprimir dig2!
+	jal sprint_hex4
+
+	#-- Obtener Dig1
+	li t0, 0x00F00000
+	and a1, s1, t0
+	srli a1, a1, 20
+
+	#-- Imprimir dig1!
+	jal sprint_hex4
+
+	#-- Obtener Dig0
+	li t0, 0x000F0000
+	and a1, s1, t0
+	srli a1, a1, 16
+
+	#-- Imprimir dig0!
+	jal sprint_hex4
+
+	#-- Debug
+	#mv a0, s0
+	#mv a1, s1
+	#li a2, 8
+	#jal sprint_hex
+
+	
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)
+	lw ra, 28(sp)
+	addi sp, sp, 32
+	ret
+
+
 .global sprint_uint8
 sprint_uint8:
 #----------------------------------------------------------------
@@ -57,7 +221,7 @@ sprint_uint8:
 
 	mv a0, a1  #-- Registro bcd
 
-next:
+sprint_uint8_next:
 
     #-- Actualizar campo Dig2
 	
@@ -82,7 +246,7 @@ next:
 	#-- Queda un desplazamiento menos por hacer
 	addi s1, s1, -1
 
-	bgt s1, zero, next
+	bgt s1, zero, sprint_uint8_next
 
 	#-- s1: Registro bcd
 	mv s1, a0
