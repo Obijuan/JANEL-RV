@@ -84,9 +84,7 @@ sprint_uint16:
 #  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
 #  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
 #  +---------------------------------------------------------------+
-	#-- Crear la pila
-	addi sp, sp, -32
-	sw ra, 28(sp)
+	STACK32
 
 	sw s0, 0(sp)
 	sw s1, 4(sp)
@@ -212,9 +210,8 @@ sprint_uint16:
 	lw s1, 4(sp)
 	lw s2, 8(sp)
 	lw s3, 12(sp)
-	lw ra, 28(sp)
-	addi sp, sp, 32
-	ret
+	
+	UNSTACK32
 
 
 .global sprint_uint8
@@ -418,9 +415,8 @@ sprint_uint4:
 	#  | 0 0 0 0  | 0 0 0 0  | a b c d |
 	#  +-------------------------------+
 
-	#-- Crear la pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
+	STACK16
+
 	sw s0, 0(sp)
 	sw s1, 4(sp)
 
@@ -476,11 +472,10 @@ sprint_uint4:
 	jal sprint_hex4
 
 	#-- Liberar la pila
-	lw ra, 12(sp)
 	lw s0, 0(sp)
 	lw s1, 4(sp)
-	addi sp, sp, 16
-	ret
+
+	UNSTACK16
 
 
 
@@ -499,9 +494,8 @@ sprint_hex:
  #--   - a1: (Opcional) Nº de bits impresos
  #--------------------------------------------------
 
-	#-- Crear la pila
-	addi sp, sp, -32
-	sw ra, 28(sp)
+	STACK32
+
 	sw s0, 0(sp)
 	sw s1, 4(sp)
 	sw s2, 8(sp)
@@ -546,15 +540,12 @@ sprint_hex:
 	#-- TODO
 
 	#-- Liberar la pila
-	lw ra, 28(sp)
 	lw s0, 0(sp)
 	lw s1, 4(sp)
 	lw s2, 8(sp)
 	lw s3, 12(sp)
-	addi sp, sp, 32
-	ret
 
-
+	UNSTACK32
 
 
 
@@ -619,9 +610,8 @@ sprint_oct:
  #--   - a1: (Opcional) Nº de bits impresos
  #--------------------------------------------------
 
-	#-- Crear la pila
-	addi sp, sp, -32
-	sw ra, 28(sp)
+	STACK32
+
 	sw s0, 0(sp)
 	sw s1, 4(sp)
 	sw s2, 8(sp)
@@ -667,13 +657,13 @@ sprint_oct:
 	#-- TODO
 
 	#-- Liberar la pila
-	lw ra, 28(sp)
 	lw s0, 0(sp)
 	lw s1, 4(sp)
 	lw s2, 8(sp)
 	lw s3, 12(sp)
-	addi sp, sp, 32
-	ret
+
+	#-- Terminar
+	UNSTACK32
 
 
 
