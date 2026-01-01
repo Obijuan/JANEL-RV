@@ -27,31 +27,155 @@ sprint_uint32:
 #-- Registro de calculo para hacer los desplazamientos:
 #
 #  -Parte alta (s3)
-#    31                                                  3       0
-#  +---------------------------------------------------------------+
-#  |                                                   |   Dig4    |
-#  |                                                   |  0 0 0 0  |
-#  +---------------------------------------------------------------+
+#    31                                              8 | 7    4 | 3       0
+#  +------------------------------------------------------------------------+
+#  |                                                   |   Dig9 |   Dig8    |
+#  |                                                   | 0 0 0 0|  0 0 0 0  |
+#  +------------------------------------------------------------------------+
 #
 #  -Parte media (s2):
-#   31     28 27     24 23     20  19    16  15                  0
-#  +---------------------------------------------------------------+
-#  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
-#  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
-#  +---------------------------------------------------------------+
+#   31   28| 27   24|23    20| 19  16 | 15   12 | 11    8| 7      4| 3     0
+#  +------------------------------------------------------------------------+
+#  |  Dig7 |  Dig6  |  Dig5  | Dig 4  |  Dig3   | Dig2   |  Dig1   |  Dig0  |
+#  |0 0 0 0| 0 0 0 0| 0 0 0 0| 0 0 0 0| 0 0 0 0 | 0 0 0 0| 0 0 0 0 | 0 0 0 0|
+#  +------------------------------------------------------------------------+
 #
 #  -Parte baja (s1):
-#   31     28 27     24 23     20  19    16  15                  0
-#  +---------------------------------------------------------------+
-#  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
-#  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
-#  +---------------------------------------------------------------+
-	STACK16
+#   31                                                                    0
+#  +------------------------------------------------------------------------+
+#  |      n                                                                 |
+#  |  d31 - d0                                                              |
+#  +------------------------------------------------------------------------+
+	STACK32
+
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw s2, 8(sp)
+	sw s3, 12(sp)
+	sw s4, 16(sp)
+
+	#-- Guardar direccion de la cadena destino
+	mv s0, a0
+	
+	#-- Inicializar registro BCD
+	mv s1, a1  #-- Parte baja
+	li s2, 0
+	li s3, 0   #-- Parte alta
+
+	#-- Estado inicial. Desplazar registro BCD 3 bits
+	#-- a la izquierda  s2 <- s1
+	#-- 1. Obtener los 3 bits de mayor peso de s1
+	li t0, 0xFFF00000
+	and t0, s1, t0
+
+	#-- 2. Llevar estos 3 bits a s2 (a la pos de menor peso)
+	srli s2, t0, 20
+
+	#-- 3. Desplazar s1 3 bits a la izquierda
+	slli s1, s1, 3
+
+	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
+	#-- Ya hemos hecho 3, quedan 32-3 = 29
+	li s4, 29
+
+ sprint_uint32_next:
+
+	#----- Actualizar la parte alta del registro bcd
+	#-- Actualizar campo Dig9
+	mv a0, s3
+	li a1, 1   #-- Numero de digito
+	li a2, 32  #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+
+	#-- Actualizar campo Dig8
+	li a1, 0   #-- Numero de digito
+	li a2, 32  #-- Tamaño de n (en bits)
+	jal uint_update_bcd
+	mv s3, a0
+
+	#---- Actualizar la parte media del registro bcd
+	#-- Campo dig7
+	mv a0, s2
+	li a1, 7
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig6
+	li a1, 6
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig5
+	li a1, 5
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig4
+	li a1, 4
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig3
+	li a1, 3
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig2
+	li a1, 2
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig1
+	li a1, 1
+	li a2, 32
+	jal uint_update_bcd
+
+	#-- Campo dig0
+	li a1, 0
+	li a2, 32
+	jal uint_update_bcd
+	mv s2, a0
+
+	#-- Desplazamiento a la izquierda del registro s3-s2-s1
+	#-- 1. Desplazar s3 a la izquierda
+	slli s3, s3, 1
+
+	#-- 2. Leer bit mas significativo de s2
+	slt t0, s2, zero
+
+	#-- 3. Añadir BMS de s2 a s3
+	add s3, s3, t0
+
+	#-- 4. Desplazar s2 a la izquierda
+	slli s2, s2, 1
+
+	#-- 5. Leer bit mas significativo de s1
+	slt t0, s1, zero
+
+	#-- 6. Añadir BMS de s1 a s2
+	add s2, s2, t0
+
+	#-- 7. Desplazar s1 a la izquierda
+	slli s1, s1, 1
+
+	#-- Queda un desplazamiento menos por hacer
+	addi s4, s4, -1
+
+	#-- Repetir el algoritmo si todavía toca
+	bgt s4, zero, sprint_uint32_next
+	
+	PRINT_INT_HEXR(s2)
+	PRINT_CHARI('\n')
 
 
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw s2, 8(sp)
+	lw s3, 12(sp)  
+	lw s4, 16(sp)
 
 	#-- Terminar
-	UNSTACK16
+	UNSTACK32
 
 
 .global sprint_uint16
@@ -210,7 +334,7 @@ sprint_uint16:
 	lw s1, 4(sp)
 	lw s2, 8(sp)
 	lw s3, 12(sp)
-	
+
 	UNSTACK32
 
 
