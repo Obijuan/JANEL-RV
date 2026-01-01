@@ -6,6 +6,52 @@
 	.eqv BIT0 0x01 
 
 .include "rars_so.s"
+.include "stack.s"
+
+
+.global sprint_uint32
+sprint_uint32:
+#----------------------------------------------------------------
+#-- SPRINT_UINT32(dst, n)
+#--
+#-- Imprimir un numero decimal sin signo, de 32 bits (10 digitos)
+#--
+#-- ENTRADA:
+#--   - a0 (dst): Dirección de la cadena destino
+#--   - a1 (n): Numero de 32 bits a imprimir
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------------
+#-- Registro de calculo para hacer los desplazamientos:
+#
+#  -Parte alta (s3)
+#    31                                                  3       0
+#  +---------------------------------------------------------------+
+#  |                                                   |   Dig4    |
+#  |                                                   |  0 0 0 0  |
+#  +---------------------------------------------------------------+
+#
+#  -Parte media (s2):
+#   31     28 27     24 23     20  19    16  15                  0
+#  +---------------------------------------------------------------+
+#  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
+#  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
+#  +---------------------------------------------------------------+
+#
+#  -Parte baja (s1):
+#   31     28 27     24 23     20  19    16  15                  0
+#  +---------------------------------------------------------------+
+#  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
+#  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
+#  +---------------------------------------------------------------+
+	STACK16
+
+
+
+	#-- Terminar
+	UNSTACK16
 
 
 .global sprint_uint16
@@ -194,9 +240,8 @@ sprint_uint8:
 #
 # La posicion de cada campo es: pos(digi) = i*4 + tam(n)
 
-	#-- Crear la pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
+	STACK16
+
 	sw s0, 0(sp)
 	sw s1, 4(sp)
 
@@ -221,7 +266,7 @@ sprint_uint8:
 
 	mv a0, a1  #-- Registro bcd
 
-sprint_uint8_next:
+ sprint_uint8_next:
 
     #-- Actualizar campo Dig2
 	
@@ -274,11 +319,11 @@ sprint_uint8_next:
 
 
 	#-- Liberar la pila
-	lw ra, 12(sp)
 	lw s0, 0(sp)
 	lw s1, 4(sp)
-	addi sp, sp, 16
-	ret
+
+	#-- Terminar
+	UNSTACK16
 
 
 uint_update_bcd:
@@ -680,9 +725,8 @@ sprint_bin:
  #--   - a1: (Opcional) Nº de bits impresos
  #--------------------------------------------------
 
-	#-- Crear la pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
+	STACK16
+
 	sw s0, 8(sp)
 	sw s1, 4(sp)
 	sw s2, 0(sp)
@@ -730,12 +774,13 @@ sprint_bin:
 	addi a1, s1, 1  #-- n bits impresos
 
 	#-- Liberar la pila
-	lw ra, 12(sp)
+	
 	lw s0, 8(sp)
 	lw s1, 4(sp)
 	lw s2, 0(sp)
-	addi sp, sp, 16
-	ret
+
+	#-- Terminar
+	UNSTACK16
 
 
 .global sprint_bin1

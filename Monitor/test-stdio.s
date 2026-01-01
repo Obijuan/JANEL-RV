@@ -111,6 +111,12 @@ data_dec16: .word 0, 1, 10, 100, 1000, 10000, 50000, 0xFFFF
 
     #-- TODO
     #-- sprint_uint32
+    la a0, dst
+    li a1, 1
+    jal sprint_uint32
+
+    PRINT_STRINGL(dst)
+    PRINT_CHARI('\n')
 
 	#-- Terminar
 	PRINT_CHARI('\n')
