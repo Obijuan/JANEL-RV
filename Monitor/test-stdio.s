@@ -136,10 +136,7 @@ sprint_test20:
 	.text
 
     STACK16
-    sw s0, 0(sp)
-    sw s1, 4(sp)
-    sw s2, 8(sp)
-
+    PUSH3(s0, s1, s2)
 	PRINT_STRINGI("\n* TEST 20:\n")
 
     #-- Puntero a datos
@@ -175,9 +172,7 @@ sprint_test20:
 
 
 	#-- Restaurar pila
-    lw s0, 0(sp)
-    lw s1, 4(sp)
-    lw s2, 8(sp)
+    POP3(s0, s1, s2)
     UNSTACK16
 
 
