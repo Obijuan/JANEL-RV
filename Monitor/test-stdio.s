@@ -195,13 +195,8 @@ sprint_test19:
  sprint_test19_msg1:  .string "Dec: "
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-    sw s0, 0(sp)
-    sw s1, 4(sp)
-    sw s2, 8(sp)
-
+    STACK16
+    PUSH3(s0, s1, s2)
 	PRINT_STRINGI("\n* TEST 19:\n")
 
     #-- Puntero a datos
@@ -237,14 +232,9 @@ sprint_test19:
 
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-    lw s0, 0(sp)
-    lw s1, 4(sp)
-    lw s2, 8(sp)
-	addi sp, sp, 16	
-	ret
-
-
+    POP3(s0, s1, s2)
+    UNSTACK16
+ 
 
 
 
