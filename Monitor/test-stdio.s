@@ -135,9 +135,7 @@ sprint_test20:
  sprint_test20_msg1:  .string "Dec: "
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
+    STACK16
     sw s0, 0(sp)
     sw s1, 4(sp)
     sw s2, 8(sp)
@@ -177,12 +175,10 @@ sprint_test20:
 
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
     lw s0, 0(sp)
     lw s1, 4(sp)
     lw s2, 8(sp)
-	addi sp, sp, 16	
-	ret
+    UNSTACK16
 
 
 
