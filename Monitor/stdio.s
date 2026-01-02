@@ -62,14 +62,23 @@ sprint_uint32:
 	li s2, 0
 	li s3, 0   #-- Parte alta
 
+
+	#-- DEBUG!
+	PRINT_STRINGI("---- INI\n")
+	PRINT_INT_HEXR(s2)
+	PRINT_CHARI('\n')
+	PRINT_INT_HEXR(s1)
+	PRINT_CHARI('\n')
+
+
 	#-- Estado inicial. Desplazar registro BCD 3 bits
 	#-- a la izquierda  s2 <- s1
 	#-- 1. Obtener los 3 bits de mayor peso de s1
-	li t0, 0xFFF00000
+	li t0, 0xE0000000  #-- Cambiar a lui
 	and t0, s1, t0
 
 	#-- 2. Llevar estos 3 bits a s2 (a la pos de menor peso)
-	srli s2, t0, 20
+	srli s2, t0, 29
 
 	#-- 3. Desplazar s1 3 bits a la izquierda
 	slli s1, s1, 3
@@ -77,6 +86,15 @@ sprint_uint32:
 	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
 	#-- Ya hemos hecho 3, quedan 32-3 = 29
 	li s4, 29
+
+	#-- DEBUG!
+	PRINT_STRINGI("---- bcd << 3\n")
+	PRINT_INT_HEXR(s2)
+	PRINT_CHARI('\n')
+	PRINT_INT_HEXR(s1)
+	PRINT_CHARI('\n')
+	PRINT_STRINGI("----\n")
+
 
  sprint_uint32_next:
 
@@ -164,6 +182,8 @@ sprint_uint32:
 	#-- Repetir el algoritmo si todavía toca
 	bgt s4, zero, sprint_uint32_next
 	
+	PRINT_INT_HEXR(s3)
+	PRINT_CHARI('\n')
 	PRINT_INT_HEXR(s2)
 	PRINT_CHARI('\n')
 
