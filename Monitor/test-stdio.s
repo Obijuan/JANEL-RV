@@ -28,6 +28,7 @@ data_hex32: .word 0x01234567, 0x89ABCDEF, 0xCAFEBACA, 0xBEBECAFE,
             .word 0xCAFECACA, 0xFFFFAAAA, 0xAAAA5555, 0xF0F0EFEF
 data_dec8:  .word 0, 1, 10, 100, 123, 200, 250, 255 
 data_dec16: .word 0, 1, 10, 100, 1000, 10000, 50000, 0xFFFF
+data_dec32: .word 0, 1, 10, 0xFFFF, 0xFFFFF, 0xFFFFFF, 0xFFFFFFF, 0xFFFFFFFF
 
 #-----------
 #-- MAIN
@@ -112,18 +113,63 @@ data_dec16: .word 0, 1, 10, 100, 1000, 10000, 50000, 0xFFFF
     #-- Numeros decimales de 16 bits
     jal sprint_test20
 
-    #-- TODO
-    #-- sprint_uint32
-    la a0, dst
-    li a1, 0xFFFFFFFF  
+    #-- Prueba de SPRINT_UINT32
+    #-- Numeros decimales de 32 bits
+    jal sprint_test21
+
+	#-- Terminar
+	PRINT_CHARI('\n')
+	EXIT
+
+sprint_test21:
+ #------------------------------------------ 
+ #-- Pruebas para SPRINT_UINT32
+ #-- Imprimir numeros DECIMALES de 32 bits
+ #------------------------------------------
+ 	.data
+ sprint_test21_msg1:  .string "Dec: "
+	.text
+
+    STACK16
+    PUSH3(s0, s1, s2)
+	PRINT_STRINGI("\n* TEST 21:\n")
+
+    #-- Puntero a datos
+    la s0, data_dec32
+
+    #-- Cantidad de datos a mostrar
+    li s1, 8
+
+    #-- Puntero a cadena destino
+    la s2, dst
+
+ sprint_test21_repeat:
+
+    mv a0, s2
+    la a1, sprint_test21_msg1
+    jal sprint
+
+    #-- Leer dato e imprimirlo
+    lw a1, 0(s0)
     jal sprint_uint32
 
     PRINT_STRINGL(dst)
     PRINT_CHARI('\n')
 
-	#-- Terminar
-	PRINT_CHARI('\n')
-	EXIT
+    #-- Apuntar al siguiente dato
+    addi s0, s0, 4
+
+    #-- Decrementar contador
+    addi s1, s1, -1
+
+    #-- Repetir mientras queden datos
+    bgt s1, zero, sprint_test21_repeat
+
+
+	#-- Restaurar pila
+    POP3(s0, s1, s2)
+    UNSTACK16
+
 
 
 sprint_test20:
