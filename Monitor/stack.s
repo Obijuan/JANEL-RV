@@ -121,3 +121,29 @@
   lw %reg2, 8(sp)
   lw %reg3, 12(sp)
 .end_macro
+
+#----------------------------------------
+#-- Meter en la pila 5 registros
+#--   Offsets 0, 4, 8, 12, 16
+#-- WARNING: Solo es compatible STACK32!
+#----------------------------------------
+.macro STACK32_PUSH5(%reg0, %reg1, %reg2, %reg3, %reg4)
+  sw %reg0, 0(sp)
+  sw %reg1, 4(sp)
+  sw %reg2, 8(sp)
+  sw %reg3, 12(sp)
+  sw %reg4, 16(sp)
+.end_macro
+
+#-----------------------------------------
+#-- Sacar de la pila 5 registros
+#-- Offsets 0, 4, 8, 12, 16
+#-- WARNING: Solo es compatible con STACK32!
+#-----------------------------------------
+.macro STACK32_POP5(%reg0, %reg1, %reg2, %reg3, %reg4)
+  lw %reg0, 0(sp)
+  lw %reg1, 4(sp)
+  lw %reg2, 8(sp)
+  lw %reg3, 12(sp)
+  lw %reg4, 16(sp)
+.end_macro

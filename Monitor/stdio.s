@@ -47,12 +47,7 @@ sprint_uint32:
 #  |  d31 - d0                                                              |
 #  +------------------------------------------------------------------------+
 	STACK32
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
-	sw s2, 8(sp)
-	sw s3, 12(sp)
-	sw s4, 16(sp)
+	STACK32_PUSH5(s0, s1, s2, s3, s4)
 
 	#-- Guardar direccion de la cadena destino
 	mv s0, a0
@@ -229,14 +224,8 @@ sprint_uint32:
 	andi a1, s2, 0xF 
 	jal sprint_hex4
 
-
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-	lw s2, 8(sp)
-	lw s3, 12(sp)  
-	lw s4, 16(sp)
-
-	#-- Terminar
+	#-- Liberar la pila
+	STACK32_POP5(s0, s1, s2, s3, s4)
 	UNSTACK32
 
 
@@ -271,11 +260,7 @@ sprint_uint16:
 #  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
 #  +---------------------------------------------------------------+
 	STACK32
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
-	sw s2, 8(sp)
-	sw s3, 12(sp)
+	STACK32_PUSH4(s0, s1, s2, s3)
 
 	#-- Guardar direccion de la cadena destino
 	mv s0, a0
@@ -391,12 +376,8 @@ sprint_uint16:
 	#li a2, 8
 	#jal sprint_hex
 
-	
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-	lw s2, 8(sp)
-	lw s3, 12(sp)
-
+	#-- Liberar la pila
+	STACK32_POP4(s0, s1, s2, s3)
 	UNSTACK32
 
 
@@ -671,12 +652,7 @@ sprint_hex:
  #--------------------------------------------------
 
 	STACK32
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
-	sw s2, 8(sp)
-	sw s3, 12(sp)
-
+	STACK32_PUSH4(s0, s1, s2, s3)
 
 	#-- Guardar argumentos
 	mv s0, a0  #-- Puntero a cadena destino
@@ -716,11 +692,7 @@ sprint_hex:
 	#-- TODO
 
 	#-- Liberar la pila
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-	lw s2, 8(sp)
-	lw s3, 12(sp)
-
+	STACK32_POP4(s0, s1, s2, s3)
 	UNSTACK32
 
 
@@ -787,12 +759,7 @@ sprint_oct:
  #--------------------------------------------------
 
 	STACK32
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
-	sw s2, 8(sp)
-	sw s3, 12(sp)
-
+    STACK32_PUSH4(s0, s1, s2, s3)
 
 	#-- Guardar argumentos
 	mv s0, a0  #-- Puntero a cadena destino
@@ -833,12 +800,7 @@ sprint_oct:
 	#-- TODO
 
 	#-- Liberar la pila
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-	lw s2, 8(sp)
-	lw s3, 12(sp)
-
-	#-- Terminar
+	STACK32_POP4(s0, s1, s2, s3)
 	UNSTACK32
 
 
