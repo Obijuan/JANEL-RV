@@ -97,3 +97,27 @@
   lw %reg1, 4(sp)
   lw %reg2, 8(sp)
 .end_macro
+
+#----------------------------------------
+#-- Meter en la pila 4 registros
+#--   Offsets 0, 4, 8 y 12
+#-- WARNING: Solo es compatible STACK32!
+#----------------------------------------
+.macro STACK32_PUSH4(%reg0, %reg1, %reg2, %reg3)
+  sw %reg0, 0(sp)
+  sw %reg1, 4(sp)
+  sw %reg2, 8(sp)
+  sw %reg3, 12(sp)
+.end_macro
+
+#-----------------------------------------
+#-- Sacar de la pila 4 registros
+#-- Offsets 0, 4, 8 y 12
+#-- WARNING: Solo es compatible con STACK32!
+#-----------------------------------------
+.macro STACK32_POP4(%reg0, %reg1, %reg2, %reg3)
+  lw %reg0, 0(sp)
+  lw %reg1, 4(sp)
+  lw %reg2, 8(sp)
+  lw %reg3, 12(sp)
+.end_macro

@@ -892,7 +892,7 @@ sprint_bin:
  #--------------------------------------------------
 
 	STACK16
-	PUSH3(s0, s1, s3)
+	PUSH3(s0, s1, s2)
 
 	#-- Quedarse solo con los n bits de menor peso
 	#-- Del numero
