@@ -525,20 +525,14 @@ sprint_test11:
  sprint_test11_msg1:  .string "Oct: "
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 11:\n")
 
 	la a0, data_oct6
 	li a1, 2
 	jal test_print_block_octal
 
-	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
+    UNSTACK16
 
 sprint_test10:
  #------------------------------------------ 
