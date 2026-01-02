@@ -63,14 +63,6 @@ sprint_uint32:
 	li s3, 0   #-- Parte alta
 
 
-	#-- DEBUG!
-	PRINT_STRINGI("---- INI\n")
-	PRINT_INT_HEXR(s2)
-	PRINT_CHARI('\n')
-	PRINT_INT_HEXR(s1)
-	PRINT_CHARI('\n')
-
-
 	#-- Estado inicial. Desplazar registro BCD 3 bits
 	#-- a la izquierda  s2 <- s1
 	#-- 1. Obtener los 3 bits de mayor peso de s1
@@ -86,14 +78,6 @@ sprint_uint32:
 	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
 	#-- Ya hemos hecho 3, quedan 32-3 = 29
 	li s4, 29
-
-	#-- DEBUG!
-	PRINT_STRINGI("---- bcd << 3\n")
-	PRINT_INT_HEXR(s2)
-	PRINT_CHARI('\n')
-	PRINT_INT_HEXR(s1)
-	PRINT_CHARI('\n')
-	PRINT_STRINGI("----\n")
 
 
  sprint_uint32_next:
@@ -181,11 +165,69 @@ sprint_uint32:
 
 	#-- Repetir el algoritmo si todavía toca
 	bgt s4, zero, sprint_uint32_next
-	
-	PRINT_INT_HEXR(s3)
-	PRINT_CHARI('\n')
-	PRINT_INT_HEXR(s2)
-	PRINT_CHARI('\n')
+
+	#----- Imprimir digitos del registro bcd
+	#-- Obtener Dig9
+	li t0, 0xF0
+	and a1, s3, t0
+	srli a1, a1, 4
+
+	#-- Imprimir
+	mv a0, s0
+	jal sprint_hex4
+
+	#-- Obtener Dig8
+	li t0, 0x0F
+	and a1, s3, t0
+
+	#-- Imprimir
+	jal sprint_hex4
+
+	#-- Obtener Dig7
+	li t0, 0xF0000000
+	and a1, s2, t0
+	srli a1, a1, 28 
+	jal sprint_hex4
+
+	#-- Obtener Dig6
+	li t0, 0xF000000
+	and a1, s2, t0
+	srli a1, a1, 24 
+	jal sprint_hex4
+
+	#-- Obtener Dig5
+	li t0, 0xF00000
+	and a1, s2, t0
+	srli a1, a1, 20 
+	jal sprint_hex4
+
+	#-- Obtener Dig4
+	li t0, 0xF0000
+	and a1, s2, t0
+	srli a1, a1, 16 
+	jal sprint_hex4
+
+	#-- Obtener Dig3
+	li t0, 0xF000
+	and a1, s2, t0
+	srli a1, a1, 12 
+	jal sprint_hex4
+
+	#-- Obtener Dig2
+	li t0, 0xF00
+	and a1, s2, t0
+	srli a1, a1, 8 
+	jal sprint_hex4
+
+	#-- Obtener Dig1
+	li t0, 0xF0
+	and a1, s2, t0
+	srli a1, a1, 4 
+	jal sprint_hex4
+
+	#-- Obtener Dig0
+	andi a1, s2, 0xF 
+	jal sprint_hex4
 
 
 	lw s0, 0(sp)
