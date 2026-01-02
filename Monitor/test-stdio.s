@@ -6,6 +6,9 @@
 	#-- Servicios del sistema operativo del RARs
 	.include "rars_so.s"
 
+    #-- Macros para funciones y pila
+    .include "stack.s"
+
 		.data
 dst:	.space MAX
 data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
@@ -877,11 +880,8 @@ test_bin1:
 	.text
 
  	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-	sw s0, 8(sp)
-	sw a1, 4(sp)
-	sw a2, 0(sp)
+	STACK16
+    PUSH3(s0, s1, s2)
 	
 	#-- Contador de numeros
 	li s0, 0
@@ -914,12 +914,8 @@ test_bin1:
     blt s0, s1, test_bin1_next
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	lw s0, 8(sp)
-	lw s1, 4(sp)
-	lw s2, 0(sp)
-	addi sp, sp, 16	
-	ret
+	POP3(s0, s1, s2)
+    UNSTACK16
 
 
 sprint_test2:
@@ -934,10 +930,8 @@ sprint_test2:
 	.eqv MAX_UNARY 5
 
 	.text
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-	sw s0, 8(sp)
+    STACK16
+	PUSH1(s0)
 
 	PRINT_STRINGI("\n* TEST 2:\n")
 
@@ -969,12 +963,8 @@ sprint_test2:
  sprint_test2_fin:	
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	lw s0, 8(sp)
-	addi sp, sp, 16
-
-	#-- Terminar
-	ret
+    POP1(s0)
+    UNSTACK16
 
 sprint_test1:
  #--------------------------------------
@@ -989,8 +979,7 @@ sprint_test1:
 	.text	
 
 	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
+    STACK16
 
 	PRINT_STRINGI("* TEST 1:\n")
 
@@ -1011,65 +1000,5 @@ sprint_test1:
 	PRINT_STRINGL(dst)
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16
+    UNSTACK16
 
-	#-- Terminar
-	ret
-
-
-
- #--------------------------------------------------
- #-- SPRINT(dst, src)
- #-- Imprimir una cadena en una cadena destino
- #--
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (src): Puntero a cadena fuente
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bytes copiados
- #--------------------------------------------------
-
-	#-- Contador de caracteres
-	li t0, 0
-	
-	#-- Bucle principal
-  sprint_bucle:
-	#-- Leer caracter de cadena fuente
-	lb t1, 0(a1)
-	
-	#-- Copiar caracter a destino
-	sb t1, 0(a0)
-	
-	#-- Se copia el primer caracter incondicionalmente
-	#-- porque podría ser el \0
-	
-	#--- EStamos al final de la cadena fuente?
-	beq t1, zero, sprint_end
-	
-	#-- No hemos llegado al final
-	#-- Incrementar puntero de cadenas
-	addi a0, a0, 1  #-- dst
-	addi a1, a1, 1  #-- src
-	
-	#-- Incrementar contador de caracteres
-	addi t0, t0, 1
-	
-	#-- repetir
-	j sprint_bucle
-	
-	
-  sprint_end:
-	#-- Hemos terminado de copiar
-	#-- a0 apunta al final de la cadena destino
-	
-	#-- a1: Contador de caracteres
-	mv a1, t0
-	
-	#-- Terminar
-	ret
-
-	
-	
