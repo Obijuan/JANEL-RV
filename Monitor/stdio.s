@@ -892,9 +892,7 @@ sprint_bin:
  #--------------------------------------------------
 
 	STACK16
-
-	PUSH2(s0, s1)
-	sw s2, 8(sp)
+	PUSH3(s0, s1, s3)
 
 	#-- Quedarse solo con los n bits de menor peso
 	#-- Del numero
@@ -939,11 +937,7 @@ sprint_bin:
 	addi a1, s1, 1  #-- n bits impresos
 
 	#-- Liberar la pila
-	
-	POP2(s0, s1)
-	lw s2, 8(sp)
-
-	#-- Terminar
+	POP3(s0, s1, s2)
 	UNSTACK16
 
 

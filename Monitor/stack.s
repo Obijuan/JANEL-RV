@@ -77,3 +77,23 @@
   lw %reg0, 0(sp)
   lw %reg1, 4(sp)
 .end_macro
+
+#----------------------------------------
+#-- Meter en la pila 3 registros
+#--   Offsets 0, 4 y 8
+#----------------------------------------
+.macro PUSH3(%reg0, %reg1, %reg2)
+  sw %reg0, 0(sp)
+  sw %reg1, 4(sp)
+  sw %reg2, 8(sp)
+.end_macro
+
+#-----------------------------------------
+#-- Sacar de la pila 3 registros
+#-- Offsets 0, 4 y 8
+#-----------------------------------------
+.macro POP3(%reg0, %reg1, %reg2)
+  lw %reg0, 0(sp)
+  lw %reg1, 4(sp)
+  lw %reg2, 8(sp)
+.end_macro
