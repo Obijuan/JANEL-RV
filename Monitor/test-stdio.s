@@ -302,10 +302,7 @@ sprint_test17:
  sprint_test17_msg1:  .string "Hex: "
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 17:\n")
 
 	la a0, data_hex32
@@ -313,10 +310,7 @@ sprint_test17:
 	jal test_print_block_hex
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
-
+    UNSTACK16
 
 
 sprint_test16:
