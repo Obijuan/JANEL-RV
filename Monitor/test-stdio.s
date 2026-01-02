@@ -639,10 +639,7 @@ sprint_test9:
  #------------------------------------------
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 9:\n")
 
 	#-- Imprimir 8 numeros de 32 bits
@@ -650,10 +647,7 @@ sprint_test9:
 	li a1, 32
 	jal test_print_block_binary
 
-	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
+    UNSTACK16
 
 sprint_test8:
  #------------------------------------------ 
