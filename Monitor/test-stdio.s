@@ -847,10 +847,7 @@ sprint_test3:
  #------------------------------------------
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 3:\n")
 
 	#-- Imprimir 2 numeros de 1 bit
@@ -859,10 +856,7 @@ sprint_test3:
 	jal test_bin1
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
-
+    UNSTACK16
 
 test_bin1:
  #-----------------------------------------------------
