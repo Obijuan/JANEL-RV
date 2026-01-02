@@ -60,3 +60,20 @@
   lw %reg, 0(sp)
 .end_macro
 
+#----------------------------------------
+#-- Meter en la pila 2 registros
+#--   Offsets 0 y 4
+#----------------------------------------
+.macro PUSH2(%reg0, %reg1)
+  sw %reg0, 0(sp)
+  sw %reg1, 4(sp)
+.end_macro
+
+#-----------------------------------------
+#-- Sacar de la pila 2 registros
+#-- Offsets 0 y 4
+#-----------------------------------------
+.macro POP2(%reg0, %reg1)
+  lw %reg0, 0(sp)
+  lw %reg1, 4(sp)
+.end_macro

@@ -424,9 +424,7 @@ sprint_uint8:
 # La posicion de cada campo es: pos(digi) = i*4 + tam(n)
 
 	STACK16
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
+	PUSH2(s0, s1)
 
 	#-- Guardar direccion de la cadena destino
 	mv s0, a0
@@ -500,12 +498,8 @@ sprint_uint8:
 	srli a1, a1, 8
 	jal sprint_hex4
 
-
 	#-- Liberar la pila
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-
-	#-- Terminar
+	POP2(s0, s1)
 	UNSTACK16
 
 
@@ -602,9 +596,7 @@ sprint_uint4:
 	#  +-------------------------------+
 
 	STACK16
-
-	sw s0, 0(sp)
-	sw s1, 4(sp)
+	PUSH2(s0, s1)
 
 	#-- Guardar los parámetros
 	mv s0, a0  #-- Cadena destino
@@ -658,9 +650,7 @@ sprint_uint4:
 	jal sprint_hex4
 
 	#-- Liberar la pila
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-
+	POP2(s0, s1)
 	UNSTACK16
 
 
@@ -903,8 +893,7 @@ sprint_bin:
 
 	STACK16
 
-	PUSH1(s0)
-	sw s1, 4(sp)
+	PUSH2(s0, s1)
 	sw s2, 8(sp)
 
 	#-- Quedarse solo con los n bits de menor peso
@@ -951,8 +940,7 @@ sprint_bin:
 
 	#-- Liberar la pila
 	
-	POP1(s0)
-	lw s1, 4(sp)
+	POP2(s0, s1)
 	lw s2, 8(sp)
 
 	#-- Terminar
