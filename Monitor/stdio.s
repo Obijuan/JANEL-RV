@@ -57,7 +57,6 @@ sprint_uint32:
 	li s2, 0
 	li s3, 0   #-- Parte alta
 
-
 	#-- Estado inicial. Desplazar registro BCD 3 bits
 	#-- a la izquierda  s2 <- s1
 	#-- 1. Obtener los 3 bits de mayor peso de s1
@@ -370,11 +369,6 @@ sprint_uint16:
 	#-- Imprimir dig0!
 	jal sprint_hex4
 
-	#-- Debug
-	#mv a0, s0
-	#mv a1, s1
-	#li a2, 8
-	#jal sprint_hex
 
 	#-- Liberar la pila
 	STACK32_POP4(s0, s1, s2, s3)
@@ -482,6 +476,101 @@ sprint_uint8:
 	#-- Liberar la pila
 	POP2(s0, s1)
 	UNSTACK16
+
+
+.global sprint_bcd
+sprint_bcd:
+#-------------------------------------------------------------
+#-- sprint_bcd(buffer, bcd, ndig, ini0)
+#--
+#--  ENTRADA:
+#--    - a0 (buffer): Buffer donde "imprimir"
+#--    - a1 (bcd): Registro con digitos bcd (8 como maximo)  
+#--    - a2 (ndig): Numero de digitos a mostrar
+#--    - a3 (ini0): Mostrar ceros iniciales
+#--       - 0: Sin cero iniciales
+#--       - 1: Mostrar los ceros iniciales
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------
+	STACK32
+	STACK32_PUSH4(s0, s1, s2, s3)
+
+	#-- Guardar parámetros
+	mv s0, a0  #-- Buffer
+	mv s1, a1  #-- Registro bcd
+	mv s2, a2  #-- Num. Maximo de digitos
+	mv s3, a3  #-- Ceros iniciales
+
+	#-- Detectar el primer digito no cero
+	#-- s4 = 0 --> No se ha alcanzado el primer digito
+	#-- s4 = 1 --> Primer digito alcanzadof
+	mv s4, a3
+
+	#------ Imprimir el digito i
+sprint_bcd_next:
+	#-- Generar la mascara para obtener el digito i
+	li t0, 0xF
+
+	#-- t1 = Numero de digitos - 1
+	mv t1, s2
+	addi t1, t1, -1
+
+	#-- t1 = Bits a desplazar = (a2 - 1)*4
+	slli t1, t1, 2
+
+	#-- Obtener mascara
+	#-- t2 = (0xF) << (a2 -1)*4
+	sll t2, t0, t1
+
+	#-- Obtener el digito
+	#-- y situarlo en el bms
+	#-- t3 = digito
+	and t3, s1, t2
+	srl t3, t3, t1
+
+	#-- Si s4==1, estamos en modo impresión
+	#-- ¡Imprimir el digito!
+	li t0, 1
+	beq s4, t0, sprint_bcd_print
+
+	#-- Comprobar si se ha alcazando el primer
+	#-- digito distinto de cero
+	beq t3, zero, skip
+
+	#-- digi == 0
+	#-- Primer digito no 0 alcanzado!
+ sprint_bcd_print:
+	#-- Pasar a modo impresion
+	li s4, 1 
+
+	#-- Imprimir!
+	mv a1, t3
+	jal sprint_hex4
+
+ skip:
+	#-- Queda un digito menos
+	addi s2, s2, -1
+
+	#-- ¿Hemos terminado?
+	bgt s2, zero, sprint_bcd_next
+
+	#-- Caso especial
+	#-- Si s4 == 0, el numero es un 0. ¡Imprimirlo!
+	bne s4, zero, sprint_bcd_next2
+
+	#-- Imprimir el 0!
+	mv a0, s0
+	mv a1, zero
+	jal sprint_hex4
+
+ sprint_bcd_next2:
+
+	#-- Liberar la pila
+	STACK32_POP4(s0, s1, s2, s3)
+	UNSTACK32
 
 
 uint_update_bcd:
