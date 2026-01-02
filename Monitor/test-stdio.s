@@ -549,10 +549,7 @@ sprint_test10:
  sprint_test10_msg1:  .string "Oct: "
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 10:\n")
 
 	la a0, data_oct3
@@ -560,9 +557,7 @@ sprint_test10:
 	jal test_print_block_octal
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
+    UNSTACK16
 
 
 test_print_block_octal:
@@ -579,13 +574,8 @@ test_print_block_octal:
 
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -32
-	sw ra, 28(sp)
-	sw s0, 0(sp)
-	sw s1, 4(sp)
-	sw s2, 8(sp)
-	sw s3, 12(sp)
+    STACK32
+    STACK32_PUSH4(s0, s1, s2, s3)
 
 	#-- Guardar los parametros
 	mv s0, a0  #-- Puntero al bloque de datos
@@ -623,13 +613,8 @@ test_print_block_octal:
 
  fin:
 	#-- Restaurar pila
-	lw ra, 28(sp)
-	lw s0, 0(sp)
-	lw s1, 4(sp)
-	lw s2, 8(sp)
-	lw s3, 12(sp)
-	addi sp, sp, 32	
-	ret
+    STACK32_POP4(s0, s1, s2, s3)
+    UNSTACK32
 
 
 sprint_test9:
