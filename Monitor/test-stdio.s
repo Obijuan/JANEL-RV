@@ -662,10 +662,7 @@ sprint_test8:
  #------------------------------------------
 	.text
 
-	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-
+    STACK16
 	PRINT_STRINGI("\n* TEST 8:\n")
 
 	#-- Imprimir 8 numeros de 16 bits
@@ -674,9 +671,7 @@ sprint_test8:
 	jal test_print_block_binary
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-	addi sp, sp, 16	
-	ret
+    UNSTACK16
 
 
 sprint_test7:
@@ -696,7 +691,7 @@ sprint_test7:
 
 	#-- Restaurar pila
     UNSTACK16
-    
+
 test_print_block_binary:
  #------------------------------------------- 
  #-- Pruebas para SPRINT_BIN
