@@ -258,10 +258,8 @@ sprint_test18:
 	.text
 
 	#-- Crear pila
-	addi sp, sp, -16
-	sw ra, 12(sp)
-    sw s0, 0(sp)
-
+    STACK16
+    PUSH1(s0)
 	PRINT_STRINGI("\n* TEST 18:\n")
 
    #-- Contador
@@ -286,11 +284,8 @@ sprint_test18:
     blt s0, t0, sprint_test18_repeat
 
 	#-- Restaurar pila
-	lw ra, 12(sp)
-    lw s0, 0(sp)
-	addi sp, sp, 16	
-	ret
-
+    POP1(s0)
+    UNSTACK16
 
 
 sprint_test17:
