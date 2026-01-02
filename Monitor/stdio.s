@@ -903,9 +903,9 @@ sprint_bin:
 
 	STACK16
 
-	sw s0, 8(sp)
+	PUSH1(s0)
 	sw s1, 4(sp)
-	sw s2, 0(sp)
+	sw s2, 8(sp)
 
 	#-- Quedarse solo con los n bits de menor peso
 	#-- Del numero
@@ -951,9 +951,9 @@ sprint_bin:
 
 	#-- Liberar la pila
 	
-	lw s0, 8(sp)
+	POP1(s0)
 	lw s1, 4(sp)
-	lw s2, 0(sp)
+	lw s2, 8(sp)
 
 	#-- Terminar
 	UNSTACK16

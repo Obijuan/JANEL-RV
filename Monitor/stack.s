@@ -44,3 +44,19 @@
   ret
 .end_macro
 
+#-----------------------------------
+#-- Meter en la pila SOLO 1 registro
+#--   Se gudarda en offset 0
+#-----------------------------------
+.macro PUSH1(%reg)
+  sw %reg, 0(sp)
+.end_macro
+
+#------------------------------------------
+#-- Recuperar de la pila SOLO 1 registro
+#--   Se recupera del offset 0
+#------------------------------------------
+.macro POP1(%reg)
+  lw %reg, 0(sp)
+.end_macro
+
