@@ -64,8 +64,8 @@ sprint_uint32:
 	li s2, 0
 	li s3, 0   #-- Parte alta
 
-	#-- Estado inicial. Desplazar registro BCD 3 bits
-	#-- a la izquierda  s2 <- s1
+	#------- Estado inicial. Desplazar registro BCD 3 bits
+	#------- a la izquierda  s2 <- s1
 	#-- 1. Obtener los 3 bits de mayor peso de s1
 	li t0, 0xE0000000  #-- Cambiar a lui
 	and t0, s1, t0
@@ -98,7 +98,7 @@ sprint_uint32:
 	mv s2, a0
 
 
-	#-- Desplazamiento a la izquierda del registro s3-s2-s1
+	#------------ Desplazamiento a la izquierda del registro s3-s2-s1
 	#-- 1. Desplazar s3 a la izquierda
 	slli s3, s3, 1
 
@@ -120,7 +120,7 @@ sprint_uint32:
 	#-- 7. Desplazar s1 a la izquierda
 	slli s1, s1, 1
 
-	#-- Queda un desplazamiento menos por hacer
+	#------------ Queda un paso menos por hacer del algoritmo
 	addi s4, s4, -1
 
 	#-- Repetir el algoritmo si todavía toca
