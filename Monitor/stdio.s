@@ -85,50 +85,16 @@ sprint_uint32:
 
 	#-------------- Actualizar la parte alta del registro bcd
 	#-------------- Este registro almacena 2 digitos
-	#-- Contador de digitos a actualizar
-	li s5, 2
-
-	#-- Registro bcd alto
-	mv a0, s3
-
-   sprint_uint32_repeat:
-
-	#-- Actualizar contador
-	addi s5, s5, -1
-
-	#-- Actualizar digito
-	mv a1, s5  #-- Numero de ditigo (1, 0)
-	li a2, 32  #-- Tamaño del registro en bits
-	jal uint_update_bcd
-
-	#-- Siguiente digito
-	bgt s5, zero, sprint_uint32_repeat
-
-	#-- Actualizar registro bcd
+	mv a0, s3  #-- Registro bcd alto
+	li a1, 2   #-- Actualizar 2 digitos
+	jal uint_update_bcd_reg
 	mv s3, a0
 
 	#-------------- Actualizar la parte baja del registro bcd
 	#-------------- Este registro almacena 8 digitos
-	#-- Contador de digitos a actualizar
-	li s5, 8
-
-	#-- Registro bcd bajo
-	mv a0, s2
-
-   sprint_uint32_repeat2:
-
-	#-- Actualizar contador
-	addi s5, s5, -1
-
-	#-- Actualizar digito
-	mv a1, s5  #-- Numero de ditigo (1, 0)
-	li a2, 32  #-- Tamaño del registro en bits
-	jal uint_update_bcd
-
-	#-- Siguiente digito
-	bgt s5, zero, sprint_uint32_repeat2
-
-	#-- Actualizar registro bcd
+	mv a0, s2  #-- Registro bcd alto
+	li a1, 8   #-- Actualizar 8 digitos
+	jal uint_update_bcd_reg
 	mv s2, a0
 
 
@@ -621,6 +587,42 @@ store_bcd_next:
 	bgt a2, zero, store_bcd_next
 
 	ret
+
+
+uint_update_bcd_reg:
+#------------------------------------------------------------------
+#--  uint_update_bcd_reg(reg, ndig)
+#--
+#--  Actulizar TODOS los digitos indicados del registro
+#--
+#--  ENTRADAS:
+#--   - a0 (reg): Registro bcd (que contiene como max. 8 digitos)
+#--   - a1 (ndig): Numero de digitos a actualizar
+#--
+#--  SALIDA:
+#--   - a0: Devolver el registro actualizado
+#------------------------------------------------------------------
+	STACK16
+	PUSH1(s0)
+
+	#-- Contador de digitos a actualizar
+	mv s0, a1
+
+ uint_update_bcd_reg_next:
+
+	#-- Actualizar contador
+	addi s0, s0, -1
+
+	#-- Actualizar digito
+	mv a1, s0  #-- Numero de ditigo (1, 0)
+	li a2, 32  #-- Tamaño del registro en bits
+	jal uint_update_bcd
+
+	#-- Siguiente digito
+	bgt s0, zero, uint_update_bcd_reg_next
+
+	POP1(s0)
+	UNSTACK16
 
 
 
