@@ -46,6 +46,13 @@ sprint_uint32:
 #  |      n                                                                 |
 #  |  d31 - d0                                                              |
 #  +------------------------------------------------------------------------+
+	.data
+
+	#-- Buffer donde guardar los digitos bcd en memoria
+	#-- para luego "imprimirlos"
+ sprint_uint32_buff:  .space 10
+
+	.text
 	STACK32
 	STACK32_PUSH5(s0, s1, s2, s3, s4)
 
@@ -160,18 +167,27 @@ sprint_uint32:
 	#-- Repetir el algoritmo si todavía toca
 	bgt s4, zero, sprint_uint32_next
 
-	#-- Imprimir registro bcd de mayor peso
-	mv a0, s0
-    mv a1, s3
-    li a2, 2  #-- Numero de digitos
-    li a3, 0  #-- Ceros iniciales: No
-    jal sprint_bcd
+	#------- Fase de impresion
+	#-- Primero se almacena en un buffer
+	#-- Luego se imprime desde memoria
 
-	#-- Imprimir registro bcd de menor peso
-    mv a1, s2
-    li a2, 8  #-- Numero de digitos
-    li a3, 0  #-- Ceros iniciales: No
-    jal sprint_bcd
+	#-- Almacenar registro bcd de mayor peso
+	la a0, sprint_uint32_buff
+	mv a1, s3  #-- reg
+	li a2, 2   #-- Numero de digitos
+	jal store_bcd
+
+	#-- Almacenar registro bcd de menor peso
+	mv a1, s2  #-- Reg
+	li a2, 8   #-- Numero de digitos
+	jal store_bcd
+
+	#-- "Imprimir" los digitos en la cadena destino
+	mv a0, s0  #-- dst
+	la a1, sprint_uint32_buff
+	li a2, 10  #-- Numero de digitos
+	li a3, 0  #-- Ceros iniciales: NO
+	jal sprint_bcd_from_mem
 
 	#-- Liberar la pila
 	STACK32_POP5(s0, s1, s2, s3, s4)
