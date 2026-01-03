@@ -83,61 +83,54 @@ sprint_uint32:
 
  sprint_uint32_next:
 
-	#----- Actualizar la parte alta del registro bcd
-	#-- Actualizar campo Dig9
+	#-------------- Actualizar la parte alta del registro bcd
+	#-------------- Este registro almacena 2 digitos
+	#-- Contador de digitos a actualizar
+	li s5, 2
+
+	#-- Registro bcd alto
 	mv a0, s3
-	li a1, 1   #-- Numero de digito
-	li a2, 32  #-- Tamaño de n (en bits)
+
+   sprint_uint32_repeat:
+
+	#-- Actualizar contador
+	addi s5, s5, -1
+
+	#-- Actualizar digito
+	mv a1, s5  #-- Numero de ditigo (1, 0)
+	li a2, 32  #-- Tamaño del registro en bits
 	jal uint_update_bcd
 
-	#-- Actualizar campo Dig8
-	li a1, 0   #-- Numero de digito
-	li a2, 32  #-- Tamaño de n (en bits)
-	jal uint_update_bcd
+	#-- Siguiente digito
+	bgt s5, zero, sprint_uint32_repeat
+
+	#-- Actualizar registro bcd
 	mv s3, a0
 
-	#---- Actualizar la parte media del registro bcd
-	#-- Campo dig7
+	#-------------- Actualizar la parte baja del registro bcd
+	#-------------- Este registro almacena 8 digitos
+	#-- Contador de digitos a actualizar
+	li s5, 8
+
+	#-- Registro bcd bajo
 	mv a0, s2
-	li a1, 7
-	li a2, 32
+
+   sprint_uint32_repeat2:
+
+	#-- Actualizar contador
+	addi s5, s5, -1
+
+	#-- Actualizar digito
+	mv a1, s5  #-- Numero de ditigo (1, 0)
+	li a2, 32  #-- Tamaño del registro en bits
 	jal uint_update_bcd
 
-	#-- Campo dig6
-	li a1, 6
-	li a2, 32
-	jal uint_update_bcd
+	#-- Siguiente digito
+	bgt s5, zero, sprint_uint32_repeat2
 
-	#-- Campo dig5
-	li a1, 5
-	li a2, 32
-	jal uint_update_bcd
-
-	#-- Campo dig4
-	li a1, 4
-	li a2, 32
-	jal uint_update_bcd
-
-	#-- Campo dig3
-	li a1, 3
-	li a2, 32
-	jal uint_update_bcd
-
-	#-- Campo dig2
-	li a1, 2
-	li a2, 32
-	jal uint_update_bcd
-
-	#-- Campo dig1
-	li a1, 1
-	li a2, 32
-	jal uint_update_bcd
-
-	#-- Campo dig0
-	li a1, 0
-	li a2, 32
-	jal uint_update_bcd
+	#-- Actualizar registro bcd
 	mv s2, a0
+
 
 	#-- Desplazamiento a la izquierda del registro s3-s2-s1
 	#-- 1. Desplazar s3 a la izquierda
