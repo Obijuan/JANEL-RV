@@ -185,6 +185,14 @@ sprint_uint16:
 #  |   Dig3  |   Dig2  |  Dig1    | Dig 0   |           n          |
 #  | 0 0 0 0 | 0 0 0 0 | 0 0 0 0  | 0 0 0 0 |        d15 - d0      |
 #  +---------------------------------------------------------------+
+	.data
+
+	#-- Buffer donde guardar los digitos bcd en memoria
+	#-- para luego "imprimirlos"
+ sprint_uint16_buff:  .space 5
+
+	.text
+
 	STACK32
 	STACK32_PUSH4(s0, s1, s2, s3)
 
@@ -244,46 +252,23 @@ sprint_uint16:
 	bgt s3, zero, sprint_uint16_next
 
 
+	#-- Almacenar registro bcd de mayor peso
+	la a0, sprint_uint16_buff
+	mv a1, s2  #-- reg
+	li a2, 1   #-- Numero de digitos
+	jal store_bcd
 
-	#-- Obtener Dig4
-	li t0, 0xF
-	and a1, s2, t0
+	#-- Almacenar registro bcd de menor peso
+	srli a1, s1, 16  #-- Reg
+	li a2, 4         #-- Numero de digitos
+	jal store_bcd
 
-	#-- Imprimir dig4!
-	mv a0, s0
-	jal sprint_hex4
-
-	#-- Obtener Dig3
-	li t0, 0xF0000000
-	and a1, s1, t0
-	srli a1, a1, 28
-
-	#-- Imprimir dig3!
-	jal sprint_hex4
-
-	#-- Obtener Dig2
-	li t0, 0x0F000000
-	and a1, s1, t0
-	srli a1, a1, 24
-
-	#-- Imprimir dig2!
-	jal sprint_hex4
-
-	#-- Obtener Dig1
-	li t0, 0x00F00000
-	and a1, s1, t0
-	srli a1, a1, 20
-
-	#-- Imprimir dig1!
-	jal sprint_hex4
-
-	#-- Obtener Dig0
-	li t0, 0x000F0000
-	and a1, s1, t0
-	srli a1, a1, 16
-
-	#-- Imprimir dig0!
-	jal sprint_hex4
+	#-- "Imprimir" los digitos en la cadena destino
+	mv a0, s0  #-- dst
+	la a1, sprint_uint16_buff
+	li a2, 5  #-- Numero de digitos
+	li a3, 0  #-- Ceros iniciales: NO
+	jal sprint_bcd_from_mem
 
 
 	#-- Liberar la pila
