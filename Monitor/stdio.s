@@ -325,30 +325,24 @@ sprint_uint8:
 
  sprint_uint8_next:
 
-    #-- Actualizar campo Dig2
-	
-	li a1, 2   #-- Numero de digito
-	li a2, 8   #-- Tamaño de n (en bits)
-	jal uint_update_bcd
 
-	#-- Actualizar campo Dig1
-	li a1, 1
-	li a2, 8
-	jal uint_update_bcd
-
-	#-- Actualizar campo Dig0
-	li a1, 0
-	li a2, 8
-	jal uint_update_bcd
-	#-- a0: Registro bcd actualizado
+	#-------------- Actualizar registro bcd
+	#-------------- Este registro almacena 3 digitos
+	#mv a0, a1  #-- Registro bcd
+	li a1, 3   #-- Actualizar 3 digitos
+	li a2, 8  #-- Offset
+	jal uint_update_bcd_reg
 
 	#-- Desplazamiento a la izquierda
 	slli a0, a0, 1
 
-	#-- Queda un desplazamiento menos por hacer
+	#-- Queda un paso menos del algoritmo por hacer
 	addi s1, s1, -1
 
 	bgt s1, zero, sprint_uint8_next
+
+
+
 
 	#-- s1: Registro bcd
 	mv s1, a0
