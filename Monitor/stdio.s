@@ -87,6 +87,7 @@ sprint_uint32:
 	#-------------- Este registro almacena 2 digitos
 	mv a0, s3  #-- Registro bcd alto
 	li a1, 2   #-- Actualizar 2 digitos
+	li a2, 0   #-- Offset: 0
 	jal uint_update_bcd_reg
 	mv s3, a0
 
@@ -94,6 +95,7 @@ sprint_uint32:
 	#-------------- Este registro almacena 8 digitos
 	mv a0, s2  #-- Registro bcd alto
 	li a1, 8   #-- Actualizar 8 digitos
+	li a2, 0   #-- Offset 0
 	jal uint_update_bcd_reg
 	mv s2, a0
 
@@ -213,29 +215,16 @@ sprint_uint16:
 	jal uint_update_bcd
 	mv s2, a0
 
-	#-- Actualizar campo Dig3
-	mv a0, s1
-	li a1, 3   #-- Numero de digito
-	li a2, 16   #-- Tamaño de n (en bits)
-	jal uint_update_bcd
 
-	#-- Actualizar campo Dig2
-	li a1, 2   #-- Numero de digito
-	li a2, 16   #-- Tamaño de n (en bits)
-	jal uint_update_bcd
-
-	#-- Actualizar campo Dig1
-	li a1, 1   #-- Numero de digito
-	li a2, 16   #-- Tamaño de n (en bits)
-	jal uint_update_bcd
-
-	#-- Actualizar campo Dig0
-	li a1, 0   #-- Numero de digito
-	li a2, 16   #-- Tamaño de n (en bits)
-	jal uint_update_bcd
+	#-------------- Actualizar la parte alta del registro bcd
+	#-------------- Este registro almacena 4 digitos
+	mv a0, s1  #-- Registro bcd alto
+	li a1, 4   #-- Actualizar 4 digitos
+	li a2, 16  #-- Offset
+	jal uint_update_bcd_reg
 	mv s1, a0
 
-	#-- Desplazamiento a la izquierda del registro s2-s1
+	#---------- Desplazamiento a la izquierda del registro s2-s1
 	#-- 1. Desplazar S2 a la izquierda
 	slli s2, s2, 1
 
@@ -248,11 +237,13 @@ sprint_uint16:
 	#-- 4. Desplazar s1 a la izquierda
 	slli s1, s1, 1
 
-	#-- Queda un desplazamiento menos por hacer
+	#-------- Queda un desplazamiento menos por hacer
 	addi s3, s3, -1
 
 	#-- Repetir el algoritmo si todavía toca
 	bgt s3, zero, sprint_uint16_next
+
+
 
 	#-- Obtener Dig4
 	li t0, 0xF
@@ -591,22 +582,25 @@ store_bcd_next:
 
 uint_update_bcd_reg:
 #------------------------------------------------------------------
-#--  uint_update_bcd_reg(reg, ndig)
+#--  uint_update_bcd_reg(reg, ndig, off)
 #--
 #--  Actulizar TODOS los digitos indicados del registro
 #--
 #--  ENTRADAS:
 #--   - a0 (reg): Registro bcd (que contiene como max. 8 digitos)
 #--   - a1 (ndig): Numero de digitos a actualizar
+#--   - a2 (off): Offset dentro del registro (para el comienzo de
+#--               los digitos)
 #--
 #--  SALIDA:
 #--   - a0: Devolver el registro actualizado
 #------------------------------------------------------------------
 	STACK16
-	PUSH1(s0)
+	PUSH2(s0, s1)
 
 	#-- Contador de digitos a actualizar
-	mv s0, a1
+	mv s0, a1  #-- numero de digitos
+	mv s1, a2  #-- offset
 
  uint_update_bcd_reg_next:
 
@@ -614,14 +608,14 @@ uint_update_bcd_reg:
 	addi s0, s0, -1
 
 	#-- Actualizar digito
-	mv a1, s0  #-- Numero de ditigo (1, 0)
-	li a2, 32  #-- Tamaño del registro en bits
+	mv a1, s0  #-- Numero de digito
+	mv a2, s1  #-- Offset
 	jal uint_update_bcd
 
 	#-- Siguiente digito
 	bgt s0, zero, uint_update_bcd_reg_next
 
-	POP1(s0)
+	POP2(s0, s1)
 	UNSTACK16
 
 
