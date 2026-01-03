@@ -10,6 +10,7 @@
     .include "stack.s"
 
 		.data
+buff:   .space 8
 dst:	.space MAX
 data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 data16: .word 0x0003, 0x000C, 0x0030, 0x00C0, 0x0300, 0x0C00, 0x3000, 0xC000
@@ -124,9 +125,31 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
     #-- Prueba de SPRINT_BCD
     jal sprint_test23
 
+	#-- Prueba de store_bcd()
+	la a0, buff
+	li a1, 0x0000
+	li a2, 4
+	jal store_bcd
+
+	li a1, 0x0
+	li a2, 4
+	jal store_bcd
+
+	#-- Prueba de sprint_bcd_from_mem
+	la a0, dst
+	la a1, buff
+	li a2, 8
+	li a3, 1  #-- Ceros iniciales
+	jal sprint_bcd_from_mem
+
+	PRINT_STRINGL(dst)
+	PRINT_CHARI('\n')
+
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
+
+
 
 
 sprint_test23:
