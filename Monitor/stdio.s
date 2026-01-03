@@ -431,10 +431,12 @@ sprint_uint8:
 .global sprint_bcd
 sprint_bcd:
 #-------------------------------------------------------------
-#-- sprint_bcd(buffer, bcd, ndig, ini0)
+#-- sprint_bcd(dst, bcd, ndig, ini0)
+#--
+#--  Imprimir en la cadena destino los digitos bcd
 #--
 #--  ENTRADA:
-#--    - a0 (buffer): Buffer donde "imprimir"
+#--    - a0 (dst): Buffer donde "imprimir" la cadena
 #--    - a1 (bcd): Registro con digitos bcd (8 como maximo)  
 #--    - a2 (ndig): Numero de digitos a mostrar
 #--    - a3 (ini0): Mostrar ceros iniciales
@@ -445,80 +447,36 @@ sprint_bcd:
 #--   - a0: Puntero al final de la cadena destino
 #--   - a1: (Opcional) Nº de bits impresos
 #------------------------------------------------------------
+	.data
+
+	#-- Buffer donde guardar los digitos bcd en memoria
+	#-- para luego "imprimirlos"
+sprint_bcd_buff:  .space 32
+
+	.text
+
 	STACK32
 	STACK32_PUSH4(s0, s1, s2, s3)
 
 	#-- Guardar parámetros
-	mv s0, a0  #-- Buffer
+	mv s0, a0  #-- Cadena destino
 	mv s1, a1  #-- Registro bcd
 	mv s2, a2  #-- Num. Maximo de digitos
 	mv s3, a3  #-- Ceros iniciales
 
-	#-- Detectar el primer digito no cero
-	#-- s4 = 0 --> No se ha alcanzado el primer digito
-	#-- s4 = 1 --> Primer digito alcanzadof
-	mv s4, a3
+	#-- Almacenar el registro con digitos bcds en memoria
+	la a0, sprint_bcd_buff
+	mv a1, s1  #-- reg
+	mv a2, s2  #-- n
+	jal store_bcd
 
-	#------ Imprimir el digito i
-sprint_bcd_next:
-	#-- Generar la mascara para obtener el digito i
-	li t0, 0xF
+	#-- "Imprimir" los digitos en la cadena destino
+	mv a0, s0  #-- dst
+	la a1, sprint_bcd_buff
+	mv a2, s2  #-- n
+	mv a3, s3  #-- ini0
+	jal sprint_bcd_from_mem
 
-	#-- t1 = Numero de digitos - 1
-	mv t1, s2
-	addi t1, t1, -1
-
-	#-- t1 = Bits a desplazar = (a2 - 1)*4
-	slli t1, t1, 2
-
-	#-- Obtener mascara
-	#-- t2 = (0xF) << (a2 -1)*4
-	sll t2, t0, t1
-
-	#-- Obtener el digito
-	#-- y situarlo en el bms
-	#-- t3 = digito
-	and t3, s1, t2
-	srl t3, t3, t1
-
-	#-- Si s4==1, estamos en modo impresión
-	#-- ¡Imprimir el digito!
-	li t0, 1
-	beq s4, t0, sprint_bcd_print
-
-	#-- Comprobar si se ha alcazando el primer
-	#-- digito distinto de cero
-	beq t3, zero, skip
-
-	#-- digi == 0
-	#-- Primer digito no 0 alcanzado!
- sprint_bcd_print:
-	#-- Pasar a modo impresion
-	li s4, 1 
-
-	#-- Imprimir!
-	mv a1, t3
-	jal sprint_hex4
-
- skip:
-	#-- Queda un digito menos
-	addi s2, s2, -1
-
-	#-- ¿Hemos terminado?
-	bgt s2, zero, sprint_bcd_next
-
-	#-- Caso especial
-	#-- Si s4 == 0, el numero es un 0. ¡Imprimirlo!
-	bne s4, zero, sprint_bcd_next2
-
-	#-- Imprimir el 0!
-	mv a0, s0
-	mv a1, zero
-	jal sprint_hex4
-
- sprint_bcd_next2:
-
-	#-- Liberar la pila
 	STACK32_POP4(s0, s1, s2, s3)
 	UNSTACK32
 
@@ -526,7 +484,7 @@ sprint_bcd_next:
 .global sprint_bcd_from_mem
 sprint_bcd_from_mem:
 #-----------------------------------------------------------------
-#-- sprint_bcd_from_memory(dst,buff, n)
+#-- sprint_bcd_from_memory(dst,buff, n, ini0)
 #--
 #-- Imprimir los n digitos bcd almacenados en buffer en la cadena dst
 #--
