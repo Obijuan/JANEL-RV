@@ -1096,12 +1096,31 @@ sprint_unary:
 	mv a1, t0 
 	ret
 
-#--- TODO: sprint_char()
+#--------------------------------------------------
+#-- sprint_char()
+#-- Imprimir un caracter en una cadena
+#--
+#-- ENTRADAS
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (car): Caracter a añadir a la cadena
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--------------------------------------------------
+.global sprint_char
+sprint_char:
+	#-- Guardar caracter en el buffer
+	sb a1, 0(a0)
+
+	#-- Incrementar puntero del buffer
+	addi a0, a0, 1
+
+	#-- Almacenar el terminador 0
+	sb zero, 0(a0)
+	ret
 
 #--------------------------------------------------
 #-- sprint(dst, src)
 #-- Imprimir una cadena en una cadena destino
-#--
 #--
 #--  ENTRADAS:
 #--   - a0 (dst): Puntero a cadena destino
