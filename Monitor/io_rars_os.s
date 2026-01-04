@@ -4,6 +4,13 @@
 #-- Esta implementacion utiliza los servicios del sistema
 #-- operativo del RARs
 #----------------------------------------------------------
+#-- Funciones de BAJO nivel a implementar en cada plataforma:
+#--
+#-- * io_init(): Inicializacion del modulo de I/O
+#-- * exit(): Funcion para terminar
+#-- * putchar(car): Imprimir un caracter en la consola
+#--
+#------------------------------------------------------------
 
 #-- Servicios del sistema operativo del RARs
 	.include "rars_so.h"
@@ -39,6 +46,16 @@ putchar:
 #--
 #-- Terminar
 #------------------------------------------
+    .data
+msg_exit: .string "io_rars_os: EXIT\n\n"
+
+    .text
+
 .global exit
 exit:
+    #-- Imprimir mensaje de fin
+    la a0, msg_exit
+    jal puts
+
+    #-- Terminar
     EXIT

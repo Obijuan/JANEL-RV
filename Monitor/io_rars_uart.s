@@ -59,8 +59,18 @@ wait_tx_ready:
 #--
 #-- Terminar
 #------------------------------------------
+	.data
+msg_exit: .string "io_rars_uart: EXIT\n\n"
+	.text
+	
 .global exit
 exit:
+
+	#-- Debug: Imprimir una cadena para indicar
+	#-- que se ha terminado
+	la a0, msg_exit
+	jal puts
+	
 
 	#-- La funcion de exit para un sistema empotrado deberia
 	#-- ser un bucle infinito

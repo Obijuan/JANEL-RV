@@ -1,9 +1,10 @@
-#---------------------------------
+#----------------------------------------
 #-- Ejemplos de prueba
-#---------------------------------
+#-- Impresion de cadenas mediante puts
+#----------------------------------------
 
     .data
-msg1: .string "Hi!\n"    
+msg1: .string "Ejemplo de uso de la funcion puts()\n"    
 
     .text
 
