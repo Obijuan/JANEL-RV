@@ -251,6 +251,9 @@ sprint_uint16:
 	#-- Repetir el algoritmo si todavía toca
 	bgt s3, zero, sprint_uint16_next
 
+	#------- Fase de impresion
+	#-- Primero se almacena en un buffer
+	#-- Luego se imprime desde memoria
 
 	#-- Almacenar registro bcd de mayor peso
 	la a0, sprint_uint16_buff
@@ -298,6 +301,13 @@ sprint_uint8:
 #  +----------------------------------------------------------+
 #
 # La posicion de cada campo es: pos(digi) = i*4 + tam(n)
+	.data
+
+	#-- Buffer donde guardar los digitos bcd en memoria
+	#-- para luego "imprimirlos"
+ sprint_uint8_buff:  .space 3
+
+	.text
 
 	STACK16
 	PUSH2(s0, s1)
@@ -341,32 +351,25 @@ sprint_uint8:
 
 	bgt s1, zero, sprint_uint8_next
 
-
-
+	#------- Fase de impresion
+	#-- Primero se almacena en un buffer
+	#-- Luego se imprime desde memoria
 
 	#-- s1: Registro bcd
 	mv s1, a0
 
-	#-- Obtener Dig2
-	li t0, 0xF0000
-	and a1, s1, t0
-	srli a1, a1, 16
+	#-- Almacenar registro bcd
+	la a0, sprint_uint8_buff
+	srli a1, s1, 8  #-- Reg bcd
+	li a2, 3        #-- Numero de digitos
+	jal store_bcd
 
-	#-- Imprimir dig2!
-	mv a0, s0
-	jal sprint_hex4
-
-	#-- Obtener Dig1 e imprimirlo
-	li t0, 0xF000
-	and a1, s1, t0
-	srli a1, a1, 12
-	jal sprint_hex4
-
-	#-- Obtener Dig0 e imprimirlo
-	li t0, 0xF00
-	and a1, s1, t0
-	srli a1, a1, 8
-	jal sprint_hex4
+	#-- "Imprimir" los digitos en la cadena destino
+	mv a0, s0  #-- dst
+	la a1, sprint_uint8_buff
+	li a2, 3  #-- Numero de digitos
+	li a3, 0  #-- Ceros iniciales: NO
+	jal sprint_bcd_from_mem
 
 	#-- Liberar la pila
 	POP2(s0, s1)
