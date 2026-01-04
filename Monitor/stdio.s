@@ -1166,6 +1166,7 @@ sprint:
 puts:
 
     STACK16
+	PUSH1(s0)
 
     #-- s0: Puntero al buffer
     mv s0, a0
@@ -1190,7 +1191,7 @@ puts:
 
  puts_end:
 
-
+	POP1(s0)
     UNSTACK16
     ret
 
