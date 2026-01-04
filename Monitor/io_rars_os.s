@@ -47,7 +47,7 @@ putchar:
 #-- Terminar
 #------------------------------------------
     .data
-msg_exit: .string "io_rars_os: EXIT\n\n"
+msg_exit: .string "\n--------> io_rars_os: EXIT\n\n"
 
     .text
 
