@@ -8,6 +8,18 @@
 #-- Servicios del sistema operativo del RARs
 	.include "rars_so.h"
 
+#--------------------------------------
+#-- io_init()
+#--
+#-- Configuracion de la entrada salida
+#--
+#-- Como hay un sistema operativo debajo,
+#-- no hay que configurar nada
+#----------------------------------------
+.global io_init
+io_init:
+    ret
+
 #----------------------------------------
 #-- putchar(car)
 #--
