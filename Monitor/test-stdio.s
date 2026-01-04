@@ -145,6 +145,8 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	PRINT_STRINGL(dst)
 	PRINT_CHARI('\n')
 
+	jal unittest_sprint
+
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
@@ -1051,4 +1053,77 @@ sprint_test1:
 
 	#-- Restaurar pila
     UNSTACK16
+
+
+#---------------------------------
+#-- Pruebas unitarias de sprint
+#-- TEST1
+#---------------------------------
+	.data
+buffer:        .space MAX
+test1_name:    .string "> TEST 1...."
+result1_ok:    .string "OK!\n"
+result1_error: .string "ERROR!\n" 
+cad1:          .string "Cadena de prueba"
+cad2:          .string "dddd"
+msg_abort:     .string "ABORT!\n"
+
+	.text
+
+unittest_sprint:
+	STACK16
+
+	#-- Inicio de la prueba
+	la a0, test1_name
+	jal puts
+
+	#--- Prueba de "impresion" de una cadena
+	la a0, buffer
+	la a1, cad1
+	jal sprint
+
+	#------ assert buffer == cad1
+	#-- Comparar cadenas buffer y cad1
+	la a0, buffer
+	la a1, cad1
+
+next:
+	#-- Leer caracteres fuente y destino
+	lb t0, 0(a0)
+	lb t1, 0(a1)
+
+	#-- Compararlos!
+	bne t0, t1, not_equal
+
+	#-- Los caracteres son iguales
+	#-- comprobar si hemos llegado al final de la 
+	#-- cadena destino
+	beq t1, zero, end_equal
+
+	#--- No se ha llegado al final
+	#--- Incrementar punteros de las cadenas origen y destino
+	addi a0, a0, 1
+	addi a1, a1, 1
+
+	#-- Siguiente caracter
+	j next
+
+ not_equal: 
+    #-- Las cadenas NO son iguales
+	#-- Test NO pasado!
+	la a0, result1_error
+	jal puts
+
+	#-- Abortar test!
+	la a0, msg_abort
+	jal puts
+	jal exit
+
+ end_equal:
+	#-- Las cadenas son iguales!!
+	la a0, result1_ok
+	jal puts
+
+end:
+	UNSTACK16
 

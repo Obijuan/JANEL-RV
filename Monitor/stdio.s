@@ -1096,22 +1096,22 @@ sprint_unary:
 	mv a1, t0 
 	ret
 
+#--- TODO: sprint_char()
 
+#--------------------------------------------------
+#-- sprint(dst, src)
+#-- Imprimir una cadena en una cadena destino
+#--
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (src): Puntero a cadena fuente
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bytes copiados
+#--------------------------------------------------
 .global sprint
 sprint:
- #--------------------------------------------------
- #-- SPRINT(dst, src)
- #-- Imprimir una cadena en una cadena destino
- #--
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (src): Puntero a cadena fuente
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bytes copiados
- #--------------------------------------------------
-
 	#-- Contador de caracteres
 	li t0, 0
 	
