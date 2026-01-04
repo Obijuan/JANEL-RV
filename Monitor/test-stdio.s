@@ -10,6 +10,7 @@
     .include "stack.h"
 
 		.data
+buffer: .space MAX
 buff:   .space 8
 dst:	.space MAX
 data8:	.word 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
@@ -143,6 +144,7 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	PRINT_CHARI('\n')
 
 	jal unittest_sprint
+	jal unittest_sprint_char
 
 	#-- Terminar
 	PRINT_CHARI('\n')
@@ -1015,16 +1017,108 @@ sprint_test2:
     POP1(s0)
     UNSTACK16
 
+#---------------------------------------
+#-- Pruebas unitarios de sprint_char()
+#-- TEST4-TEST7
+#---------------------------------------
+unittest_sprint_char:
+
+	.data
+test4_name:	 .string "> TEST 4...."
+result4_str: .string "A"
+test5_name:  .string "> TEST 5...."
+result5_str: .string "XY"
+test6_name:  .string "> TEST 6...."
+test6_cad:   .string "TEST-"
+result6_str: .string "TEST-Z"
+test7_name:  .string "> TEST 7...."
+test7_cad:   .string "CUBE"
+result7_str: .string "CUBE-CUBE"
+
+	.text
+	STACK16
+
+	#-------- 4. Prueba de "impresion" de un caracter
+	la a0, test4_name
+	jal puts
+
+	#-- sprint_char(buffer, 'A')
+	la a0, buffer
+	li a1, 'A'
+	jal sprint_char
+
+	#-- assert buffer == "A"
+	la a0, buffer
+	la a1, result4_str
+	jal assert_str_equal
+
+	#--------- 5. Prueba de impresion de dos caracteres
+	la a0, test5_name
+	jal puts
+
+	#-- sprint_char(buffer, 'X')
+	la a0, buffer
+	li a1, 'X'
+	jal sprint_char
+
+	#-- sprint_char(buffer, 'Y')
+	li a1, 'Y'
+	jal sprint_char
+
+	#-- assert buffer == "XY"
+	la a0, buffer
+	la a1, result5_str
+	jal assert_str_equal
+
+	#---------- 6. Impresion de cadena + caracter
+	la a0, test6_name
+	jal puts
+
+	#-- sprint(buffer, "TEST-")
+	la a0, buffer
+	la a1, test6_cad
+	jal sprint	
+
+	#-- sprint_char(buffer, 'Z')
+	li a1, 'Z'
+	jal sprint_char
+
+	#-- assert buffer = "TEST-Z"
+	la a0, buffer
+	la a1, result6_str
+	jal assert_str_equal
+
+	#----------- 7. Impresion de cadena + caracter + cadena
+	la a0, test7_name
+	jal puts
+
+	#-- sprint(buffer, "CUBE")
+	la a0, buffer
+	la a1, test7_cad
+	jal sprint
+	#-- sprint_char(buffer, "-")
+	li a1, '-'
+	jal sprint_char
+	#-- sprint(buffer, "CUBE")
+	la a1, test7_cad
+	jal sprint
+
+	#-- assert buffer = "CUBE-CUBE"
+	la a0, buffer
+	la a1, result7_str
+	jal assert_str_equal
+
+	UNSTACK16
+
 
 
 #---------------------------------
-#-- Pruebas unitarias de sprint
+#-- Pruebas unitarias de sprint()
 #-- TEST1-TEST3
 #---------------------------------
 unittest_sprint:
 
 	.data
- buffer:        .space MAX
  test1_name:    .string "> TEST 1...."
  test2_name:    .string "> TEST 2...."
  test3_name:    .string "> TEST 3...."
