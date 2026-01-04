@@ -4,10 +4,10 @@
 	.eqv MAX 255
 
 	#-- Servicios del sistema operativo del RARs
-	.include "rars_so.s"
+	.include "rars_so.h"
 
     #-- Macros para funciones y pila
-    .include "stack.s"
+    .include "stack.h"
 
 		.data
 buff:   .space 8

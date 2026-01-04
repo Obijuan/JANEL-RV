@@ -5,8 +5,8 @@
 #-- Mascaras para BITs
 	.eqv BIT0 0x01 
 
-.include "rars_so.s"
-.include "stack.s"
+#-- Macros de acceso a la pila
+.include "stack.h"
 
 
 .global sprint_uint32
@@ -1153,3 +1153,44 @@ sprint:
 
 	
 	
+#------------------------------------------------
+#-- puts(str)
+#--
+#-- Imprimir una cadena en la consola
+#-- Llama a putchar para imprimir cada caracter
+#--
+#-- ENTRADA:
+#--  - a0 (str): Puntero a la cadena a imprimir
+#------------------------------------------------
+.global puts
+puts:
+
+    STACK16
+
+    #-- s0: Puntero al buffer
+    mv s0, a0
+
+ puts_bucle:
+
+    #-- Leer el caracter del buffer
+    lb t0, 0(s0)
+
+    #-- Si es 0, terminar
+    beq t0, zero, puts_end
+
+    #-- Imprimir el caracter a traves de putchar
+    mv a0, t0
+    jal putchar
+
+    #-- Apuntar al siguiente caracter
+    addi s0, s0, 1
+
+    #-- Siguiente caracter
+    j puts_bucle
+
+ puts_end:
+
+
+    UNSTACK16
+    ret
+
