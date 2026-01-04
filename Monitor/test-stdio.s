@@ -37,9 +37,6 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 #----------- 
 	.text   
 
-	#-- Prueba de SPRINT
-	jal sprint_test1
-
 	#-- Prueba de SPRINT_UNARY
 	jal sprint_test2
 
@@ -1018,63 +1015,29 @@ sprint_test2:
     POP1(s0)
     UNSTACK16
 
-sprint_test1:
- #--------------------------------------
- #-- Prueba para SPRINTS
- #-- Imprimiendo cadenas
- #--------------------------------------
-	.data
- test1_msg1:	.string "Holi!"
- test1_msg2:   .string "Manoli!"
- test1_msg3:   .string "--->ok!\n"
-
-	.text	
-
-	#-- Crear pila
-    STACK16
-
-	PRINT_STRINGI("* TEST 1:\n")
-
-	#-- Copiar msg1 en dst
-	la a0, dst
-	la a1, test1_msg1
-	jal sprint
-
-	#-- Cadena 2
-	la a1, test1_msg2
-	jal sprint
-	
-	#-- Cadena 3
-	la a1, test1_msg3
-	jal sprint
-
-	#-- Imprimir la cadena creada
-	PRINT_STRINGL(dst)
-
-	#-- Restaurar pila
-    UNSTACK16
 
 
 #---------------------------------
 #-- Pruebas unitarias de sprint
 #-- TEST1-TEST3
 #---------------------------------
+unittest_sprint:
+
 	.data
-buffer:        .space MAX
-test1_name:    .string "> TEST 1...."
-test2_name:    .string "> TEST 2...."
-test3_name:    .string "> TEST 3...."
-cad1:          .string "Cadena de prueba"
-cad2:          .string "MSG1-"
-cad3:          .string "MSG2"
-result2_str:   .string "MSG1-MSG2"
-cad4:          .string "ABCD-"
-cad5:          .string "EFGH-"
-cad6:          .string "IJKL"
-result3_str:   .string "ABCD-EFGH-IJKL"
+ buffer:        .space MAX
+ test1_name:    .string "> TEST 1...."
+ test2_name:    .string "> TEST 2...."
+ test3_name:    .string "> TEST 3...."
+ cad1:          .string "Cadena de prueba"
+ cad2:          .string "MSG1-"
+ cad3:          .string "MSG2"
+ result2_str:   .string "MSG1-MSG2"
+ cad4:          .string "ABCD-"
+ cad5:          .string "EFGH-"
+ cad6:          .string "IJKL"
+ result3_str:   .string "ABCD-EFGH-IJKL"
 
 	.text
-unittest_sprint:
 	STACK16
 
 	#-------- 1. Prueba de "impresion" de una cadena
@@ -1129,130 +1092,4 @@ unittest_sprint:
 
 	UNSTACK16
 
-
-#-------------------------------------------------
-#-- assert_str_equal(str1, str2)
-#--
-#-- Asegurarse que las dos cadenas str1 y str2
-#-- son iguales. Si NO lo son, se aborta el test
-#--
-#-- ENTRADAS:
-#--   - a0 (str1): Puntero a cadena 1
-#--   - a1 (str2): Puntero a cadena 2
-#-- SALIDA:
-#--   - Ninguna
-#-------------------------------------------------
-	.data
-result_ok:   .string "OK!\n"
-result_fail: .string "FAIL!\n"
-msg_abort:   .string "ABORT!\n"
-real_cad:    .string "  * Cadena generada: "
-expect_cad:  .string "  * Cadena esperada: "
-
-
-	.text
-assert_str_equal:
-	STACK16
-	PUSH2(s0, s1)
-
-	#-- Guardar los parametros
-	mv s0, a0
-	mv s1, a1
-
-	#-- Comparar las cadenas
-	jal cmpstr
-
-	#-- Analizar resultado
-	beq a0, zero, assert_str_equal_ne
-
-	#-- Las cadenas son iguales!!
-	la a0, result_ok
-	jal puts
-	j assert_str_equal_end
-
- assert_str_equal_ne: 
-    #-- Las cadenas NO son iguales
-	#-- Test NO pasado!
-	la a0, result_fail
-	jal puts
-
-	#------ Imprimir resultados
-	#-- Cadena generada
-	la a0, real_cad
-	jal puts
-
-	mv a0, s0
-	jal puts
-
-	li a0, '\n'
-	jal putchar
-
-	#-- Cadena esperada
-	la a0, expect_cad
-	jal puts
-
-	mv a0, s1
-	jal puts
-
-	li a0, '\n'
-	jal putchar
-
-	#-- Abortar test!
-	la a0, msg_abort
-	jal puts
-	jal exit
-
-assert_str_equal_end:
-	POP2(s0, s1)
-	UNSTACK16
-
-
-#--------------------------------------------
-#-- cmpstr(str1, str2)
-#--
-#-- Comparar dos cadenas
-#--
-#-- ENTRADA:
-#--   - a0 (str1): Puntero a cadena 1
-#--   - a1 (str2): Puntero a cadena 2
-#--
-#-- SALIDA:
-#--   - a0: Resultado de la comparacion
-#--     - 0: NO son iguales
-#--     - 1: Son iguales
-#---------------------------------------------
-cmpstr:
-
- cmpstr_next:
-	#-- Leer caracteres fuente y destino
-	lb t0, 0(a0)
-	lb t1, 0(a1)
-
-	#-- Compararlos!
-	bne t0, t1, cmpstr_not_equal
-
-	#-- Los caracteres son iguales
-	#-- comprobar si hemos llegado al final de la 
-	#-- cadena destino
-	beq t1, zero, cmpstr_end_equal
-
-	#--- No se ha llegado al final
-	#--- Incrementar punteros de las cadenas origen y destino
-	addi a0, a0, 1
-	addi a1, a1, 1
-
-	#-- Siguiente caracter
-	j cmpstr_next
-
- cmpstr_not_equal: 
-    #-- Las cadenas NO son iguales
-	li a0, 0
-	j cmpstr_end
-
- cmpstr_end_equal:
-	#-- Las cadenas son iguales!!
-	li a0, 1
-
- cmpstr_end:
-	ret
 
