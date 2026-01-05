@@ -1097,7 +1097,7 @@ sprint_unary:
 	ret
 
 #--------------------------------------------------
-#-- sprint_char()
+#-- sprint_char(dst, car)
 #-- Imprimir un caracter en una cadena
 #--
 #-- ENTRADAS

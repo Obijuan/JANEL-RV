@@ -38,9 +38,6 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 #----------- 
 	.text   
 
-	#-- Prueba de SPRINT_UNARY
-	jal sprint_test2
-
 	#-- Prueba de SPRINT_BIN
 	#-- Numeros binarios de 1 bit
 	jal sprint_test3
@@ -145,6 +142,7 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 
 	jal unittest_sprint
 	jal unittest_sprint_char
+	jal unittest_sprint_unary
 
 	#-- Terminar
 	PRINT_CHARI('\n')
@@ -969,53 +967,147 @@ test_bin1:
     UNSTACK16
 
 
-sprint_test2:
- #--------------------------------------
- #-- Pruebas para SPRINT_UNARY
- #-- Imprimiendo numeros en unario
- #--------------------------------------
-	.data
- test2_msg1: .string "Unario: "
 
-	#-- Numero maximo de unarios a imprimir
-	.eqv MAX_UNARY 5
+
+
+#---------------------------------------
+#-- Pruebas unitarias de sprint_unary()
+#-- TEST8-TEST13
+#---------------------------------------
+unittest_sprint_unary:
+
+	.data
+ test8_tittle:  .string "----- SPRINT_UNARY()-----\n"
+ test8_name:     .string "> TEST 8...."
+ test8_result1:  .string "1"
+ test9_name:     .string "> TEST 9...."
+ test9_result2:  .string "11"
+ test10_name:    .string "> TEST 10...."
+ test10_result3: .string "111"
+ test11_name:    .string "> TEST 11...."
+ test11_result4: .string "****"
+ test12_name:    .string "> TEST 12...."
+ test12_cad5:    .string "Unary: "
+ test12_result5: .string "Unary: 11111"
+ test13_name:    .string "> TEST 13...."
+ test13_cad6:    .string "->"
+ test13_cad7:    .string "<-\n"
+ test13_result6: .string "->111111<-\n"
+
 
 	.text
-    STACK16
-	PUSH1(s0)
+	STACK16
 
-	PRINT_STRINGI("\n* TEST 2:\n")
+	#--- Imprimir titulo
+	la a0, test8_tittle
+	jal puts
 
-	#-- Inicializar contador de unarios
-	li s0, 0
+	#-------- 8. Numero unario 1
+	la a0, test8_name
+	jal puts
 
- sprint_test2_next:
-	#-- Imprimir cadena
-	la a0, dst  #-- Puntero a cadena destino
-	la a1, test2_msg1
+	#-- sprint_unariy(buffer, 1, '1')
+	la a0, buffer
+	li a1, 1    #-- Una marca
+	li a2, '1'  #-- Marca a utilizar
+	jal sprint_unary
+
+	#-- assert buffer == '1'
+	la a0, buffer
+	la a1, test8_result1
+	jal assert_str_equal
+
+	#--------- 9. Numero unario 11
+	la a0, test9_name
+	jal puts
+
+	#-- sprint_unary(buffer, 2, '1')
+	la a0, buffer
+	li a1, 2   #-- Dos marcas
+	li a2, '1' #-- Marca a utilizar
+	jal sprint_unary
+
+	#-- assert buffer == '11'
+	la a0, buffer
+	la a1, test9_result2
+	jal assert_str_equal
+
+	#--------- 10. Numero unario 111
+	la a0, test10_name
+	jal puts
+
+	#-- sprint_unary(buffer, 3, '1')
+	la a0, buffer
+	li a1, 3  #-- Tres marcas
+	li a2, '1'
+	jal sprint_unary
+
+	#-- assert buffer == '111'
+	la a0, buffer
+	la a1, test10_result3
+	jal assert_str_equal
+
+	#---------- 11. Barra de progreso ****
+	la a0, test11_name
+	jal puts
+
+	#-- sprint_unary(buffer, 4, '*')
+	la a0, buffer
+	li a1, 4
+	li a2, '*'
+	jal sprint_unary
+
+	#-- assert buffer == '****'
+	la a0, buffer
+	la a1, test11_result4
+	jal assert_str_equal
+
+	#----------- 12. Cadena + unario: "Unary: 11111"
+	la a0, test12_name
+	jal puts
+
+	#-- sprint(buffer, "Unary")
+	la a0, buffer
+	la a1, test12_cad5
 	jal sprint
 
-	#-- Imprimir un numero en unario
-	mv a1, s0  #-- Numero a imprimir
-	li a2, '1'  #-- Marca a usar
+	#-- sprint_unary(buffer, 5, '1')
+	li a1, 5
+	li a2, '1'
 	jal sprint_unary
-	
-	#-- Imprimir cadena resultante
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
 
-	li t0, MAX_UNARY
-    beq s0, t0, sprint_test2_fin
+	#-- assert buffer == 'Unary: 11111'
+	la a0, buffer
+	la a1, test12_result5
+	jal assert_str_equal
 
-	#-- Incrementar numero unario
-	addi s0, s0, 1
-	j sprint_test2_next
+	#----------- 13. Cadena + unario + cadena: "->111111<-"
+	la a0, test13_name
+	jal puts
 
- sprint_test2_fin:	
+	#-- sprint(buffer, "->")
+	la a0, buffer
+	la a1, test13_cad6
+	jal sprint
 
-	#-- Restaurar pila
-    POP1(s0)
-    UNSTACK16
+	#-- sprint_unary(buffer, 6, '1')
+	li a1, 6
+	li a2, '1'
+	jal sprint_unary
+
+	#-- sprint(buffer, "<-\n")
+	la a1, test13_cad7
+	jal sprint
+
+	#-- assert buffer == '->111111<-'
+	la a0, buffer
+	la a1, test13_result6
+	jal assert_str_equal
+
+	UNSTACK16
+
+
+
 
 #---------------------------------------
 #-- Pruebas unitarios de sprint_char()
@@ -1024,19 +1116,24 @@ sprint_test2:
 unittest_sprint_char:
 
 	.data
-test4_name:	 .string "> TEST 4...."
-result4_str: .string "A"
-test5_name:  .string "> TEST 5...."
-result5_str: .string "XY"
-test6_name:  .string "> TEST 6...."
-test6_cad:   .string "TEST-"
-result6_str: .string "TEST-Z"
-test7_name:  .string "> TEST 7...."
-test7_cad:   .string "CUBE"
-result7_str: .string "CUBE-CUBE"
+ test4_tittle:  .string "----- SPRINT_CHAR()-----\n"
+ test4_name:	 .string "> TEST 4...."
+ result4_str: .string "A"
+ test5_name:  .string "> TEST 5...."
+ result5_str: .string "XY"
+ test6_name:  .string "> TEST 6...."
+ test6_cad:   .string "TEST-"
+ result6_str: .string "TEST-Z"
+ test7_name:  .string "> TEST 7...."
+ test7_cad:   .string "CUBE"
+ result7_str: .string "CUBE-CUBE"
 
 	.text
 	STACK16
+
+	#--- Imprimir titulo
+	la a0, test4_tittle
+	jal puts
 
 	#-------- 4. Prueba de "impresion" de un caracter
 	la a0, test4_name
@@ -1119,6 +1216,7 @@ result7_str: .string "CUBE-CUBE"
 unittest_sprint:
 
 	.data
+ test1_tittle:  .string "----- SPRINT()--------\n"
  test1_name:    .string "> TEST 1...."
  test2_name:    .string "> TEST 2...."
  test3_name:    .string "> TEST 3...."
@@ -1133,6 +1231,10 @@ unittest_sprint:
 
 	.text
 	STACK16
+
+	#-- Imprimir el titulo
+	la a0, test1_tittle
+	jal puts
 
 	#-------- 1. Prueba de "impresion" de una cadena
 	la a0, test1_name
