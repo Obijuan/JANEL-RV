@@ -1081,8 +1081,8 @@ sprint_bin1:
 #--------------------------------------------------
 #-- IMPLEMENTACION 1: Sin utilizar look-up table
 #--------------------------------------------------
-.global sprint_bcd_digit
-sprint_bcd_digit:
+.global sprint_bcd_digit2
+sprint_bcd_digit2:
 
 	#-- Quedarse con los 4 bits menos significativos
 	andi a1, a1, 0x0F
@@ -1114,6 +1114,40 @@ sprint_bcd_digit:
 	li a1, 4  #-- 4 bits impresos
 	ret
 
+#--------------------------------------------------
+#-- sprint_bcd_digit
+#--------------------------------------------------
+#-- IMPLEMENTACION 2: Mediante tabla de Look-up
+#--------------------------------------------------
+.global sprint_bcd_digit
+sprint_bcd_digit:
+	.data
+
+	#--- Look up table (LUT) para los digitos BCD
+ bcd_lut:
+	.byte '0', '1', '2', '3', '4', '5', '6', '7'
+	.byte '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+
+	.text
+
+	#-- Obtener direccion base de la lut
+	la t0, bcd_lut
+
+	#-- Sumar el digito bcd actual
+	add t0, t0, a1
+
+	#-- Realizar la conversion
+	lb t1, 0(t0)
+
+	#-- Almacenar caracter en cadena destino
+	sb t1, 0(a0)
+
+	#-- Incrementar puntero cadena destino
+	addi a0, a0, 1
+
+	#-- Cadena terminada
+	sb zero, 0(a0)
+	ret
 
 #--------------------------------------------------
 # SPRINT_UNARY(dst, n, mark)
