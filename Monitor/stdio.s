@@ -1023,18 +1023,17 @@ sprint_bin:
 
 .global sprint_bin1
 sprint_bin1:
- #--------------------------------------------------
- #-- SPRINT_BIN1(dst, n)
- #-- Imprimir un numero binario de 1 bit
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bits impresos
- #--------------------------------------------------
-
+#--------------------------------------------------
+#-- SPRINT_BIN1(dst, n)
+#-- Imprimir un numero binario de 1 bit
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (n): Numero a imprimir
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#--------------------------------------------------
 	#-- Quedarse con el bit 0
 	andi a1, a1, BIT0
 
@@ -1053,22 +1052,83 @@ sprint_bin1:
 	li a1, 1  #-- Un bit impreso
 	ret
 
+#--------------------------------------------------
+#-- sprint_bcd(dst, dig)
+#--
+#-- Imprimir un digito en BCD. Del digito pasado
+#-- solo se usan los 4 bits de menor peso
+#--
+#-- Numero BCD     Caracter
+#-- ----------     --------
+#-- 0000             '0'
+#-- 0001             '1'
+#-- 0010             '2'
+#-- 0011             '3' 
+#-- 0100             '4'
+#-- ...
+#-- 1010             'A'
+#-- 1011             'B'
+#-- 1100             'C'
+#-- ...
+#-- 1111             'F'
+#--
+#-- ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (bcd): Digito BCD a imprimir (4 bits)
+#--
+#-- SALIDAS:
+#--   - a0: Puntero al final de la cadena destino
+#--------------------------------------------------
+#-- IMPLEMENTACION 1: Sin utilizar look-up table
+#--------------------------------------------------
+.global sprint_bcd_digit
+sprint_bcd_digit:
 
+	#-- Quedarse con los 4 bits menos significativos
+	andi a1, a1, 0x0F
+
+	#-- Convertir a caracter '0'...'9' - 'A'...'F'
+	#-- Si n < 10, sumar '0'. Es un digito '0' - '9'
+	#-- sino, sumar ('A'-10) = 0x37
+	li t0, 10
+	blt a1, t0, sprint_bcd_digit_digit_0_9
+
+	#-- Digito 'A'...'F'
+	addi a1, a1, 0x37
+	j sprint_bcd_digit_next
+
+ sprint_bcd_digit_digit_0_9:
+	addi a1, a1, '0' 
+
+ sprint_bcd_digit_next:
+
+	#-- Almacenar caracter en cadena destino
+	sb a1, 0(a0)
+
+	#-- Incrementar puntero de cadena destino
+	addi a0, a0, 1
+
+	#-- Cadena terminada
+	sb zero, 0(a0)
+
+	li a1, 4  #-- 4 bits impresos
+	ret
+
+
+#--------------------------------------------------
+# SPRINT_UNARY(dst, n, mark)
+#-- Imprimir un numero en unario
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (n): Numero a imprimir en unario
+#--   - a2 (mark): Marca a usar
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de marcas impresas
+#--------------------------------------------------
 .global sprint_unary
 sprint_unary:
- #--------------------------------------------------
- # SPRINT_UNARY(dst, n, mark)
- #-- Imprimir un numero en unario
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir en unario
- #--   - a2 (mark): Marca a usar
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de marcas impresas
- #--------------------------------------------------
-
 	#-- Contador de marcas
 	li t0, 0
 

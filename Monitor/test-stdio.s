@@ -140,9 +140,14 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	PRINT_STRINGL(dst)
 	PRINT_CHARI('\n')
 
+
+	#-----------------------------
+	#-- TESTS UNITARIOS
+	#-----------------------------
 	jal unittest_sprint
 	jal unittest_sprint_char
 	jal unittest_sprint_unary
+	jal unittest_sprint_bcd_digit
 
 	#-- Terminar
 	PRINT_CHARI('\n')
@@ -968,6 +973,85 @@ test_bin1:
 
 
 
+#------------------------------------------
+#-- Pruebas unitarias de sprint_bcd_digit
+#------------------------------------------
+unittest_sprint_bcd_digit:
+
+	.data
+test14_tittle:  .string "----- SPRINT_BCD_DIGIT()-----\n"
+test14_name:    .string "> TEST 14...."
+test14_result1: .string "0"
+test15_name:    .string "> TEST 15...."
+test15_result1: .string "1"
+test16_name:    .string "> TEST 16...."
+test16_result1: .string "01234567"
+
+
+	.text
+	STACK16
+
+	#--- Imprimir titulo
+	la a0, test14_tittle
+	jal puts
+
+	#--------  14. Imprimir Bit 0
+	la a0, test14_name
+	jal puts
+
+	#-- sprint_bcd_digit(buffer, 0)
+	la a0, buffer
+	li a1, 0
+	jal sprint_bcd_digit
+
+	#-- assert buffer == '0'
+	la a0, buffer
+	la a1, test14_result1
+	jal assert_str_equal
+
+	#--------  15. Imprimir Bit 1
+	la a0, test15_name
+	jal puts
+
+	#-- sprint_bcd_digit(buffer, 1)
+	la a0, buffer
+	li a1, 1
+	jal sprint_bcd_digit
+
+	#-- assert buffer == '1'
+	la a0, buffer
+	la a1, test15_result1
+	jal assert_str_equal
+
+	#--------  16. Imprimir todos los digitos octales
+	la a0, test16_name
+	jal puts
+
+	#-- Contador de digitos
+	li s0, 0
+
+	#-- Direccion del buffer
+	la a0, buffer
+
+ next16:
+	#-- sprint_bcd_digit(buffer, dig)
+	mv a1, s0
+	jal sprint_bcd_digit
+
+	#-- Incrementar contador
+	addi s0, s0, 1
+
+	#-- Mientras digito actual sea menor a 8, repetir
+	li t0, 8
+	blt s0, t0, next16
+
+	#-- assert buffer == '01234567'
+	la a0, buffer
+	la a1, test16_result1
+	jal assert_str_equal
+
+	UNSTACK16
+	ret
 
 
 #---------------------------------------
