@@ -1052,6 +1052,58 @@ sprint_bin1:
 	li a1, 1  #-- Un bit impreso
 	ret
 
+
+#---------------------------------------------------
+#-- bcd_copy(dst, buffer_bcd)
+#--
+#--  Imprimir una lista de digitos bcd almacenada en
+#--  buffer_bcd en la cadena destino
+#--
+#--  Ej. La lista de bytes 1, 2, 3  se copia en la cadena
+#--    destino como "123"
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Buffer de la cadena destino
+#--   - a1 (buffer_bcd): Buffer de los digitos bcd
+#--   - a2 (ndig): Numero de digitos a copiar en cadena destino
+#--
+#--  SALIDAS:
+#--   - Ninguna
+#----------------------------------------------------------------
+.global bcd_copy
+bcd_copy:
+
+	STACK16
+	PUSH3(s0, s1, s2)
+
+	#-- Guardar los parametros
+	mv s1, a1  #-- Buffer bcd origen
+	mv s2, a2  #-- Contador de digitos
+
+ bcd_copy_next:
+	#-- Si quedan 0 digitos, hemos terminado
+	beq s2, zero, bcd_copy_end
+
+	#-- Leer digito bcd actual
+	lb a1, 0(s1)
+
+	#-- Imprimirlo en la cadena
+	jal sprint_bcd_digit
+
+	#-- Siguiente digito
+	addi s1, s1, 1
+
+	#-- Decrementar contador de digitos
+	addi s2, s2, -1
+
+	#-- Repetir
+	j bcd_copy_next
+
+ bcd_copy_end:
+	POP3(s0, s1, s2)
+	UNSTACK16
+
+
 #--------------------------------------------------
 #-- sprint_bcd(dst, dig)
 #--
@@ -1081,8 +1133,8 @@ sprint_bin1:
 #--------------------------------------------------
 #-- IMPLEMENTACION 1: Sin utilizar look-up table
 #--------------------------------------------------
-.global sprint_bcd_digit2
-sprint_bcd_digit2:
+.global sprint_bcd_digit
+sprint_bcd_digit:
 
 	#-- Quedarse con los 4 bits menos significativos
 	andi a1, a1, 0x0F
@@ -1119,8 +1171,8 @@ sprint_bcd_digit2:
 #--------------------------------------------------
 #-- IMPLEMENTACION 2: Mediante tabla de Look-up
 #--------------------------------------------------
-.global sprint_bcd_digit
-sprint_bcd_digit:
+.global sprint_bcd_digit2
+sprint_bcd_digit2:
 	.data
 
 	#--- Look up table (LUT) para los digitos BCD

@@ -148,6 +148,8 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_sprint_char
 	jal unittest_sprint_unary
 	jal unittest_sprint_bcd_digit
+	jal unittest_bcd_copy
+
 
 	#-- Terminar
 	PRINT_CHARI('\n')
@@ -972,9 +974,83 @@ test_bin1:
     UNSTACK16
 
 
+#------------------------------------------
+#-- Pruebas unitarias de bcd_copy
+#-- TEST22-
+#------------------------------------------
+unittest_bcd_copy:
+
+	.data
+ test22_tittle:  .string "----- BCD_COPY() ------\n"
+ test22_name:    .string "> TEST 22...."
+ test22_bcd:     .byte 0
+ test22_result:  .string "0"
+ test23_name:    .string "> TEST 23...."
+ test23_bcd:     .byte 0, 1
+ test23_result:  .string "01"
+ test24_name:    .string "> TEST 24...."
+ test24_bcd:     .byte 1, 2, 3
+ test24_result:  .string "123"
+
+
+	.text
+	STACK16
+
+	#--- Imprimir titulo
+	la a0, test22_tittle
+	jal puts
+
+	#--------  22. Imprimir un digito bcd
+	la a0, test22_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 1)
+	la a0, buffer  #-- Cadena destino
+	la a1, test22_bcd   #-- Buffer bcd
+	li a2, 1            #-- Un digito
+	jal bcd_copy
+
+	#-- assert buffer == "0"
+	la a0, buffer
+	la a1, test22_result
+	jal assert_str_equal
+
+	#-------- 23. Imprimir dos digitos bcd
+	la a0, test23_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 2)
+	la a0, buffer
+	la a1, test23_bcd
+	li a2, 2
+	jal bcd_copy
+
+	#-- assert buffer == "01"
+	la a0, buffer
+	la a1, test23_result
+	jal assert_str_equal
+
+	#-------- 24. Imprimir tres digitos bcd
+	la a0, test24_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 2)
+	la a0, buffer
+	la a1, test24_bcd
+	li a2, 3
+	jal bcd_copy
+
+	#-- assert buffer == "01"
+	la a0, buffer
+	la a1, test24_result
+	jal assert_str_equal
+
+	UNSTACK16
+
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_bcd_digit
+#-- TEST14-TEST21
 #------------------------------------------
 unittest_sprint_bcd_digit:
 
