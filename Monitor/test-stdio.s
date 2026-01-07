@@ -894,7 +894,7 @@ unittest_sprint_oct:
 	STACK16
 	TEST_TITTLE("----- SPRINT_OCT() ------\n")
 
-	#-- Imprmir un digito octal
+	#-- Imprimir un digito octal
 	TEST_NAME("64")
 	SPRINT_OCT(buffer, 0, 1, CON_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "0")

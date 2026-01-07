@@ -8,6 +8,11 @@
 #-- Macros de acceso a la pila
 .include "stack.h"
 
+	.data
+ buffer_bcd: .space 32
+
+	.text
+
 
 .global sprint_uint32
 sprint_uint32:
@@ -861,8 +866,8 @@ sprint_hex4:
 	ret
 
 
-.global sprint_oct
-sprint_oct:
+.global sprint_oct2
+sprint_oct2:
  #--------------------------------------------------
  #-- SPRINT_OCT(dst, n, tam)
  #-- Imprimir un numero octar de n digitos
@@ -895,7 +900,7 @@ sprint_oct:
 
 
 	#-- Imprimir digito a digito
- sprint_oct_next:
+ sprint_oct2_next:
 
 
 	#-- Extraer el digito que toca
@@ -913,7 +918,7 @@ sprint_oct:
 	addi s3, s3, -3
 
 	#-- Hemos impreso los n bits?
-	bgt s2, zero, sprint_oct_next
+	bgt s2, zero, sprint_oct2_next
 
 	#-- n bits impresos
 	#-- TODO
@@ -956,6 +961,43 @@ sprint_oct3:
 	li a1, 3  #-- 3 bits impresos
 	ret
 
+#--------------------------------------------------
+#-- SPRINT_OCT(dst, n, tam)
+#-- Imprimir un numero octal de n digitos
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (n): Numero a imprimir
+#--   - a2 (tam): Tamaño del numero a imprimir
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#--------------------------------------------------
+.global sprint_oct
+sprint_oct:
+
+	.text
+	STACK16
+	PUSH2(s0, s1)
+
+	#-- Guardar parametros
+	mv s0, a0   #-- Cadena destino
+	mv s1, a2   #-- Numero de digitos a imprimir
+
+	#-- Pasarlos a BCD y guardarlos en memoria
+	la a0, buffer_bcd
+	jal bcd_store_oct
+
+	#-- Imprimir los digitos BCD en la cadena destino
+	mv a0, s0
+	la a1, buffer_bcd
+	mv a2, s1
+	li a3, 1  #-- Con ceros iniciales
+	jal bcd_copy
+
+	POP2(s0, s1)
+	UNSTACK16
+
 
 
 #--------------------------------------------------
@@ -972,9 +1014,6 @@ sprint_oct3:
 #--------------------------------------------------
 .global sprint_bin
 sprint_bin:
-
-	.data
- buffer_bcd: .space 32
 
 	.text
 	STACK16
@@ -997,6 +1036,58 @@ sprint_bin:
 
 	POP2(s0, s1)
 	UNSTACK16
+
+#------------------------------------------------------------------
+#-- bcd_store_oct(buff_bcd, reg, tam)
+#--  Almacenar en la memoria apuntada por buff_bcd los n digitos
+#--  de menor peso que se encuentra en reg (10 max)
+#--
+#--  Cada digito se almacena como un byte
+#--
+#--  Ejemplo: bcd_store_oct(buff, 0x29C, 4) --> Almacena en memoria
+#--    estos bytes: 1, 2, 3, 4 (Ordenacion Big Endian) 
+#--
+#-- ENTRADAS:
+#--   - a0: (buff_bcd) Puntero al buffer donde guardar los digitos bcd
+#--   - a1: (reg) Registro con los dígitos bcd
+#--   - a2 (n): Número de bits a copiar (desde el de menor peso)
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de los digitos bcd
+#------------------------------------------------------------------
+.global bcd_store_oct
+bcd_store_oct:
+ bcd_store_oct_next:
+
+	#-- Bits a desplazar: t2 = (tam-1)*3
+	mv t2, a2
+	addi t2, t2, -1  #-- tam-1
+
+	#-- t3 = (tam - 1) * 3
+	slli t0, t2, 1  #-- * 2
+	add t3, t0, t2  #-- * 3
+
+	#-- t0 = mascara para obtener el digito actual
+	li t0, 0x7
+	sll t0, t0, t3
+
+	#-- t1 = digito actual
+	and t1, a1, t0   #-- Sacarlo del registro
+	srl t1, t1, t3   #-- Llevarlos a la posición de menor peso
+
+	#-- Guardarlo en el buffer
+	sb t1, 0(a0)
+
+	#-- Apuntar a la siguiente posicion
+	addi a0, a0, 1
+
+	#-- Queda un digito menos
+	addi a2, a2, -1
+
+	#-- Terminar si todos los bits estan almacenados
+	bgt a2, zero, bcd_store_oct_next
+
+	ret
 
 
 
