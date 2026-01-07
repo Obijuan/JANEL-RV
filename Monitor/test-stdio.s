@@ -100,11 +100,31 @@
 
 #---------------------------------------------------------
 #-- Llamar a la funcion sprint_unary(num, mark)
+#-- No se pasa el buffer
 #---------------------------------------------------------
 .macro SPRINT_UNARY(%num, %mark)
 	li a1, %num    #-- Una marca
 	li a2, %mark   #-- Marca a utilizar
 	jal sprint_unary
+.end_macro
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(buffer, bcd)
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%buffer, %bcd)
+	la a0, %buffer
+	li a1, %bcd
+	jal sprint_bcd_digit
+.end_macro
+
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(bcd)
+#-- No se pasa el buffer
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%bcd)
+	li a1, %bcd
+	jal sprint_bcd_digit
 .end_macro
 
 #-----------------------------------------
@@ -1635,70 +1655,23 @@ unittest_bcd_copy:
 #------------------------------------------
 unittest_sprint_bcd_digit:
 
-	.data
- test14_tittle:  .string "----- SPRINT_BCD_DIGIT()-----\n"
- test14_name:    .string "> TEST 14...."
- test14_result1: .string "0"
- test15_name:    .string "> TEST 15...."
- test15_result2: .string "1"
- test16_name:    .string "> TEST 16...."
- test16_result3: .string "01234567"
- test17_name:    .string "> TEST 17...."
- test17_result4: .string "0123456789"
- test18_name:    .string "> TEST 18...."
- test18_result5: .string "0123456789ABCDEF"
- test19_name:    .string "> TEST 19...."
- test19_cad:     .string "Bit: "
- test19_result6: .string "Bit: 0"
- test20_name:    .string "> TEST 20...."
- test20_cad:     .string "Bin: "
- test20_result6: .string "Bin: 10"
- test21_name:    .string "> TEST 21...."
- test21_cad1:    .string "Digito: "
- test21_cad2:    .string "-----\n"
- test21_result7: .string "Digito: 9-----\n"
- 
 	.text
 	STACK16
 
-	#--- Imprimir titulo
-	la a0, test14_tittle
-	jal puts
+	TEST_TITTLE("----- SPRINT_BCD_DIGIT()-----\n")
 
+	#--------  Imprimir Bit 0
+	TEST_NAME("14")
+	SPRINT_BCD_DIGIT(buffer, 0)
+	ASSERT_STR_EQUAL(buffer, "0")
 
-	#--------  14. Imprimir Bit 0
-	la a0, test14_name
-	jal puts
+	#--------  Imprimir Bit 1
+	TEST_NAME("15")
+	SPRINT_BCD_DIGIT(buffer, 1)
+	ASSERT_STR_EQUAL(buffer, "1")
 
-	#-- sprint_bcd_digit(buffer, 0)
-	la a0, buffer
-	li a1, 0
-	jal sprint_bcd_digit
-
-	#-- assert buffer == '0'
-	la a0, buffer
-	la a1, test14_result1
-	jal assert_str_equal
-
-
-	#--------  15. Imprimir Bit 1
-	la a0, test15_name
-	jal puts
-
-	#-- sprint_bcd_digit(buffer, 1)
-	la a0, buffer
-	li a1, 1
-	jal sprint_bcd_digit
-
-	#-- assert buffer == '1'
-	la a0, buffer
-	la a1, test15_result2
-	jal assert_str_equal
-
-
-	#--------  16. Imprimir todos los digitos octales
-	la a0, test16_name
-	jal puts
+	#--------  Imprimir todos los digitos octales
+	TEST_NAME("16")
 
 	#-- Contador de digitos
 	li s0, 0
@@ -1718,15 +1691,10 @@ unittest_sprint_bcd_digit:
 	li t0, 8
 	blt s0, t0, next16
 
-	#-- assert buffer == '01234567'
-	la a0, buffer
-	la a1, test16_result3
-	jal assert_str_equal
+	ASSERT_STR_EQUAL(buffer, "01234567")
 
-
-	#--------  17. Imprimir todos los digitos decimales
-	la a0, test17_name
-	jal puts
+	#--------  Imprimir todos los digitos decimales
+	TEST_NAME("17")
 
 	#-- Contador de digitos
 	li s0, 0
@@ -1746,15 +1714,11 @@ unittest_sprint_bcd_digit:
 	li t0, 10
 	blt s0, t0, next17
 
-	#-- assert buffer == '0123456789'
-	la a0, buffer
-	la a1, test17_result4
-	jal assert_str_equal
+	ASSERT_STR_EQUAL(buffer, "0123456789")
 
 
-	#--------  18. Imprimir todos los digitos hexadecimales
-	la a0, test18_name
-	jal puts
+	#--------  Imprimir todos los digitos hexadecimales
+	TEST_NAME("18")
 
 	#-- Contador de digitos
 	li s0, 0
@@ -1774,78 +1738,29 @@ unittest_sprint_bcd_digit:
 	li t0, 16
 	blt s0, t0, next18
 
-	#-- assert buffer == '0123456789'
-	la a0, buffer
-	la a1, test18_result5
-	jal assert_str_equal
+	ASSERT_STR_EQUAL(buffer, "0123456789ABCDEF")
 
+	#--------- Imprimir Cadena+Digito BCD
+	TEST_NAME("19")
+	SPRINT(buffer, "Bit: ")
+	SPRINT_BCD_DIGIT(0)
+	ASSERT_STR_EQUAL(buffer, "Bit: 0")
 
-	#--------- 19. Imprimir Cadena+Digito BCD
-	la a0, test19_name
-	jal puts
+	#--------- Imprimir Cadena+Digito+Digito
+	TEST_NAME("20")
+	SPRINT(buffer, "Bin: ")
+	SPRINT_BCD_DIGIT(1)
+	SPRINT_BCD_DIGIT(0)
+	ASSERT_STR_EQUAL(buffer, "Bin: 10")
 
-	#-- sprint(buffer, "Bit: ")
-	la a0, buffer
-	la a1, test19_cad
-	jal sprint
-
-	#-- sprint_bcd_digit(buffer, 0)
-	li a1, 0
-	jal sprint_bcd_digit
-
-	#-- assert buffer == '0'
-	la a0, buffer
-	la a1, test19_result6
-	jal assert_str_equal
-
-
-	#--------- 20. Imprimir Cadena+Digito+Digito
-	la a0, test20_name
-	jal puts
-
-	#-- sprint(buffer, "Bin: ")
-	la a0, buffer
-	la a1, test20_cad
-	jal sprint
-
-	#-- sprint_bcd_digit(buffer, 1)
-	li a1, 1
-	jal sprint_bcd_digit
-
-	#-- sprint_bcd_digit(buffer, 0)
-	li a1, 0
-	jal sprint_bcd_digit
-
-	#-- assert buffer == 'Bin: 10'
-	la a0, buffer
-	la a1, test20_result6
-	jal assert_str_equal
-
-
-	#---------- 21. Imprimir Cadena + Digito + Cadena
-	la a0, test21_name
-	jal puts
-
-	#-- sprint(buffer, "Digito: ")
-	la a0, buffer
-	la a1, test21_cad1
-	jal sprint
-
-	#-- sprint_bcd_digit(buffer, 9)
-	li a1, 9
-	jal sprint_bcd_digit
-
-	#-- sprint(buffer, "-----\n")
-	la a1, test21_cad2
-	jal sprint
-
-	#-- assert_str_equal(buffer, "Digito: 9-----\n")
-	la a0, buffer
-	la a1, test21_result7
-	jal assert_str_equal
+	#---------- Imprimir Cadena + Digito + Cadena
+	TEST_NAME("21")
+	SPRINT(buffer, "Digito: ")
+	SPRINT_BCD_DIGIT(9)
+	SPRINT("-----\n")
+	ASSERT_STR_EQUAL(buffer, "Digito: 9-----\n")
 
 	UNSTACK16
-	ret
 
 
 #---------------------------------------
@@ -1879,13 +1794,13 @@ unittest_sprint_unary:
 	SPRINT_UNARY(buffer, 4, '*')
 	ASSERT_STR_EQUAL(buffer, "****")
 
-	#----------- 12. Cadena + unario: "Unary: 11111"
+	#----------- Cadena + unario: "Unary: 11111"
 	TEST_NAME("12")
 	SPRINT(buffer, "Unary: ")
 	SPRINT_UNARY(5, '1')
 	ASSERT_STR_EQUAL(buffer, "Unary: 11111")
 
-	#----------- 13. Cadena + unario + cadena: "->111111<-"
+	#----------- Cadena + unario + cadena: "->111111<-"
 	TEST_NAME("13")
 	SPRINT(buffer, "->")
 	SPRINT_UNARY(6, '1')
