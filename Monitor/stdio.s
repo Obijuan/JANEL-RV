@@ -1066,6 +1066,9 @@ sprint_bin1:
 #--   - a0 (dst): Buffer de la cadena destino
 #--   - a1 (buffer_bcd): Buffer de los digitos bcd
 #--   - a2 (ndig): Numero de digitos a copiar en cadena destino
+#--   - a3 (ini0): Copiar ceros iniciales
+#--      - 0: Sin cero iniciales
+#--      - 1: Copiar los ceros iniciales
 #--
 #--  SALIDAS:
 #--   - Ninguna
@@ -1073,22 +1076,47 @@ sprint_bin1:
 .global bcd_copy
 bcd_copy:
 
-	STACK16
-	PUSH3(s0, s1, s2)
+	STACK32
+	STACK32_PUSH5(s0, s1, s2, s3, s4)
 
 	#-- Guardar los parametros
+	mv s0, a0  #-- Cadena destino
 	mv s1, a1  #-- Buffer bcd origen
 	mv s2, a2  #-- Contador de digitos
+	mv s3, a3  #-- Ceros iniciales
 
- bcd_copy_next:
-	#-- Si quedan 0 digitos, hemos terminado
+	#-- Detectar el primer digito no cero
+	#-- s4 = 0 --> No se ha alcanzado el primer digito
+	#-- s4 = 1 --> Primer digito alcanzadof
+	mv s4, a3
+
+	#-- Si hay 0 digitos, hemos terminado
 	beq s2, zero, bcd_copy_end
 
+ bcd_copy_next:
+	
 	#-- Leer digito bcd actual
-	lb a1, 0(s1)
+	lbu a1, 0(s1)
+
+	#-- Si s4==1, estamos en modo impresión
+	#-- ¡Imprimir el digito!
+	li t0, 1
+	beq s4, t0, bcd_copy_print
+
+	#-- Comprobar si se ha alcazando el primer
+	#-- digito distinto de cero
+	beq a1, zero, bcd_copy_skip
+
+	#-- Primer digito NO es cero 
+bcd_copy_print:
+
+	#-- Pasar a modo impresion
+	li s4, 1
 
 	#-- Imprimirlo en la cadena
 	jal sprint_bcd_digit
+
+bcd_copy_skip:
 
 	#-- Siguiente digito
 	addi s1, s1, 1
@@ -1096,12 +1124,21 @@ bcd_copy:
 	#-- Decrementar contador de digitos
 	addi s2, s2, -1
 
-	#-- Repetir
-	j bcd_copy_next
+	#-- ¿Hemos terminado?
+	bgt s2, zero, bcd_copy_next
+
+	#-- Caso especial
+	#-- Si s4 ==0, el numero es un 0. ¡Imprimirlo!
+	bne s4, zero, bcd_copy_end
+
+	#-- Imprimir el 0!
+	mv a0, s0
+	mv a1, zero
+	jal sprint_bcd
 
  bcd_copy_end:
-	POP3(s0, s1, s2)
-	UNSTACK16
+	STACK32_POP5(s0, s1, s2, s3, s4)
+	UNSTACK32
 
 
 #--------------------------------------------------

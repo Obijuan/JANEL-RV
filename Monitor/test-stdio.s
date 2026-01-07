@@ -989,9 +989,31 @@ unittest_bcd_copy:
  test23_bcd:     .byte 0, 1
  test23_result:  .string "01"
  test24_name:    .string "> TEST 24...."
- test24_bcd:     .byte 1, 2, 3
- test24_result:  .string "123"
+ test24_bcd:     .byte 0, 0, 2
+ test24_result:  .string "002"
+ test25_name:    .string "> TEST 25...."
+ test25_bcd:     .byte 0, 1, 2, 3, 4, 5, 6, 7
+				 .byte 8, 9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+ test25_result:  .string "0123456789ABCDEF"
+ test26_name:    .string "> TEST 26...."
+ test26_bcd:     .byte 0
+ test26_result:  .string "0"
+ test27_name:    .string "> TEST 27...."
+ test27_bcd:     .byte 0, 2
+ test27_result:  .string "2"
+ test28_name:    .string "> TEST 28...."
+ test28_bcd:     .byte 0, 0, 3
+ test28_result:  .string "3"
+ test29_name:    .string "> TEST 29...."
+ test29_bcd:     .byte 0, 0, 0, 0, 0xB, 0xA, 0xC, 0xA
+ test29_result:  .string "BACA"
+ test30_name:    .string "> TEST 30...."
+ test30_bcd:     .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+ test30_result:  .string "0"
 
+	#-- Valores para el parametro ini0
+	.eqv CON_0s_INICIALES 1
+	.eqv SIN_0s_INICIALES 0
 
 	.text
 	STACK16
@@ -1008,6 +1030,7 @@ unittest_bcd_copy:
 	la a0, buffer  #-- Cadena destino
 	la a1, test22_bcd   #-- Buffer bcd
 	li a2, 1            #-- Un digito
+	li a3, CON_0s_INICIALES
 	jal bcd_copy
 
 	#-- assert buffer == "0"
@@ -1023,6 +1046,7 @@ unittest_bcd_copy:
 	la a0, buffer
 	la a1, test23_bcd
 	li a2, 2
+	li a3, CON_0s_INICIALES
 	jal bcd_copy
 
 	#-- assert buffer == "01"
@@ -1038,11 +1062,109 @@ unittest_bcd_copy:
 	la a0, buffer
 	la a1, test24_bcd
 	li a2, 3
+	li a3, CON_0s_INICIALES
 	jal bcd_copy
 
-	#-- assert buffer == "01"
+	#-- assert buffer == "002"
 	la a0, buffer
 	la a1, test24_result
+	jal assert_str_equal
+
+	#--------- 25. Imprimir 16 digitos bcd
+	la a0, test25_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 16)
+	la a0, buffer
+	la a1, test25_bcd
+	li a2, 16
+	li a3, CON_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "0123456789ABCDEF"
+	la a0, buffer
+	la a1, test25_result
+	jal assert_str_equal
+
+	#--------- 26. Imprimir un '0' sin ceros iniciales
+	#------------  Caso especial
+	la a0, test26_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 1)
+	la a0, buffer
+	la a1, test26_bcd
+	li a2, 1
+	li a3, SIN_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "0"
+	la a0, buffer
+	la a1, test26_result
+	jal assert_str_equal
+
+	#--------- 27. Imprimir un digito con  1 cero iniciales
+	la a0, test27_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 2)
+	la a0, buffer
+	la a1, test27_bcd
+	li a2, 2
+	li a3, SIN_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "2"
+	la a0, buffer
+	la a1, test27_result
+	jal assert_str_equal
+
+	#--------- 28. Imprimir un digito con 2 ceros iniciales
+	la a0, test28_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 3)
+	la a0, buffer
+	la a1, test28_bcd
+	li a2, 3
+	li a3, SIN_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "3"
+	la a0, buffer
+	la a1, test28_result
+	jal assert_str_equal
+
+	#--------- 29. Imprimir un numero con muchos ceros iniciales
+	la a0, test29_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 8)
+	la a0, buffer
+	la a1, test29_bcd
+	li a2, 8
+	li a3, SIN_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "BACA"
+	la a0, buffer
+	la a1, test29_result
+	jal assert_str_equal
+
+	#--------- 30. Imprimir un numero con muchos ceros
+	la a0, test30_name
+	jal puts
+
+	#-- bcd_copy(buffer, buffer_bcd, 10)
+	la a0, buffer
+	la a1, test30_bcd
+	li a2, 10
+	li a3, SIN_0s_INICIALES
+	jal bcd_copy
+
+	#-- assert buffer == "0"
+	la a0, buffer
+	la a1, test30_result
 	jal assert_str_equal
 
 	UNSTACK16
