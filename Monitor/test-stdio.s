@@ -47,7 +47,6 @@
 #-- Llamar a la funcion sprint(dst, cad)
 #-------------------------------------------
 .macro SPRINT(%dst, %str)
-
 	.data
  cad: %str
 
@@ -71,6 +70,24 @@
 	jal sprint
 .end_macro
 
+#-----------------------------------------
+#-- Llamar a la funcion sprint(dst, car)
+#-----------------------------------------
+.macro SPRINT_CHAR(%dst, %car)
+	la a0, %dst
+	li a1, %car
+	jal sprint_char
+.end_macro
+
+#-----------------------------------------
+#-- Llamar a la funcion sprint(car)
+#-- No se pasa el buffer
+#-----------------------------------------
+.macro SPRINT_CHAR(%car)
+	li a1, %car
+	jal sprint_char
+.end_macro
+
 
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
@@ -86,6 +103,8 @@
 	la a1, result
 	jal assert_str_equal
 .end_macro
+
+
 
 
 		.data
@@ -1956,95 +1975,34 @@ unittest_sprint_unary:
 #---------------------------------------
 unittest_sprint_char:
 
-	.data
- test4_tittle:  .string "----- SPRINT_CHAR()-----\n"
- test4_name:	 .string "> TEST 4...."
- result4_str: .string "A"
- test5_name:  .string "> TEST 5...."
- result5_str: .string "XY"
- test6_name:  .string "> TEST 6...."
- test6_cad:   .string "TEST-"
- result6_str: .string "TEST-Z"
- test7_name:  .string "> TEST 7...."
- test7_cad:   .string "CUBE"
- result7_str: .string "CUBE-CUBE"
-
 	.text
 	STACK16
 
-	#--- Imprimir titulo
-	la a0, test4_tittle
-	jal puts
+	TEST_TITTLE("----- SPRINT_CHAR()------\n")
 
-	#-------- 4. Prueba de "impresion" de un caracter
-	la a0, test4_name
-	jal puts
+	#-------- Impresion de un caracter
+	TEST_NAME("4")
+	SPRINT_CHAR(buffer, 'A')
+	ASSERT_STR_EQUAL(buffer, "A")
 
-	#-- sprint_char(buffer, 'A')
-	la a0, buffer
-	li a1, 'A'
-	jal sprint_char
+	#--------- Impresion de dos caracteres
+	TEST_NAME("5")
+	SPRINT_CHAR(buffer, 'X')
+	SPRINT_CHAR('Y')
+	ASSERT_STR_EQUAL(buffer, "XY")
 
-	#-- assert buffer == "A"
-	la a0, buffer
-	la a1, result4_str
-	jal assert_str_equal
+	#---------- Impresion de cadena + caracter
+	TEST_NAME("6")
+	SPRINT(buffer, "TEST-")
+	SPRINT_CHAR('Z')
+	ASSERT_STR_EQUAL(buffer, "TEST-Z")
 
-	#--------- 5. Prueba de impresion de dos caracteres
-	la a0, test5_name
-	jal puts
-
-	#-- sprint_char(buffer, 'X')
-	la a0, buffer
-	li a1, 'X'
-	jal sprint_char
-
-	#-- sprint_char(buffer, 'Y')
-	li a1, 'Y'
-	jal sprint_char
-
-	#-- assert buffer == "XY"
-	la a0, buffer
-	la a1, result5_str
-	jal assert_str_equal
-
-	#---------- 6. Impresion de cadena + caracter
-	la a0, test6_name
-	jal puts
-
-	#-- sprint(buffer, "TEST-")
-	la a0, buffer
-	la a1, test6_cad
-	jal sprint	
-
-	#-- sprint_char(buffer, 'Z')
-	li a1, 'Z'
-	jal sprint_char
-
-	#-- assert buffer = "TEST-Z"
-	la a0, buffer
-	la a1, result6_str
-	jal assert_str_equal
-
-	#----------- 7. Impresion de cadena + caracter + cadena
-	la a0, test7_name
-	jal puts
-
-	#-- sprint(buffer, "CUBE")
-	la a0, buffer
-	la a1, test7_cad
-	jal sprint
-	#-- sprint_char(buffer, "-")
-	li a1, '-'
-	jal sprint_char
-	#-- sprint(buffer, "CUBE")
-	la a1, test7_cad
-	jal sprint
-
-	#-- assert buffer = "CUBE-CUBE"
-	la a0, buffer
-	la a1, result7_str
-	jal assert_str_equal
+	#----------- Impresion de cadena + caracter + cadena
+	TEST_NAME("7")
+	SPRINT(buffer, "CUBE")
+	SPRINT_CHAR('-')
+	SPRINT("CUBE")
+	ASSERT_STR_EQUAL(buffer, "CUBE-CUBE")
 
 	UNSTACK16
 
@@ -2061,7 +2019,7 @@ unittest_sprint:
 
 	TEST_TITTLE("----- SPRINT()--------\n")
 
-	#-------- Prueba de "impresion" de una cadena
+	#-------- Impresion de una cadena
 	TEST_NAME("1")
 	SPRINT(buffer, "Cadena de prueba")
 	ASSERT_STR_EQUAL(buffer, "Cadena de prueba")
