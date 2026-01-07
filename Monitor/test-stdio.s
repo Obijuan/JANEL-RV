@@ -1131,7 +1131,7 @@ test_bin1:
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_bin
-#-- TEST31-
+#-- TEST31-TEST61
 #------------------------------------------
 unittest_sprint_bin:
  
