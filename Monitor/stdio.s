@@ -1108,7 +1108,7 @@ bcd_copy:
 	beq a1, zero, bcd_copy_skip
 
 	#-- Primer digito NO es cero 
-bcd_copy_print:
+ bcd_copy_print:
 
 	#-- Pasar a modo impresion
 	li s4, 1
@@ -1116,7 +1116,7 @@ bcd_copy_print:
 	#-- Imprimirlo en la cadena
 	jal sprint_bcd_digit
 
-bcd_copy_skip:
+ bcd_copy_skip:
 
 	#-- Siguiente digito
 	addi s1, s1, 1

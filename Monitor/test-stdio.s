@@ -9,6 +9,85 @@
     #-- Macros para funciones y pila
     .include "stack.h"
 
+	#-- Valores para el parametro ini0
+	.eqv CON_0s_INICIALES 1
+	.eqv SIN_0s_INICIALES 0
+
+#-----------------------------------------------------------------------
+#--- MACROS
+#-----------------------------------------------------------------------
+
+#---------------------------------------
+#-- Imprimir el titulo de testo
+#---------------------------------------
+.macro TEST_TITTLE(%test_tittle)
+	.data
+ tittle: .string %test_tittle
+
+	.text
+	la a0, tittle
+	jal puts
+.end_macro
+
+#----------------------------------------
+#-- Imprimir el mensaje del test actual 
+#-- "TEST %test_num...."
+#----------------------------------------
+.macro TEST_NAME(%test_num)
+   .data
+ test_name: .ascii "> TEST "
+            .ascii %test_num
+			.string "...."
+   .text
+       la a0, test_name
+	   jal puts 
+.end_macro
+
+#-------------------------------------------
+#-- Llamar a la funcion sprint(dst, cad)
+#-------------------------------------------
+.macro SPRINT(%dst, %str)
+
+	.data
+ cad: %str
+
+	.text
+	la a0, %dst
+	la a1, cad
+	jal sprint
+.end_macro
+
+#-----------------------------------------------------
+#-- Llamar a la funcion sprint(cad)
+#-- No se pasa el buffer. Se toma del registro a0
+#-----------------------------------------------------
+.macro SPRINT(%str)
+
+	.data
+ cad: %str
+
+	.text
+	la a1, cad
+	jal sprint
+.end_macro
+
+
+#-----------------------------------------
+#-- Comparar que dos cadenas son iguales
+#-- La cadena izquierda es una etiqueta
+#-- La cadena derecha es un literal
+#-----------------------------------------
+.macro ASSERT_STR_EQUAL(%buffer, %str)
+	.data
+ result: .string %str
+
+	.text
+	la a0, %buffer
+	la a1, result
+	jal assert_str_equal
+.end_macro
+
+
 		.data
 buffer: .space MAX
 buff:   .space 8
@@ -149,6 +228,7 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_sprint_unary
 	jal unittest_sprint_bcd_digit
 	jal unittest_bcd_copy
+	jal unittest_sprint_bin
 
 
 	#-- Terminar
@@ -973,10 +1053,356 @@ test_bin1:
 	POP3(s0, s1, s2)
     UNSTACK16
 
+#------------------------------------------
+#-- Pruebas unitarias de sprint_bin
+#-- TEST31-
+#------------------------------------------
+unittest_sprint_bin:
+	.data
+ test31_tittle:  .string "----- SPRINT_BIN() ------\n"
+ test31_name:    .string "> TEST 31...."
+ test31_result:  .string "0"
+ test32_name:    .string "> TEST 32...."
+ test32_result:  .string "1"
+ test33_name:    .string "> TEST 33...."
+ test33_result:  .string "00"
+ test34_name:    .string "> TEST 34...."
+ test34_result:  .string "01"
+ test35_name:    .string "> TEST 35...."
+ test35_result:  .string "10"
+ test36_name:    .string "> TEST 36...."
+ test36_result:  .string "11"
+ test37_name:    .string "> TEST 37...."
+ test37_result:  .string "000"
+ test38_name:    .string "> TEST 38...."
+ test38_result:  .string "001"
+ test39_name:    .string "> TEST 39...."
+ test39_result:  .string "010"
+ test40_name:    .string "> TEST 40...."
+ test40_result:  .string "101"
+ test41_name:    .string "> TEST 41...."
+ test41_result:  .string "111"
+ test42_name:    .string "> TEST 42...."
+ test42_result:  .string "0000"
+ test43_name:    .string "> TEST 43...."
+ test43_result:  .string "0001"
+ test44_name:    .string "> TEST 44...."
+ test44_result:  .string "0101"
+ test45_name:    .string "> TEST 45...."
+ test45_result:  .string "1010"
+ test46_name:    .string "> TEST 46...."
+ test46_result:  .string "1111"
+ test47_name:    .string "> TEST 47...."
+ test47_result:  .string "00000000"
+ test48_name:    .string "> TEST 48...."
+ test48_result:  .string "00000001"
+ test49_name:    .string "> TEST 49...."
+ test49_result:  .string "01010101"
+ test50_name:    .string "> TEST 50...."
+ test50_result:  .string "10101010"
+ test51_name:    .string "> TEST 51...."
+ test51_result:  .string "0000000000000000"
+ test52_name:    .string "> TEST 52...."
+ test52_result:  .string "0000000000000001"
+ test53_name:    .string "> TEST 53...."
+ test53_result:  .string "0101010101010101"
+ test54_name:    .string "> TEST 54...."
+ test54_result:  .string "1010101010101010"
+ test55_name:    .string "> TEST 55...."
+ test55_result:  .string "1111111111111111"
+ test56_name:    .string "> TEST 56...."
+ test56_result:  .string "00000000000000000000000000000000" 
+ test57_name:    .string "> TEST 57...."
+ test57_result:  .string "00000000000000000000000000000001"
+ test58_name:    .string "> TEST 58...."
+ test58_result:  .string "00000000000000001111111111111111"
+ test59_name:    .string "> TEST 59...."
+ test59_result:  .string "01010101010101010101010101010101"
+ test60_name:    .string "> TEST 60...."
+ test60_result:  .string "10101010101010101010101010101010"
+ test61_name:    .string "> TEST 61...."
+ test61_result:  .string "11111111111111111111111111111111"     
+ 
+ .macro TEST_NAME(%test_num)
+   .data
+ test_name: .ascii "> TEST "
+            .ascii %test_num
+			.string "...."
+   .text
+       la a0, test_name
+	   jal puts 
+ .end_macro
+
+ .macro TEST_BIN(%NTEST)
+	.data
+test_name:   .string "> TEST %NTEST"
+test_result: .string "0000"
+	.text
+	#--------  41. Imprimir binario "111"
+	la a0, test_name
+	jal puts
+
+	#-- sprint_bin(buffer, 7, 3, CON_0s)
+	la a0, buffer
+	li a1, 7  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "111"
+	la a0, buffer
+	la a1, test_result
+	jal assert_str_equal
+.end_macro
+
+	.text
+	STACK16
+
+	#--- Imprimir titulo
+	la a0, test31_tittle
+	jal puts
+
+	#--------  31. Imprimir bit 0
+	la a0, test31_name
+	jal puts
+
+	#-- sprint_bin(buffer, 0)
+	la a0, buffer
+	li a1, 0  #-- Numero binario
+	li a2, 1  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "0"
+	la a0, buffer
+	la a1, test31_result
+	jal assert_str_equal
+
+	#--------  32. Imprimir bit 1
+	la a0, test32_name
+	jal puts
+
+	#-- sprint_bin(buffer, 1)
+	la a0, buffer
+	li a1, 1  #-- Numero binario
+	li a2, 1  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "1"
+	la a0, buffer
+	la a1, test32_result
+	jal assert_str_equal
+
+	#--------  33. Imprimir binario "00"
+	la a0, test33_name
+	jal puts
+
+	#-- sprint_bin(buffer, 0, 2, CON_0s)
+	la a0, buffer
+	li a1, 0  #-- Numero binario
+	li a2, 2  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "00"
+	la a0, buffer
+	la a1, test33_result
+	jal assert_str_equal
+
+	#--------  34. Imprimir binario "01"
+	la a0, test34_name
+	jal puts
+
+	#-- sprint_bin(buffer, 1, 2, CON_0s)
+	la a0, buffer
+	li a1, 1  #-- Numero binario
+	li a2, 2  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "01"
+	la a0, buffer
+	la a1, test34_result
+	jal assert_str_equal
+
+	#--------  35. Imprimir binario "10"
+	la a0, test35_name
+	jal puts
+
+	#-- sprint_bin(buffer, 2, 2, CON_0s)
+	la a0, buffer
+	li a1, 2  #-- Numero binario
+	li a2, 2  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "10"
+	la a0, buffer
+	la a1, test35_result
+	jal assert_str_equal
+
+	#--------  36. Imprimir binario "11"
+	la a0, test36_name
+	jal puts
+
+	#-- sprint_bin(buffer, 3, 2, CON_0s)
+	la a0, buffer
+	li a1, 3  #-- Numero binario
+	li a2, 2  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "11"
+	la a0, buffer
+	la a1, test36_result
+	jal assert_str_equal
+
+	#--------  37. Imprimir binario "000"
+	la a0, test37_name
+	jal puts
+
+	#-- sprint_bin(buffer, 0, 3, CON_0s)
+	la a0, buffer
+	li a1, 0  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "000"
+	la a0, buffer
+	la a1, test37_result
+	jal assert_str_equal
+
+	#--------  38. Imprimir binario "001"
+	la a0, test38_name
+	jal puts
+
+	#-- sprint_bin(buffer, 1, 3, CON_0s)
+	la a0, buffer
+	li a1, 1  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "001"
+	la a0, buffer
+	la a1, test38_result
+	jal assert_str_equal
+
+	#--------  39. Imprimir binario "010"
+	la a0, test39_name
+	jal puts
+
+	#-- sprint_bin(buffer, 2, 3, CON_0s)
+	la a0, buffer
+	li a1, 2  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "010"
+	la a0, buffer
+	la a1, test39_result
+	jal assert_str_equal
+
+	#--------  40. Imprimir binario "101"
+	la a0, test40_name
+	jal puts
+
+	#-- sprint_bin(buffer, 5, 3, CON_0s)
+	la a0, buffer
+	li a1, 5  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "101"
+	la a0, buffer
+	la a1, test40_result
+	jal assert_str_equal
+
+	#--------  41. Imprimir binario "111"
+	la a0, test41_name
+	jal puts
+
+	#-- sprint_bin(buffer, 7, 3, CON_0s)
+	la a0, buffer
+	li a1, 7  #-- Numero binario
+	li a2, 3  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "111"
+	la a0, buffer
+	la a1, test41_result
+	jal assert_str_equal
+
+	#--------  42. Imprimir binario "0000"
+	TEST_NAME("42")
+
+	#-- sprint_bin(buffer, 0, 4, CON_0s)
+	la a0, buffer
+	li a1, 0  #-- Numero binario
+	li a2, 4  #-- Tamaño en bits
+	li a3, CON_0s_INICIALES
+	jal sprint_bin
+
+	#-- assert buffer == "0000"
+	la a0, buffer
+	la a1, test42_result
+	jal assert_str_equal
+
+
+	UNSTACK16
+
+ #test42_name:    .string "> TEST 42...."
+ #test42_result:  .string "0000"
+ #test43_name:    .string "> TEST 43...."
+ #test43_result:  .string "0001"
+ #test44_name:    .string "> TEST 44...."
+ #test44_result:  .string "0101"
+ #test45_name:    .string "> TEST 45...."
+ #test45_result:  .string "1010"
+ #test46_name:    .string "> TEST 46...."
+ #test46_result:  .string "1111"
+ #test47_name:    .string "> TEST 47...."
+ #test47_result:  .string "00000000"
+ #test48_name:    .string "> TEST 48...."
+ #test48_result:  .string "00000001"
+ #test49_name:    .string "> TEST 49...."
+ #test49_result:  .string "01010101"
+ #test50_name:    .string "> TEST 50...."
+ #test50_result:  .string "10101010"
+ #test51_name:    .string "> TEST 51...."
+ #test51_result:  .string "0000000000000000"
+ #test52_name:    .string "> TEST 52...."
+ #test52_result:  .string "0000000000000001"
+ #test53_name:    .string "> TEST 53...."
+ #test53_result:  .string "0101010101010101"
+ #test54_name:    .string "> TEST 54...."
+ #test54_result:  .string "1010101010101010"
+ #test55_name:    .string "> TEST 55...."
+ #test55_result:  .string "1111111111111111"
+ #test56_name:    .string "> TEST 56...."
+ #test56_result:  .string "00000000000000000000000000000000" 
+ #test57_name:    .string "> TEST 57...."
+ #test57_result:  .string "00000000000000000000000000000001"
+ #test58_name:    .string "> TEST 58...."
+ #test58_result:  .string "00000000000000001111111111111111"
+ #test59_name:    .string "> TEST 59...."
+ #test59_result:  .string "01010101010101010101010101010101"
+ #test60_name:    .string "> TEST 60...."
+ #test60_result:  .string "10101010101010101010101010101010"
+ #test61_name:    .string "> TEST 61...."
+ #test61_result:  .string "11111111111111111111111111111111"     
+ 
+
+
 
 #------------------------------------------
 #-- Pruebas unitarias de bcd_copy
-#-- TEST22-
+#-- TEST22-30
 #------------------------------------------
 unittest_bcd_copy:
 
@@ -1010,10 +1436,6 @@ unittest_bcd_copy:
  test30_name:    .string "> TEST 30...."
  test30_bcd:     .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  test30_result:  .string "0"
-
-	#-- Valores para el parametro ini0
-	.eqv CON_0s_INICIALES 1
-	.eqv SIN_0s_INICIALES 0
 
 	.text
 	STACK16
@@ -1634,76 +2056,28 @@ unittest_sprint_char:
 #---------------------------------
 unittest_sprint:
 
-	.data
- test1_tittle:  .string "----- SPRINT()--------\n"
- test1_name:    .string "> TEST 1...."
- test2_name:    .string "> TEST 2...."
- test3_name:    .string "> TEST 3...."
- cad1:          .string "Cadena de prueba"
- cad2:          .string "MSG1-"
- cad3:          .string "MSG2"
- result2_str:   .string "MSG1-MSG2"
- cad4:          .string "ABCD-"
- cad5:          .string "EFGH-"
- cad6:          .string "IJKL"
- result3_str:   .string "ABCD-EFGH-IJKL"
-
 	.text
 	STACK16
 
-	#-- Imprimir el titulo
-	la a0, test1_tittle
-	jal puts
+	TEST_TITTLE("----- SPRINT()--------\n")
 
-	#-------- 1. Prueba de "impresion" de una cadena
-	la a0, test1_name
-	jal puts
+	#-------- Prueba de "impresion" de una cadena
+	TEST_NAME("1")
+	SPRINT(buffer, "Cadena de prueba")
+	ASSERT_STR_EQUAL(buffer, "Cadena de prueba")
 
-	#--- sprint(buffer, cad1)
-	la a0, buffer
-	la a1, cad1
-	jal sprint
+	#-------- Impresion de dos cadenas
+	TEST_NAME("2")
+	SPRINT(buffer, "MSG1-")
+	SPRINT("MSG2")
+	ASSERT_STR_EQUAL(buffer, "MSG1-MSG2")
 
-	#--- assert buffer == cad1
-	la a0, buffer
-	la a1, cad1
-	jal assert_str_equal
-
-	#-------- 2. Impresion de dos cadenas
-	la a0, test2_name
-	jal puts
-	#-- sprint(buffer, cad2)
-	la a0, buffer
-	la a1, cad2
-	jal sprint
-
-	#-- sprint(buffer, cad3)
-	la a1, cad3
-	jal sprint
-
-	#-- assert buffer == result2_str
-	la a0, buffer
-	la a1, result2_str
-	jal assert_str_equal
-
-	#--------- 3. Impresion de tres cadenas
-	la a0, test3_name
-	jal puts
-	#-- sprint(buffer, cad4)
-	la a0, buffer
-	la a1, cad4
-	jal sprint
-	#-- sprint(buffer, cad5)
-	la a1, cad5
-	jal sprint
-	#-- sprint(buffer, cad6)
-	la a1, cad6
-	jal sprint
-
-	#-- assert buffer == result3_str
-	la a0, buffer
-	la a1, result3_str
-	jal assert_str_equal
+	#--------- Impresion de tres cadenas
+	TEST_NAME("3")
+	SPRINT(buffer, "ABCD-")
+	SPRINT("EFGH-")
+	SPRINT("IJKL")
+	ASSERT_STR_EQUAL(buffer, "ABCD-EFGH-IJKL")
 
 	UNSTACK16
 
