@@ -88,6 +88,24 @@
 	jal sprint_char
 .end_macro
 
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(buffer, num, mark)
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%buffer, %num, %mark)
+	la a0, %buffer
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
+
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(num, mark)
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%num, %mark)
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
 
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
@@ -1836,136 +1854,45 @@ unittest_sprint_bcd_digit:
 #---------------------------------------
 unittest_sprint_unary:
 
-	.data
- test8_tittle:  .string "----- SPRINT_UNARY()-----\n"
- test8_name:     .string "> TEST 8...."
- test8_result1:  .string "1"
- test9_name:     .string "> TEST 9...."
- test9_result2:  .string "11"
- test10_name:    .string "> TEST 10...."
- test10_result3: .string "111"
- test11_name:    .string "> TEST 11...."
- test11_result4: .string "****"
- test12_name:    .string "> TEST 12...."
- test12_cad5:    .string "Unary: "
- test12_result5: .string "Unary: 11111"
- test13_name:    .string "> TEST 13...."
- test13_cad6:    .string "->"
- test13_cad7:    .string "<-\n"
- test13_result6: .string "->111111<-\n"
-
-
 	.text
 	STACK16
 
-	#--- Imprimir titulo
-	la a0, test8_tittle
-	jal puts
+	TEST_TITTLE("----- SPRINT_UNARY()-----\n")
 
-	#-------- 8. Numero unario 1
-	la a0, test8_name
-	jal puts
+	#-------- Numero unario 1
+	TEST_NAME("8")
+	SPRINT_UNARY(buffer, 1, '1')
+	ASSERT_STR_EQUAL(buffer, "1")
 
-	#-- sprint_unariy(buffer, 1, '1')
-	la a0, buffer
-	li a1, 1    #-- Una marca
-	li a2, '1'  #-- Marca a utilizar
-	jal sprint_unary
+	#--------- Numero unario 11
+	TEST_NAME("9")
+	SPRINT_UNARY(buffer, 2, '1')
+	ASSERT_STR_EQUAL(buffer, "11")
 
-	#-- assert buffer == '1'
-	la a0, buffer
-	la a1, test8_result1
-	jal assert_str_equal
+	#--------- Numero unario 111
+	TEST_NAME("10")
+	SPRINT_UNARY(buffer, 3, '1')
+	ASSERT_STR_EQUAL(buffer, "111")
 
-	#--------- 9. Numero unario 11
-	la a0, test9_name
-	jal puts
-
-	#-- sprint_unary(buffer, 2, '1')
-	la a0, buffer
-	li a1, 2   #-- Dos marcas
-	li a2, '1' #-- Marca a utilizar
-	jal sprint_unary
-
-	#-- assert buffer == '11'
-	la a0, buffer
-	la a1, test9_result2
-	jal assert_str_equal
-
-	#--------- 10. Numero unario 111
-	la a0, test10_name
-	jal puts
-
-	#-- sprint_unary(buffer, 3, '1')
-	la a0, buffer
-	li a1, 3  #-- Tres marcas
-	li a2, '1'
-	jal sprint_unary
-
-	#-- assert buffer == '111'
-	la a0, buffer
-	la a1, test10_result3
-	jal assert_str_equal
-
-	#---------- 11. Barra de progreso ****
-	la a0, test11_name
-	jal puts
-
-	#-- sprint_unary(buffer, 4, '*')
-	la a0, buffer
-	li a1, 4
-	li a2, '*'
-	jal sprint_unary
-
-	#-- assert buffer == '****'
-	la a0, buffer
-	la a1, test11_result4
-	jal assert_str_equal
+	#---------- Barra de progreso ****
+	TEST_NAME("11")
+	SPRINT_UNARY(buffer, 4, '*')
+	ASSERT_STR_EQUAL(buffer, "****")
 
 	#----------- 12. Cadena + unario: "Unary: 11111"
-	la a0, test12_name
-	jal puts
-
-	#-- sprint(buffer, "Unary")
-	la a0, buffer
-	la a1, test12_cad5
-	jal sprint
-
-	#-- sprint_unary(buffer, 5, '1')
-	li a1, 5
-	li a2, '1'
-	jal sprint_unary
-
-	#-- assert buffer == 'Unary: 11111'
-	la a0, buffer
-	la a1, test12_result5
-	jal assert_str_equal
+	TEST_NAME("12")
+	SPRINT(buffer, "Unary: ")
+	SPRINT_UNARY(5, '1')
+	ASSERT_STR_EQUAL(buffer, "Unary: 11111")
 
 	#----------- 13. Cadena + unario + cadena: "->111111<-"
-	la a0, test13_name
-	jal puts
-
-	#-- sprint(buffer, "->")
-	la a0, buffer
-	la a1, test13_cad6
-	jal sprint
-
-	#-- sprint_unary(buffer, 6, '1')
-	li a1, 6
-	li a2, '1'
-	jal sprint_unary
-
-	#-- sprint(buffer, "<-\n")
-	la a1, test13_cad7
-	jal sprint
-
-	#-- assert buffer == '->111111<-'
-	la a0, buffer
-	la a1, test13_result6
-	jal assert_str_equal
+	TEST_NAME("13")
+	SPRINT(buffer, "->")
+	SPRINT_UNARY(6, '1')
+	SPRINT("<-\n")
+	ASSERT_STR_EQUAL(buffer, "->111111<-\n")
 
 	UNSTACK16
-
 
 
 
