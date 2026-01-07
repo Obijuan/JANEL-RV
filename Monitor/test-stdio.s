@@ -153,6 +153,21 @@
 	jal sprint_bin
 .end_macro
 
+.macro SPRINT_OCT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
+.macro SPRINT_OCT(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
 #-- La cadena izquierda es una etiqueta
@@ -872,7 +887,7 @@ test_print_block_octal:
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_oct
-#-- TEST62-
+#-- TEST64-TEST69
 #------------------------------------------
 unittest_sprint_oct:
 
@@ -880,14 +895,44 @@ unittest_sprint_oct:
 	TEST_TITTLE("----- SPRINT_OCT() ------\n")
 
 	#-- Imprmir un digito octal
-	TEST_NAME("xx")
+	TEST_NAME("64")
+	SPRINT_OCT(buffer, 0, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0")
+
+	#-- Imprmir un digito octal
+	TEST_NAME("65")
+	SPRINT_OCT(buffer, 3, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "3")
+
+	#-- Imprimir Numero octal
+	TEST_NAME("66")
+	SPRINT_OCT(buffer, 0x17, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "27")
+
+	#-- Imprimir Numero octal
+	TEST_NAME("67")
+	SPRINT_OCT(buffer, 0x3FFFF, 6, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "777777")
+
+	#-- Imprimir cadena + numero octal
+	TEST_NAME("68")
+	SPRINT(buffer, "Oct: ")
+	SPRINT_OCT(0x53, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "Oct: 123")
+
+	#-- Imprimir cadena + numero octal + cadena
+	TEST_NAME("69")
+	SPRINT(buffer, "Oct: ")
+	SPRINT_OCT(0x29c, 4, CON_0s_INICIALES)
+	SPRINT("<---")
+	ASSERT_STR_EQUAL(buffer, "Oct: 1234<---")
 
 	UNSTACK16
 
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_bin
-#-- TEST31-TEST61
+#-- TEST31-TEST63
 #------------------------------------------
 unittest_sprint_bin:
  
