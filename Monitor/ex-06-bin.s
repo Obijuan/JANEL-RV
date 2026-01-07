@@ -9,6 +9,9 @@
     .data
 buffer: .space MAX
 msg1:   .string "Numeros binarios: \n"
+msg2:   .string "Bin: "
+msg3:   .string "Binario: "
+msg4:   .string "<-----\n"
 
     .text
 
@@ -38,6 +41,36 @@ msg1:   .string "Numeros binarios: \n"
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
+    la a0, buffer
+    jal puts
+
+    #----- Imprimir cadena + numero binario
+    la a0, buffer
+    la a1, msg2
+    jal sprint
+
+    li a1, 0x80
+    li a2, 8
+    jal sprint_bin
+
+    li a1, '\n'
+    jal sprint_char
+
+    la a0, buffer
+    jal puts
+
+    #------ Imprimir cadena + numero bin + cadena
+    la a0, buffer
+    la a1, msg3
+    jal sprint
+
+    li a1, 0x8080
+    li a2, 16
+    jal sprint_bin
+
+    la a1, msg4
+    jal sprint
+
     la a0, buffer
     jal puts
 

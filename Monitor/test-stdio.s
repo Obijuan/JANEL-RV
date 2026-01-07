@@ -146,6 +146,13 @@
 	jal sprint_bin
 .end_macro
 
+.macro SPRINT_BIN(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
 #-- La cadena izquierda es una etiqueta
@@ -192,34 +199,6 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 #-- MAIN
 #----------- 
 	.text   
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 1 bit
-	jal sprint_test3
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 2 bits
-	jal sprint_test4
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 3 bits
-	jal sprint_test5
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 4 bits
-	jal sprint_test6
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 8 bits
-	jal sprint_test7
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 16 bits
-	jal sprint_test8
-
-	#-- Prueba de SPRINT_BIN
-	#-- Numeros binarios de 32 bits
-	jal sprint_test9
 
 	#-- Prueba de SPRINT_OCT
 	#-- Numeros octales de 1 digito
@@ -305,6 +284,7 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_sprint_bcd_digit
 	jal unittest_bcd_copy
 	jal unittest_sprint_bin
+	jal unittest_sprint_oct
 
 
 	#-- Terminar
@@ -890,244 +870,20 @@ test_print_block_octal:
     UNSTACK32
 
 
-sprint_test9:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 32 bits
- #------------------------------------------
-	.text
+#------------------------------------------
+#-- Pruebas unitarias de sprint_oct
+#-- TEST62-
+#------------------------------------------
+unittest_sprint_oct:
 
-    STACK16
-	PRINT_STRINGI("\n* TEST 9:\n")
-
-	#-- Imprimir 8 numeros de 32 bits
-	la a0, data32
-	li a1, 32
-	jal test_print_block_binary
-
-    UNSTACK16
-
-sprint_test8:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 16 bits
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 8:\n")
-
-	#-- Imprimir 8 numeros de 16 bits
-	la a0, data16
-	li a1, 16
-	jal test_print_block_binary
-
-	#-- Restaurar pila
-    UNSTACK16
-
-
-sprint_test7:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 8 bits
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 7:\n")
-
-	#-- Imprimir 8 numeros de 8 bits
-	la a0, data8
-	li a1, 8
-	jal test_print_block_binary
-
-	#-- Restaurar pila
-    UNSTACK16
-
-test_print_block_binary:
- #------------------------------------------- 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir un bloque de 8 numeros BINARIOS
- #-- 
- #-- ENTRADAS:
- #--   - a0: Puntero al bloque de datos
- #--   - a1: Tamaño del numero binario (en bits)
- #-------------------------------------------
-	.data
- base_bin: .string "Bin: "
-
-	.text
-
-    STACK32
-    STACK32_PUSH4(s0, s1, s2, s3)
-
-	#-- Guardar los parametros
-	mv s0, a0  #-- Puntero al bloque de datos
-	mv s1, a1  #-- Tamaño del numero binario (en bits)
-	li s2, 8  #-- Contador de numeros a imprimir
-
- test_print_block_binary_next:
-	beq s2, zero, test_print_block_binary_fin
-
-	#-- Leer dato
-	lw s3, 0(s0)
-
-	#-- Incrementar puntero
-	addi s0, s0, 4
-
-	#-- Decrementar contador
-	addi s2, s2, -1
-
-	#----- Imprimir numero
-	#-- 1: Cadena "Bin: "
-	la a0, dst
-	la a1, base_bin
-	jal sprint
-
-	#-- 2: Numero binario
-	mv a1, s3  #-- Numero a imprimir
-	mv a2, s1  #-- Tamaño en bits
-	jal sprint_bin
-
-	#-- 3: Sacar por la consola
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
-	j test_print_block_binary_next
-
- test_print_block_binary_fin:
-
-	#-- Restaurar pila
-    STACK32_POP4(s0, s1, s2, s3)
-    UNSTACK32
-
-
-sprint_test6:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 4 bits
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 6:\n")
-
-	#-- Imprimir 16 numeros de 4 bits
-	li a0, 16
-	li a1, 4
-	jal test_bin1
-
-	#-- Restaurar pila
-    UNSTACK16
-
-
-sprint_test5:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 3 bits
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 5:\n")
-
-	#-- Imprimir 8 numeros de 3 bits
-	li a0, 8
-	li a1, 3
-	jal test_bin1
-
-	#-- Restaurar pila
-    UNSTACK16
-
-sprint_test4:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 2 bits
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 4:\n")
-
-	#-- Imprimir 4 numeros de 2 bits
-	li a0, 4
-	li a1, 2
-	jal test_bin1
-
-	#-- Restaurar pila
-    UNSTACK16
-
-
-sprint_test3:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros BINARIOS de 1 bit
- #------------------------------------------
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 3:\n")
-
-	#-- Imprimir 2 numeros de 1 bit
-	li a0, 2
-	li a1, 1
-	jal test_bin1
-
-	#-- Restaurar pila
-    UNSTACK16
-
-test_bin1:
- #-----------------------------------------------------
- #-- Pruebas para SPRINT_BIN
- #-- Imprimir numeros en binario desde 0 
- #--   hasta el valor maximo indicado (max)
- #--
- #-- ENTRADAS:
- #--   - a0: Valor maximo a imprimir
- #--   - a1: Tamaño en bits de los numeros a imprimir
- #-----------------------------------------------------
-	.data
- test_bin1_msg: .string "Bin: "	
-
-	.text
-
- 	#-- Crear pila
 	STACK16
-    PUSH3(s0, s1, s2)
-	
-	#-- Contador de numeros
-	li s0, 0
+	TEST_TITTLE("----- SPRINT_OCT() ------\n")
 
-	#-- Valor maximo del numero a mostrar
-	mv s1, a0
+	#-- Imprmir un digito octal
+	TEST_NAME("xx")
 
-	#-- Tamaño en bits
-	mv s2, a1
+	UNSTACK16
 
- test_bin1_next:	
-	#-- Imprimir mensaje
-	la a0, dst
-	la a1, test_bin1_msg
-	jal sprint
-
-	#-- Imprimir el numero binario
-	mv a1, s0
-	mv a2, s2
-	jal sprint_bin
-
-	#-- Imprimir la cadena resultante
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
-	#-- Siguiente numero
-	addi s0, s0, 1
-
-	#-- Hemos alcanzado el maximo?
-    blt s0, s1, test_bin1_next
-
-	#-- Restaurar pila
-	POP3(s0, s1, s2)
-    UNSTACK16
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_bin
@@ -1135,7 +891,6 @@ test_bin1:
 #------------------------------------------
 unittest_sprint_bin:
  
-	.text
 	STACK16
 	TEST_TITTLE("----- SPRINT_BIN() ------\n")
 
@@ -1274,6 +1029,19 @@ unittest_sprint_bin:
 	TEST_NAME("61")
 	SPRINT_BIN(buffer, 0xFFFFFFFF, 32, CON_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "11111111111111111111111111111111")
+
+	#---- Imprimir cadena + numero binario
+	TEST_NAME("62")
+	SPRINT(buffer, "Bin: ")
+	SPRINT_BIN(0xF0, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "Bin: 11110000")
+
+	#---- Imprimir cadena + numero binario + cadena
+	TEST_NAME("63")
+	SPRINT(buffer, "Bin: ")
+	SPRINT_BIN(0xAA55, 16, CON_0s_INICIALES)
+	SPRINT("<---")
+	ASSERT_STR_EQUAL(buffer, "Bin: 1010101001010101<---")
 	
 	UNSTACK16
 

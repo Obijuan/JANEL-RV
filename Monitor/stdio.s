@@ -902,6 +902,7 @@ sprint_oct:
 	srl a1, s1, s3
 
 	#-- Imprimir el digito octal!
+	#jal sprint_bcd_digit
 	jal sprint_oct3
 
 
