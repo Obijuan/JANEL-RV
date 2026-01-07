@@ -956,101 +956,97 @@ sprint_oct3:
 	ret
 
 
-.global sprint_bin
-sprint_bin:
- #--------------------------------------------------
- #-- SPRINT_BIN(dst, n, tam)
- #-- Imprimir un numero binario de n bits
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir
- #--   - a2 (tam): Tamaño del numero a imprimir
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bits impresos
- #--------------------------------------------------
 
-	STACK16
-	PUSH3(s0, s1, s2)
-
-	#-- Quedarse solo con los n bits de menor peso
-	#-- Del numero
-	#-- Calcular mascara: (1<<tam)-1  Cuando tam<32
-	#--   si tam=32, la mascara es 0xFFFFFFFF
-	li t0, 32
-	blt a2, t0, mask1
-
-	#-- Tamaño: 32 bits
-	li t0, -1  #-- mascara 0xFFFFFFFF
-	j cont
-
- mask1:
-	#-- Tamaño < 32 bits
-	li t0, 1
-	sll t0, t0, a2
-	addi t0, t0, -1
-
- cont:
-	#-- Aplicar la máscara!
-	and a1, a1, t0
-
-	#-- Rotaciones a la derecha a realizar (tam-1)
-	addi s1, a2, -1
-
-	#-- Guardar agumentos
-	mv s0, a1  #-- Numero a imprimir
-
- sprint_bin_next:
-
-	#-- Imprimir bit que toca
-	#-- Empezando por el mas significativo
-	srl a1, s0, s1
-	jal sprint_bin1
-
-    #-- Una rotacion menos por hacer
-	addi s1, s1, -1
-
-	#-- Hemos impreso los n bits?
-	bge s1, zero, sprint_bin_next
-
-	addi a1, s1, 1  #-- n bits impresos
-
-	#-- Liberar la pila
-	POP3(s0, s1, s2)
-	UNSTACK16
-
-
-.global sprint_bin1
-sprint_bin1:
 #--------------------------------------------------
-#-- SPRINT_BIN1(dst, n)
-#-- Imprimir un numero binario de 1 bit
+#-- SPRINT_BIN(dst, n, tam)
+#-- Imprimir un numero binario de n bits
 #--
 #--  ENTRADAS:
 #--   - a0 (dst): Puntero a cadena destino
 #--   - a1 (n): Numero a imprimir
+#--   - a2 (tam): Tamaño del numero a imprimir
 #--  SALIDA:
 #--   - a0: Puntero al final de la cadena destino
 #--   - a1: (Opcional) Nº de bits impresos
 #--------------------------------------------------
-	#-- Quedarse con el bit 0
-	andi a1, a1, BIT0
+.global sprint_bin
+sprint_bin:
 
-	#-- Convertir a caracter: '0' o '1'
-	addi a1, a1, '0'
+	.data
+ buffer_bcd: .space 32
 
-	#-- Almacenar caracter en cadena destino
-	sb a1, 0(a0)
+	.text
+	STACK16
+	PUSH2(s0, s1)
 
-	#-- Incrementar puntero de cadena destino
+	#-- Guardar parametros
+	mv s0, a0   #-- Cadena destino
+	mv s1, a2   #-- Numero de bits a imprimir
+
+	#-- Pasarlos a BCD y guardarlos en memoria
+	la a0, buffer_bcd
+	jal bcd_store_bin
+
+	#-- Imprimir los digitos BCD en la cadena destino
+	mv a0, s0
+	la a1, buffer_bcd
+	mv a2, s1
+	li a3, 1  #-- Con ceros iniciales
+	jal bcd_copy
+
+	POP2(s0, s1)
+	UNSTACK16
+
+
+
+#------------------------------------------------------------------
+#-- bcd_store_bin(buff_bcd, reg, tam)
+#--  Almacenar en la memoria apuntada por buff_bcd los n bits
+#--  de menor peso que se encuentra en reg (32 max)
+#--
+#--  Cada bit se almacena como un byte
+#--
+#--  Ejemplo: bcd_store_bin(buff, 0x101, 3) --> Almacena en memoria
+#--    estos bytes: 1, 0, 1 (Ordenacion Big Endian) 
+#--
+#-- ENTRADAS:
+#--   - a0: (buff_bcd) Puntero al buffer donde guardar los digitos bcd
+#--   - a1: (reg) Registro con los dígitos bcd
+#--   - a2 (n): Número de bits a copiar (desde el de menor peso)
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de los digitos bcd
+#------------------------------------------------------------------
+.global bcd_store_bin
+bcd_store_bin:
+ bcd_store_bin_next:
+
+	#-- Bits a desplazar: t2 = tam-1
+	mv t2, a2
+	addi t2, t2, -1  #-- tam-1
+
+	#-- t0 = mascara para obtener el digito actual
+	li t0, 1
+	sll t0, t0, t2
+
+	#-- t1 = digito actual
+	and t1, a1, t0   #-- Sacarlo del registro
+	srl t1, t1, t2   #-- Llevarlos a la posición de menor peso
+
+	#-- Guardarlo en el buffer
+	sb t1, 0(a0)
+
+	#-- Apuntar a la siguiente posicion
 	addi a0, a0, 1
 
-	#-- Cadena terminada
-	sb zero, 0(a0)
+	#-- Queda un digito menos
+	addi a2, a2, -1
 
-	li a1, 1  #-- Un bit impreso
+	#-- Terminar si todos los bits estan almacenados
+	bgt a2, zero, bcd_store_bin_next
+
 	ret
+
 
 
 #---------------------------------------------------
