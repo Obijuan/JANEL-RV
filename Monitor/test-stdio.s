@@ -138,6 +138,14 @@
 	jal bcd_copy
 .end_macro
 
+.macro SPRINT_BIN(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
 #-- La cadena izquierda es una etiqueta
@@ -1126,345 +1134,148 @@ test_bin1:
 #-- TEST31-
 #------------------------------------------
 unittest_sprint_bin:
-	.data
- test31_tittle:  .string "----- SPRINT_BIN() ------\n"
- test31_name:    .string "> TEST 31...."
- test31_result:  .string "0"
- test32_name:    .string "> TEST 32...."
- test32_result:  .string "1"
- test33_name:    .string "> TEST 33...."
- test33_result:  .string "00"
- test34_name:    .string "> TEST 34...."
- test34_result:  .string "01"
- test35_name:    .string "> TEST 35...."
- test35_result:  .string "10"
- test36_name:    .string "> TEST 36...."
- test36_result:  .string "11"
- test37_name:    .string "> TEST 37...."
- test37_result:  .string "000"
- test38_name:    .string "> TEST 38...."
- test38_result:  .string "001"
- test39_name:    .string "> TEST 39...."
- test39_result:  .string "010"
- test40_name:    .string "> TEST 40...."
- test40_result:  .string "101"
- test41_name:    .string "> TEST 41...."
- test41_result:  .string "111"
- test42_name:    .string "> TEST 42...."
- test42_result:  .string "0000"
- test43_name:    .string "> TEST 43...."
- test43_result:  .string "0001"
- test44_name:    .string "> TEST 44...."
- test44_result:  .string "0101"
- test45_name:    .string "> TEST 45...."
- test45_result:  .string "1010"
- test46_name:    .string "> TEST 46...."
- test46_result:  .string "1111"
- test47_name:    .string "> TEST 47...."
- test47_result:  .string "00000000"
- test48_name:    .string "> TEST 48...."
- test48_result:  .string "00000001"
- test49_name:    .string "> TEST 49...."
- test49_result:  .string "01010101"
- test50_name:    .string "> TEST 50...."
- test50_result:  .string "10101010"
- test51_name:    .string "> TEST 51...."
- test51_result:  .string "0000000000000000"
- test52_name:    .string "> TEST 52...."
- test52_result:  .string "0000000000000001"
- test53_name:    .string "> TEST 53...."
- test53_result:  .string "0101010101010101"
- test54_name:    .string "> TEST 54...."
- test54_result:  .string "1010101010101010"
- test55_name:    .string "> TEST 55...."
- test55_result:  .string "1111111111111111"
- test56_name:    .string "> TEST 56...."
- test56_result:  .string "00000000000000000000000000000000" 
- test57_name:    .string "> TEST 57...."
- test57_result:  .string "00000000000000000000000000000001"
- test58_name:    .string "> TEST 58...."
- test58_result:  .string "00000000000000001111111111111111"
- test59_name:    .string "> TEST 59...."
- test59_result:  .string "01010101010101010101010101010101"
- test60_name:    .string "> TEST 60...."
- test60_result:  .string "10101010101010101010101010101010"
- test61_name:    .string "> TEST 61...."
- test61_result:  .string "11111111111111111111111111111111"     
  
- .macro TEST_NAME(%test_num)
-   .data
- test_name: .ascii "> TEST "
-            .ascii %test_num
-			.string "...."
-   .text
-       la a0, test_name
-	   jal puts 
- .end_macro
-
- .macro TEST_BIN(%NTEST)
-	.data
-test_name:   .string "> TEST %NTEST"
-test_result: .string "0000"
-	.text
-	#--------  41. Imprimir binario "111"
-	la a0, test_name
-	jal puts
-
-	#-- sprint_bin(buffer, 7, 3, CON_0s)
-	la a0, buffer
-	li a1, 7  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "111"
-	la a0, buffer
-	la a1, test_result
-	jal assert_str_equal
-.end_macro
-
 	.text
 	STACK16
+	TEST_TITTLE("----- SPRINT_BIN() ------\n")
 
-	#--- Imprimir titulo
-	la a0, test31_tittle
-	jal puts
+	#-------- Imprimir bit 0
+	TEST_NAME("31")
+	SPRINT_BIN(buffer, 0, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0")
 
-	#--------  31. Imprimir bit 0
-	la a0, test31_name
-	jal puts
+	#--------  Imprimir bit 1
+	TEST_NAME("32")
+	SPRINT_BIN(buffer, 1, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1")
 
-	#-- sprint_bin(buffer, 0)
-	la a0, buffer
-	li a1, 0  #-- Numero binario
-	li a2, 1  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
+	#--------  Imprimir binario "00"
+	TEST_NAME("33")
+	SPRINT_BIN(buffer, 0, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00")
 
-	#-- assert buffer == "0"
-	la a0, buffer
-	la a1, test31_result
-	jal assert_str_equal
+	#--------  Imprimir binario "01"
+	TEST_NAME("34")
+	SPRINT_BIN(buffer, 1, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "01")
 
-	#--------  32. Imprimir bit 1
-	la a0, test32_name
-	jal puts
+	#--------  Imprimir binario "10"
+	TEST_NAME("35")
+	SPRINT_BIN(buffer, 2, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "10")
 
-	#-- sprint_bin(buffer, 1)
-	la a0, buffer
-	li a1, 1  #-- Numero binario
-	li a2, 1  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
+	#--------  Imprimir binario "11"
+	TEST_NAME("36")
+	SPRINT_BIN(buffer, 3, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "11")
 
-	#-- assert buffer == "1"
-	la a0, buffer
-	la a1, test32_result
-	jal assert_str_equal
+	#--------  Imprimir binario "000"
+	TEST_NAME("37")
+	SPRINT_BIN(buffer, 0, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "000")
 
-	#--------  33. Imprimir binario "00"
-	la a0, test33_name
-	jal puts
+	#--------  Imprimir binario "001"
+	TEST_NAME("38")
+	SPRINT_BIN(buffer, 1, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "001")
 
-	#-- sprint_bin(buffer, 0, 2, CON_0s)
-	la a0, buffer
-	li a1, 0  #-- Numero binario
-	li a2, 2  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
+	#--------  Imprimir binario "010"
+	TEST_NAME("39")
+	SPRINT_BIN(buffer, 2, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "010")
 
-	#-- assert buffer == "00"
-	la a0, buffer
-	la a1, test33_result
-	jal assert_str_equal
+	#--------  Imprimir binario "101"
+	TEST_NAME("40")
+	SPRINT_BIN(buffer, 5, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "101")
 
-	#--------  34. Imprimir binario "01"
-	la a0, test34_name
-	jal puts
+	#--------  Imprimir binario "111"
+	TEST_NAME("41")
+	SPRINT_BIN(buffer, 7, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "111")
 
-	#-- sprint_bin(buffer, 1, 2, CON_0s)
-	la a0, buffer
-	li a1, 1  #-- Numero binario
-	li a2, 2  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "01"
-	la a0, buffer
-	la a1, test34_result
-	jal assert_str_equal
-
-	#--------  35. Imprimir binario "10"
-	la a0, test35_name
-	jal puts
-
-	#-- sprint_bin(buffer, 2, 2, CON_0s)
-	la a0, buffer
-	li a1, 2  #-- Numero binario
-	li a2, 2  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "10"
-	la a0, buffer
-	la a1, test35_result
-	jal assert_str_equal
-
-	#--------  36. Imprimir binario "11"
-	la a0, test36_name
-	jal puts
-
-	#-- sprint_bin(buffer, 3, 2, CON_0s)
-	la a0, buffer
-	li a1, 3  #-- Numero binario
-	li a2, 2  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "11"
-	la a0, buffer
-	la a1, test36_result
-	jal assert_str_equal
-
-	#--------  37. Imprimir binario "000"
-	la a0, test37_name
-	jal puts
-
-	#-- sprint_bin(buffer, 0, 3, CON_0s)
-	la a0, buffer
-	li a1, 0  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "000"
-	la a0, buffer
-	la a1, test37_result
-	jal assert_str_equal
-
-	#--------  38. Imprimir binario "001"
-	la a0, test38_name
-	jal puts
-
-	#-- sprint_bin(buffer, 1, 3, CON_0s)
-	la a0, buffer
-	li a1, 1  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "001"
-	la a0, buffer
-	la a1, test38_result
-	jal assert_str_equal
-
-	#--------  39. Imprimir binario "010"
-	la a0, test39_name
-	jal puts
-
-	#-- sprint_bin(buffer, 2, 3, CON_0s)
-	la a0, buffer
-	li a1, 2  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "010"
-	la a0, buffer
-	la a1, test39_result
-	jal assert_str_equal
-
-	#--------  40. Imprimir binario "101"
-	la a0, test40_name
-	jal puts
-
-	#-- sprint_bin(buffer, 5, 3, CON_0s)
-	la a0, buffer
-	li a1, 5  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "101"
-	la a0, buffer
-	la a1, test40_result
-	jal assert_str_equal
-
-	#--------  41. Imprimir binario "111"
-	la a0, test41_name
-	jal puts
-
-	#-- sprint_bin(buffer, 7, 3, CON_0s)
-	la a0, buffer
-	li a1, 7  #-- Numero binario
-	li a2, 3  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
-
-	#-- assert buffer == "111"
-	la a0, buffer
-	la a1, test41_result
-	jal assert_str_equal
-
-	#--------  42. Imprimir binario "0000"
+	#--------  Imprimir binario "0000"
 	TEST_NAME("42")
+	SPRINT_BIN(buffer, 0, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0000")
 
-	#-- sprint_bin(buffer, 0, 4, CON_0s)
-	la a0, buffer
-	li a1, 0  #-- Numero binario
-	li a2, 4  #-- Tamaño en bits
-	li a3, CON_0s_INICIALES
-	jal sprint_bin
+	TEST_NAME("43")
+	SPRINT_BIN(buffer, 1, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0001")
 
-	#-- assert buffer == "0000"
-	la a0, buffer
-	la a1, test42_result
-	jal assert_str_equal
+	TEST_NAME("44")
+	SPRINT_BIN(buffer, 5, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0101")
 
+	TEST_NAME("45")
+	SPRINT_BIN(buffer, 10, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1010")
 
+	TEST_NAME("46")
+	SPRINT_BIN(buffer, 15, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1111")
+
+	TEST_NAME("47")
+	SPRINT_BIN(buffer, 0, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000000")
+
+	TEST_NAME("48")
+	SPRINT_BIN(buffer, 1, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000001")
+
+	TEST_NAME("49")
+	SPRINT_BIN(buffer, 85, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "01010101")
+
+	TEST_NAME("50")
+	SPRINT_BIN(buffer, 170, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "10101010")
+
+	TEST_NAME("51")
+	SPRINT_BIN(buffer, 0, 16, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0000000000000000")
+
+	TEST_NAME("52")
+	SPRINT_BIN(buffer, 1, 16, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0000000000000001")
+
+	TEST_NAME("53")
+	SPRINT_BIN(buffer, 0x5555, 16, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0101010101010101")
+
+	TEST_NAME("54")
+	SPRINT_BIN(buffer, 0xAAAA, 16, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1010101010101010")
+
+	TEST_NAME("55")
+	SPRINT_BIN(buffer, 0xFFFF, 16, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1111111111111111")
+
+	TEST_NAME("56")
+	SPRINT_BIN(buffer, 0, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000000000000000000000000000000")
+
+	TEST_NAME("57")
+	SPRINT_BIN(buffer, 1, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000000000000000000000000000001")
+
+	TEST_NAME("58")
+	SPRINT_BIN(buffer, 0x0000FFFF, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000000000000001111111111111111")
+
+	TEST_NAME("59")
+	SPRINT_BIN(buffer, 0x55555555, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "01010101010101010101010101010101")
+
+	TEST_NAME("60")
+	SPRINT_BIN(buffer, 0xAAAAAAAA, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "10101010101010101010101010101010")
+
+	TEST_NAME("61")
+	SPRINT_BIN(buffer, 0xFFFFFFFF, 32, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "11111111111111111111111111111111")
+	
 	UNSTACK16
-
- #test42_name:    .string "> TEST 42...."
- #test42_result:  .string "0000"
- #test43_name:    .string "> TEST 43...."
- #test43_result:  .string "0001"
- #test44_name:    .string "> TEST 44...."
- #test44_result:  .string "0101"
- #test45_name:    .string "> TEST 45...."
- #test45_result:  .string "1010"
- #test46_name:    .string "> TEST 46...."
- #test46_result:  .string "1111"
- #test47_name:    .string "> TEST 47...."
- #test47_result:  .string "00000000"
- #test48_name:    .string "> TEST 48...."
- #test48_result:  .string "00000001"
- #test49_name:    .string "> TEST 49...."
- #test49_result:  .string "01010101"
- #test50_name:    .string "> TEST 50...."
- #test50_result:  .string "10101010"
- #test51_name:    .string "> TEST 51...."
- #test51_result:  .string "0000000000000000"
- #test52_name:    .string "> TEST 52...."
- #test52_result:  .string "0000000000000001"
- #test53_name:    .string "> TEST 53...."
- #test53_result:  .string "0101010101010101"
- #test54_name:    .string "> TEST 54...."
- #test54_result:  .string "1010101010101010"
- #test55_name:    .string "> TEST 55...."
- #test55_result:  .string "1111111111111111"
- #test56_name:    .string "> TEST 56...."
- #test56_result:  .string "00000000000000000000000000000000" 
- #test57_name:    .string "> TEST 57...."
- #test57_result:  .string "00000000000000000000000000000001"
- #test58_name:    .string "> TEST 58...."
- #test58_result:  .string "00000000000000001111111111111111"
- #test59_name:    .string "> TEST 59...."
- #test59_result:  .string "01010101010101010101010101010101"
- #test60_name:    .string "> TEST 60...."
- #test60_result:  .string "10101010101010101010101010101010"
- #test61_name:    .string "> TEST 61...."
- #test61_result:  .string "11111111111111111111111111111111"     
- 
 
 
 
