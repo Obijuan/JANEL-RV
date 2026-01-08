@@ -13,7 +13,6 @@
 
 	.text
 
-uint_update_bcd_reg:
 #------------------------------------------------------------------
 #--  uint_update_bcd_reg(reg, ndig, off)
 #--
@@ -28,6 +27,8 @@ uint_update_bcd_reg:
 #--  SALIDA:
 #--   - a0: Devolver el registro actualizado
 #------------------------------------------------------------------
+uint_update_bcd_reg:
+
 	STACK16
 	PUSH2(s0, s1)
 
@@ -52,8 +53,10 @@ uint_update_bcd_reg:
 	UNSTACK16
 
 
+	#-- Algoritmo Doubble Dabble
+	#-- https://en.wikipedia.org/wiki/Double_dabble
 
-uint_update_bcd:
+
 #--------------------------------------------------------------------
 #-- uint_update_bcd(reg_bcd, i, n)
 #--
@@ -70,6 +73,7 @@ uint_update_bcd:
 #-- SALIDA:
 #--   a0: Valor actualizado del registro BCD
 #----------------------------------------------------------------------
+uint_update_bcd:
 
 	#-- Obtener la posicion del campo
 	#-- t0: pos(a1, a2) = a1*4 + a2
@@ -105,118 +109,6 @@ uint_update_bcd:
 
 	#-- a0: Registro bcd actualizado
 	ret
-
-
-
-.global sprint_uint4
-sprint_uint4:
-#----------------------------------------------------------------
-#-- SPRINT_UINT4(dst, n)
-#--
-#-- Imprimir un numero decimal sin signo, de 4 bits (2 digitos)
-#--
-#-- ENTRADA:
-#--   - a0 (dst): Dirección de la cadena destino
-#--   - a1 (n): Numero de 4 bits a imprimir
-#--
-#-- SALIDA:
-#--   - a0: Puntero al final de la cadena destino
-#--   - a1: (Opcional) Nº de bits impresos
-#------------------------------------------------------------------
-
-	#-- Mascara para obtener el campo Dig1
-	.eqv DIG1_MASK 0xF00 
-
-	#-- Posicion del campo Dig1
-	.eqv DIG1_POS 8
-
-	#-- Mascara para obtener el campo Dig0
-	.eqv DIG0_MASK 0x0F0
-
-	#-- Posicion del campo Dig0
-	.eqv DIG0_POS 4
-
-	#-- Algoritmo Doubble Dabble
-	#-- https://en.wikipedia.org/wiki/Double_dabble
-
-	#-- Registro de calculo: a1
-	#  +-------------------------------+
-	#  |  Dig1    |  Dig0    |    n    |
-	#  | 0 0 0 0  | 0 0 0 0  | a b c d |
-	#  +-------------------------------+
-
-	STACK16
-	PUSH2(s0, s1)
-
-	#-- Guardar los parámetros
-	mv s0, a0  #-- Cadena destino
-	#-- s1: Registro bcd
-
-	#-- Estado inicial: Poner dig1 y dig0 a 0
-	andi s1, a1, 0xF
-
-	#-- Primera fase: Desplazar a1 3 bits hacia la izquierda
-	slli s1, s1, 3
-	#  +-------------------------------+
-	#  |  Dig1    |  Dig0    |    n    |
-	#  | 0 0 0 0  | 0 a b c  | d 0 0 0 |
-	#  +-------------------------------+
-
-	#-- Actualizar campo Dig1
-	mv a0, s1  #-- Registro bcd
-	li a1, 1   #-- Numero de digito bcd
-	li a2, 4   #-- Tamaño de 4 bits
-	jal uint_update_bcd
-
-	#-- Actualizar campo Dig0
-	li a1, 0   #-- Numero de digito bcd
-	li a2, 4   #-- Tamaño de 4 bits
-	jal uint_update_bcd
-
-	#-- Desplazamiento a la izquierda 1 bit: Fin!
-	#-- Ya tenemos en dig1 y dig0 el numero en BCD
-	slli a0, a0, 1
-
-	#-- Guardar registro bcd
-	mv s1, a0
-
-	#-- Obtener dig1
-	li t2, DIG1_MASK
-	and t1, s1, t2
-	srli t1, t1, DIG1_POS  #-- t1 = dig1
-
-	#-- Imprimir dig1!
-	mv a0, s0
-	mv a1, t1
-	jal sprint_hex4
-
-	#-- Obtener dig0
-	li t2, DIG0_MASK
-	and t0, s1, t2
-	srli t0, t0, DIG0_POS  #-- t0 = dig0
-
-	#-- Imprimir  dig0!
-	mv a1, t0
-	jal sprint_hex4
-
-	#-- Liberar la pila
-	POP2(s0, s1)
-	UNSTACK16
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
