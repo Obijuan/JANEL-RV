@@ -348,6 +348,36 @@ msg4:   .string "<-----\n"
     la a0, buffer
     jal puts
 
+    la a0, buffer
+    li a1, 0
+    li a2, 2
+    li a3, CON_0s_INICIALES
+    jal sprint_uint
+    li a1, '\n'
+    jal sprint_char
+    la a0, buffer
+    jal puts
+
+    la a0, buffer
+    li a1, 0
+    li a2, 3
+    li a3, CON_0s_INICIALES
+    jal sprint_uint
+    li a1, '\n'
+    jal sprint_char
+    la a0, buffer
+    jal puts
+
+    la a0, buffer
+    li a1, 0
+    li a2, 4
+    li a3, CON_0s_INICIALES
+    jal sprint_uint
+    li a1, '\n'
+    jal sprint_char
+    la a0, buffer
+    jal puts
+
     #-- Terminar
     jal exit
 
