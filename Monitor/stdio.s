@@ -759,64 +759,7 @@ sprint_uint4:
 
 
 
-.global sprint_hex
-sprint_hex:
- #--------------------------------------------------
- #-- SPRINT_HEX(dst, n, tam)
- #-- Imprimir un numero hexadecimal de n digitos
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir
- #--   - a2 (tam): Tamaño del numero a imprimir (en digitos)
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bits impresos
- #--------------------------------------------------
 
-	STACK32
-	STACK32_PUSH4(s0, s1, s2, s3)
-
-	#-- Guardar argumentos
-	mv s0, a0  #-- Puntero a cadena destino
-	mv s1, a1  #-- Numero a imprimir
-	mv s2, a2  #-- Tamaño en digitos
-
-	#------- Calcular el numero de bits a desplazar hacia la derecha
-	#------ (tam - 1) * 3
-	#-- s3 = tam - 1
-	addi s3, s2, -1
-
-	#-- s3 = (tam - 1) * 4
-	slli s3, s3, 2  #-- * 2
-
-
-	#-- Imprimir digito a digito
- sprint_hex_next:
-
-
-	#-- Extraer el digito que toca
-	srl a1, s1, s3
-
-	#-- Imprimir el digito octal!
-	jal sprint_hex4
-
-
-	#-- Un digito menos por imprimir
-	addi s2, s2, -1
-
-	#-- 4 bits menos por desplazar
-	addi s3, s3, -4
-
-	#-- Hemos impreso los n bits?
-	bgt s2, zero, sprint_hex_next
-
-	#-- n bits impresos
-	#-- TODO
-
-	#-- Liberar la pila
-	STACK32_POP4(s0, s1, s2, s3)
-	UNSTACK32
 
 
 
@@ -866,6 +809,43 @@ sprint_hex4:
 	ret
 
 
+
+#--------------------------------------------------
+#-- SPRINT_HEX(dst, n, tam)
+#-- Imprimir un numero hexadecimal de n digitos
+#--
+#--  ENTRADAS:
+#--   - a0 (dst): Puntero a cadena destino
+#--   - a1 (n): Numero a imprimir
+#--   - a2 (tam): Tamaño del numero a imprimir (en digitos)
+#--  SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#--------------------------------------------------
+.global sprint_hex
+sprint_hex:
+ 	STACK16
+	PUSH2(s0, s1)
+
+	#-- Guardar parametros
+	mv s0, a0   #-- Cadena destino
+	mv s1, a2   #-- Numero de digitos a imprimir
+
+	#-- Pasarlos a BCD y guardarlos en memoria
+	la a0, buffer_bcd
+	jal bcd_store_hex
+
+	#-- Imprimir los digitos BCD en la cadena destino
+	mv a0, s0
+	la a1, buffer_bcd
+	mv a2, s1
+	li a3, 1  #-- Con ceros iniciales
+	jal bcd_copy
+
+	POP2(s0, s1)
+	UNSTACK16
+
+
 #--------------------------------------------------
 #-- SPRINT_OCT(dst, n, tam)
 #-- Imprimir un numero octal de n digitos
@@ -881,7 +861,6 @@ sprint_hex4:
 .global sprint_oct
 sprint_oct:
 
-	.text
 	STACK16
 	PUSH2(s0, s1)
 
@@ -941,6 +920,59 @@ sprint_bin:
 
 	POP2(s0, s1)
 	UNSTACK16
+
+
+#------------------------------------------------------------------
+#-- bcd_store_hex(buff_bcd, reg, tam)
+#--  Almacenar en la memoria apuntada por buff_bcd los n digitos
+#--  de menor peso que se encuentra en reg (10 max)
+#--
+#--  Cada digito se almacena como un byte
+#--
+#--  Ejemplo: bcd_store_hex(buff, 0x029C, 4) --> Almacena en memoria
+#--    estos bytes: 0, 2, 9, C (Ordenacion Big Endian) 
+#--
+#-- ENTRADAS:
+#--   - a0: (buff_bcd) Puntero al buffer donde guardar los digitos bcd
+#--   - a1: (reg) Registro con los dígitos bcd
+#--   - a2 (n): Número de bits a copiar (desde el de menor peso)
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de los digitos bcd
+#------------------------------------------------------------------
+.global bcd_store_hex
+bcd_store_hex:
+ bcd_store_hex_next:
+
+	#-- Bits a desplazar: t2 = (tam-1)*4
+	mv t2, a2
+	addi t2, t2, -1  #-- tam-1
+
+	#-- t3 = (tam - 1) * 4
+	slli t3, t2, 2  #-- * 2
+
+	#-- t0 = mascara para obtener el digito actual
+	li t0, 0xF
+	sll t0, t0, t3
+
+	#-- t1 = digito actual
+	and t1, a1, t0   #-- Sacarlo del registro
+	srl t1, t1, t3   #-- Llevarlos a la posición de menor peso
+
+	#-- Guardarlo en el buffer
+	sb t1, 0(a0)
+
+	#-- Apuntar a la siguiente posicion
+	addi a0, a0, 1
+
+	#-- Queda un digito menos
+	addi a2, a2, -1
+
+	#-- Terminar si todos los bits estan almacenados
+	bgt a2, zero, bcd_store_hex_next
+
+	ret
+
 
 #------------------------------------------------------------------
 #-- bcd_store_oct(buff_bcd, reg, tam)

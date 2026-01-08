@@ -800,7 +800,6 @@ unittest_sprint_hex:
 	SPRINT("<---")
 	ASSERT_STR_EQUAL(buffer, "--->12345678<---")
 
-
 	UNSTACK16
 
 
