@@ -1,0 +1,186 @@
+#-----------------------------------------------------------------------
+#--- MACROS
+#-----------------------------------------------------------------------
+
+#---------------------------------------
+#-- Imprimir el titulo de testo
+#---------------------------------------
+.macro TEST_TITTLE(%test_tittle)
+	.data
+ tittle: .string %test_tittle
+
+	.text
+	la a0, tittle
+	jal puts
+.end_macro
+
+#----------------------------------------
+#-- Imprimir el mensaje del test actual 
+#-- "TEST %test_num...."
+#----------------------------------------
+.macro TEST_NAME(%test_num)
+   .data
+ test_name: .ascii "> TEST "
+            .ascii %test_num
+			.string "...."
+   .text
+       la a0, test_name
+	   jal puts 
+.end_macro
+
+#-------------------------------------------
+#-- Llamar a la funcion sprint(dst, cad)
+#-------------------------------------------
+.macro SPRINT(%dst, %str)
+	.data
+ cad: %str
+
+	.text
+	la a0, %dst
+	la a1, cad
+	jal sprint
+.end_macro
+
+#-----------------------------------------------------
+#-- Llamar a la funcion sprint(cad)
+#-- No se pasa el buffer. Se toma del registro a0
+#-----------------------------------------------------
+.macro SPRINT(%str)
+
+	.data
+ cad: %str
+
+	.text
+	la a1, cad
+	jal sprint
+.end_macro
+
+#-----------------------------------------
+#-- Llamar a la funcion sprint(dst, car)
+#-----------------------------------------
+.macro SPRINT_CHAR(%dst, %car)
+	la a0, %dst
+	li a1, %car
+	jal sprint_char
+.end_macro
+
+#-----------------------------------------
+#-- Llamar a la funcion sprint(car)
+#-- No se pasa el buffer
+#-----------------------------------------
+.macro SPRINT_CHAR(%car)
+	li a1, %car
+	jal sprint_char
+.end_macro
+
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(buffer, num, mark)
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%buffer, %num, %mark)
+	la a0, %buffer
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
+
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(num, mark)
+#-- No se pasa el buffer
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%num, %mark)
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(buffer, bcd)
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%buffer, %bcd)
+	la a0, %buffer
+	li a1, %bcd
+	jal sprint_bcd_digit
+.end_macro
+
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(bcd)
+#-- No se pasa el buffer
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%bcd)
+	li a1, %bcd
+	jal sprint_bcd_digit
+.end_macro
+
+#-------------------------------------------------------------
+#-- Llamar a la funcion bcd_copy(buff, buff_bcd, ndig, ini0)
+#-------------------------------------------------------------
+.macro BCD_COPY(%buff, %buff_bcd, %ndig,  %ini0)
+	la a0, %buff       #-- Cadena destino
+	la a1, %buff_bcd   #-- Buffer bcd
+	li a2, %ndig       #-- Un digito
+	li a3, %ini0
+	jal bcd_copy
+.end_macro
+
+.macro SPRINT_BIN(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
+.macro SPRINT_BIN(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
+.macro SPRINT_OCT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
+.macro SPRINT_OCT(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
+.macro SPRINT_HEX(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_HEX(%num, %size, %ini0)
+	li a1, %num  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_UINT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+.macro SPRINT_UINT(%num, %size, %ini0)
+	li a1, %num  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+
