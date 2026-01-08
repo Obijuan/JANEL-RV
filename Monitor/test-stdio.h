@@ -28,33 +28,6 @@
 	   jal puts 
 .end_macro
 
-#-------------------------------------------
-#-- Llamar a la funcion sprint(dst, cad)
-#-------------------------------------------
-.macro SPRINT(%dst, %str)
-	.data
- cad: %str
-
-	.text
-	la a0, %dst
-	la a1, cad
-	jal sprint
-.end_macro
-
-#-----------------------------------------------------
-#-- Llamar a la funcion sprint(cad)
-#-- No se pasa el buffer. Se toma del registro a0
-#-----------------------------------------------------
-.macro SPRINT(%str)
-
-	.data
- cad: %str
-
-	.text
-	la a1, cad
-	jal sprint
-.end_macro
-
 #-----------------------------------------
 #-- Llamar a la funcion sprint(dst, car)
 #-----------------------------------------

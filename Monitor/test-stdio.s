@@ -10,6 +10,7 @@
     .include "stack.h"
 
 	#-- Macros para los tests
+	.include "stdio.h"
 	.include "test-stdio.h"
 	.include "unittest.h"
 
