@@ -239,8 +239,6 @@ unittest_sprint_uint:
 	SPRINT_UINT(buffer, 0, 10, CON_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "0000000000")
 
-
-
 	UNSTACK16
 
 #------------------------------------------
