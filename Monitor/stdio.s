@@ -13,57 +13,6 @@
 
 	.text
 
-.global store_bcd
-store_bcd:
-#------------------------------------------------------------------
-#-- store_bcd(buff, reg, n)
-#--  Almacenar en la memoria apuntada por buff los n digitos bcd
-#--  que se encuentran en reg (8 como maximo)
-#--
-#--  Cada dígito BCD se almacena como un byte, empezando por el de
-#--  mayor peso
-#--
-#--  Ejemplo: store_bcd(buff, 0x321, 3) --> Almacena en memoria
-#--    estos bytes: 0x03, 0x02, 0x01 (Ordenacion Big Endian) 
-#--
-#-- ENTRADAS:
-#--   - a0: (buff) Puntero al buffer donde guardar los digitos bcd
-#--   - a1: (reg) Registro con los dígitos bcd
-#--   - a2 (n): Número de digitos a copiar (desde el de menor peso)
-#--
-#-- SALIDA:
-#--   - a0: Puntero al final de los digitos bcd
-#------------------------------------------------------------------
-store_bcd_next:
-
-	#-- Bits a desplazar: t2 = (tam-1)*4
-	mv t2, a2
-	addi t2, t2, -1  #-- tam-1
-	slli t2, t2, 2   #-- (tam-1)*4
-
-	#-- t0 = mascara para obtener el digito actual
-	li t0, 0xF
-	sll t0, t0, t2
-
-	#-- t1 = digito actual
-	and t1, a1, t0   #-- Sacarlo del registro
-	srl t1, t1, t2   #-- Llevarlos a la posición de menor peso
-
-	#-- Guardarlo en el buffer
-	sb t1, 0(a0)
-
-	#-- Apuntar a la siguiente posicion
-	addi a0, a0, 1
-
-	#-- Queda un digito menos
-	addi a2, a2, -1
-
-	#-- Terminar si todos los digitos estan almacenados
-	bgt a2, zero, store_bcd_next
-
-	ret
-
-
 uint_update_bcd_reg:
 #------------------------------------------------------------------
 #--  uint_update_bcd_reg(reg, ndig, off)
