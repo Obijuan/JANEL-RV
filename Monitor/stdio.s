@@ -249,11 +249,23 @@ sprint_uint:
 	li a2, 8   #-- Numero de digitos
 	jal bcd_store_hex
 
-	#-- "Imprimir" los digitos en la cadena destino
-	mv a0, s0  #-- dst
+	#-------- "Imprimir" los digitos en la cadena destino
+	#-- En el buffer bcd en memoria hay 10 digitos bcd SIEMPRE
+	#-- Para imprimir menos numeros calculamos el offset
+	#-- offset: 10 - Numero de digitos
+
+	#-- Calcular offset
+	#-- t1 = 10 - tam
+	li t0, 10
+	sub t1, t0, s5
+
+	#-- Obtener direccion del buffer
 	la a1, sprint_uint_buff
-	li a2, 10  #-- Numero de digitos
-	li a3, 0  #-- Ceros iniciales: NO
+	add a1, a1, t1   #-- a0 = buffer + offset
+
+	mv a0, s0  #-- Cadena destino
+	mv a2, s5  #-- Numero de digitos
+	li a3, 0   #-- Ceros iniciales: NO
 	jal bcd_copy
 
 	#-- Liberar la pila
