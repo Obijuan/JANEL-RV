@@ -27,6 +27,9 @@ buffer: .space MAX
 #----------- 
 	.text   
 
+	#-- Configurar la E/S
+	jal io_init
+
 	#-----------------------------
 	#-- TESTS UNITARIOS
 	#-----------------------------
