@@ -65,3 +65,23 @@
 	li a1, %car
 	jal sprint_char
 .end_macro
+
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(buffer, num, mark)
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%buffer, %num, %mark)
+	la a0, %buffer
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
+
+#---------------------------------------------------------
+#-- Llamar a la funcion sprint_unary(num, mark)
+#-- No se pasa el buffer
+#---------------------------------------------------------
+.macro SPRINT_UNARY(%num, %mark)
+	li a1, %num    #-- Una marca
+	li a2, %mark   #-- Marca a utilizar
+	jal sprint_unary
+.end_macro
