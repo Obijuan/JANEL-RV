@@ -230,22 +230,6 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 #----------- 
 	.text   
 
-    #-- Prueba de SPRINT_HEX
-	#-- Numeros hexadecimales de 1 digito
-	jal sprint_test14
-
-    #-- Prueba de SPRINT_HEX
-	#-- Numeros hexadecimales de 2 digito
-	jal sprint_test15
-
-    #-- Prueba de SPRINT_HEX
-	#-- Numeros hexadecimales de 4 digito
-	jal sprint_test16
-
-    #-- Prueba de SPRINT_HEX
-	#-- Numeros hexadecimales de 8 digito
-	jal sprint_test17
-
     #-- Prueba de SPRINT_UINT4
 	#-- Numeros decimales de 4 bits
 	jal sprint_test18
@@ -606,89 +590,15 @@ sprint_test18:
     UNSTACK16
 
 
-sprint_test17:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_HEX
- #-- Imprimir numeros HEXADECIMALES de 8 digitos
- #------------------------------------------
-	.data
- sprint_test17_msg1:  .string "Hex: "
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 17:\n")
-
-	la a0, data_hex32
-	li a1, 8
-	jal test_print_block_hex
-
-	#-- Restaurar pila
-    UNSTACK16
-
-
-sprint_test16:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_HEX
- #-- Imprimir numeros HEXADECIMALES de 4 digitos
- #------------------------------------------
-	.data
- sprint_test16_msg1:  .string "Hex: "
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 16:\n")
-
-	la a0, data_hex16
-	li a1, 4
-	jal test_print_block_hex
-
-	#-- Restaurar pila
-    UNSTACK16
-
-
-sprint_test15:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_HEX
- #-- Imprimir numeros HEXADECIMALES de 2 digitos
- #------------------------------------------
-	.data
- sprint_test15_msg1:  .string "Hex: "
-	.text
-
-    STACK16
-	PRINT_STRINGI("\n* TEST 15:\n")
-
-	la a0, data_hex8
-	li a1, 2
-	jal test_print_block_hex
-
-	#-- Restaurar pila
-    UNSTACK16
 
 
 
-sprint_test14:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_HEX
- #-- Imprimir numeros HEXADECIMALES de 1 digito
- #------------------------------------------
-	.data
- sprint_test14_msg1:  .string "Hex: "
-	.text
 
-    STACK16
-	PRINT_STRINGI("\n* TEST 14:\n")
 
-	la a0, data_hex4
-	li a1, 1
-	jal test_print_block_hex
 
-    la a0, data_hex4_2
-	li a1, 1
-	jal test_print_block_hex
 
-	#-- Restaurar pila
-    UNSTACK16
+
+
 
 
 test_print_block_hex:
