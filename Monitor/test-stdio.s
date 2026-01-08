@@ -168,6 +168,21 @@
 	jal sprint_oct
 .end_macro
 
+.macro SPRINT_HEX(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_HEX(%num, %size, %ini0)
+	li a1, %num  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
 #-- La cadena izquierda es una etiqueta
@@ -284,6 +299,7 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_bcd_copy
 	jal unittest_sprint_bin
 	jal unittest_sprint_oct
+	jal unittest_sprint_hex
 
 
 	#-- Terminar
@@ -731,6 +747,61 @@ test_print_block_hex:
 	#-- Restaurar pila
     STACK32_POP4(s0, s1, s2, s3)
     UNSTACK32
+
+
+#------------------------------------------
+#-- Pruebas unitarias de sprint_oct
+#-- TEST70-
+#------------------------------------------
+unittest_sprint_hex:
+	STACK16
+	TEST_TITTLE("----- SPRINT_HEX() ------\n")
+
+	#-- Imprimir un digito hexa
+	TEST_NAME("70")
+	SPRINT_HEX(buffer, 0, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0")
+
+	#-- Imprimir un digito hexa
+	TEST_NAME("71")
+	SPRINT_HEX(buffer, 10, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "A")
+
+	#-- Imprimir un numero hexa
+	TEST_NAME("72")
+	SPRINT_HEX(buffer, 0x5A, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "5A")
+
+	#-- Imprimir un numero hexa
+	TEST_NAME("73")
+	SPRINT_HEX(buffer, 0xBACA, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "BACA")
+
+	#-- Imprimir un numero hexa
+	TEST_NAME("74")
+	SPRINT_HEX(buffer, 0, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "00000000")
+
+	#-- Imprimir un numero hexa
+	TEST_NAME("75")
+	SPRINT_HEX(buffer, 0xBEBECAFE, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "BEBECAFE")
+
+	#-- Imprimir cadena + numero hexa
+	TEST_NAME("76")
+	SPRINT(buffer, "0x")
+	SPRINT_HEX(0xCAFEBACA, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0xCAFEBACA")
+
+	#-- Imprimir cadena + numero hexa + cadena
+	TEST_NAME("77")
+	SPRINT(buffer, "--->")
+	SPRINT_HEX(0x12345678, 8, CON_0s_INICIALES)
+	SPRINT("<---")
+	ASSERT_STR_EQUAL(buffer, "--->12345678<---")
+
+
+	UNSTACK16
 
 
 #------------------------------------------
