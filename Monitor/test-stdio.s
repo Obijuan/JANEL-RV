@@ -183,6 +183,21 @@
 	jal sprint_hex
 .end_macro
 
+.macro SPRINT_UINT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+.macro SPRINT_UINT(%num, %size, %ini0)
+	li a1, %num  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
 #-----------------------------------------
 #-- Comparar que dos cadenas son iguales
 #-- La cadena izquierda es una etiqueta
@@ -246,32 +261,6 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
     #-- Numeros decimales de 32 bits
     jal sprint_test21
 
-    #-- Prueba de SPRINT_BCD
-    jal sprint_test22
-
-    #-- Prueba de SPRINT_BCD
-    jal sprint_test23
-
-	#-- Prueba de store_bcd()
-	la a0, buff
-	li a1, 0x0000
-	li a2, 4
-	jal store_bcd
-
-	li a1, 0x0
-	li a2, 4
-	jal store_bcd
-
-	#-- Prueba de sprint_bcd_from_mem
-	la a0, dst
-	la a1, buff
-	li a2, 8
-	li a3, 1  #-- Ceros iniciales
-	jal sprint_bcd_from_mem
-
-	PRINT_STRINGL(dst)
-	PRINT_CHARI('\n')
-
 
 	#-----------------------------
 	#-- TESTS UNITARIOS
@@ -284,247 +273,13 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_sprint_bin
 	jal unittest_sprint_oct
 	jal unittest_sprint_hex
-
-	#-- 10 digitos
-	la a0, buffer
-	li a1, 0xFFFFFFFF  #-- 4294967295
-	li a2, 10  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 9 digitos
-	la a0, buffer
-	li a1, 0x10000000  #-- 268435456
-	li a2, 9  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 8 digitos
-	la a0, buffer
-	li a1, 0x1000000  #-- 16777216
-	li a2, 8  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 7 digitos
-	la a0, buffer
-	li a1, 0x100000  #-- 1048576
-	li a2, 7  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 6 digitos
-	la a0, buffer
-	li a1, 0x1A000  #-- 106496
-	li a2, 6  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 5 digitos
-	la a0, buffer
-	li a1, 0x10000  #-- 65536
-	li a2, 5  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 4 digitos
-	la a0, buffer
-	li a1, 0x1000  #-- 4096
-	li a2, 4  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 3 digitos
-	la a0, buffer
-	li a1, 0x100  #-- 256
-	li a2, 3  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 2 digitos
-	la a0, buffer
-	li a1, 0x10  #-- 16
-	li a2, 3  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 1 digito
-	la a0, buffer
-	li a1, 0x9  #-- 9
-	li a2, 1  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
-
-	#-- 1 digito
-	la a0, buffer
-	li a1, 0x0  #-- 0
-	li a2, 1  #-- Digitos
-	jal sprint_uint
-
-	li a1, '\n'
-	jal sprint_char
-
-	la a0, buffer
-	jal puts
+	jal unittest_sprint_uint
 
 
 	#-- Terminar
 	PRINT_CHARI('\n')
 	EXIT
 
-
-
-
-sprint_test23:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BCD
- #------------------------------------------
- 	.data
- sprint_test23_msg1:  .string "Bcd: "
-	.text
-
-    STACK16
-    PUSH3(s0, s1, s2)
-	PRINT_STRINGI("\n* TEST 23:\n")
-
-    #-- Puntero a datos
-    la s0, data_bcd1
-
-    #-- Cantidad de datos a mostrar
-    li s1, 8
-
-    #-- Puntero a cadena destino
-    la s2, dst
-
- sprint_test23_repeat:
-
-    mv a0, s2
-    la a1, sprint_test23_msg1
-    jal sprint
-
-    #-- Leer dato e imprimirlo
-    lw a1, 0(s0)
-    li a2, 8  #-- Numero de digitos
-    li a3, 0  #-- Ceros iniciales
-    jal sprint_bcd
-
-    PRINT_STRINGL(dst)
-    PRINT_CHARI('\n')
-
-    #-- Apuntar al siguiente dato
-    addi s0, s0, 4
-
-    #-- Decrementar contador
-    addi s1, s1, -1
-
-    #-- Repetir mientras queden datos
-    bgt s1, zero, sprint_test23_repeat
-
-	#-- Restaurar pila
-    POP3(s0, s1, s2)
-    UNSTACK16
-
-
-
-sprint_test22:
- #------------------------------------------ 
- #-- Pruebas para SPRINT_BCD
- #------------------------------------------
- 	.data
- sprint_test22_msg1:  .string "Bcd: "
-	.text
-
-    STACK16
-    PUSH3(s0, s1, s2)
-	PRINT_STRINGI("\n* TEST 22:\n")
-
-    #-- Puntero a datos
-    la s0, data_bcd1
-
-    #-- Cantidad de datos a mostrar
-    li s1, 8
-
-    #-- Puntero a cadena destino
-    la s2, dst
-
- sprint_test22_repeat:
-
-    mv a0, s2
-    la a1, sprint_test22_msg1
-    jal sprint
-
-    #-- Leer dato e imprimirlo
-    lw a1, 0(s0)
-    li a2, 8  #-- Numero de digitos
-    li a3, 1  #-- Ceros iniciales
-    jal sprint_bcd
-
-    PRINT_STRINGL(dst)
-    PRINT_CHARI('\n')
-
-    #-- Apuntar al siguiente dato
-    addi s0, s0, 4
-
-    #-- Decrementar contador
-    addi s1, s1, -1
-
-    #-- Repetir mientras queden datos
-    bgt s1, zero, sprint_test22_repeat
-
-
-	#-- Restaurar pila
-    POP3(s0, s1, s2)
-    UNSTACK16
 
 
 
@@ -791,11 +546,122 @@ test_print_block_hex:
     UNSTACK32
 
 
+#------------------------------------------
+#-- Pruebas unitarias de sprint_oct
+#-- TEST78-TEST99
+#------------------------------------------
+unittest_sprint_uint:
+	STACK16
+	TEST_TITTLE("----- SPRINT_UINT() ------\n")
 
+	#-- Imprimir un digito decimal
+	TEST_NAME("78")
+	SPRINT_UINT(buffer, 0, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "0")
+
+	TEST_NAME("79")
+	SPRINT_UINT(buffer, 1, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1")
+
+	TEST_NAME("80")
+	SPRINT_UINT(buffer, 9, 1, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "9")
+
+	#-- Imprimir numeros de 2 digitos
+		TEST_NAME("81")
+	SPRINT_UINT(buffer, 0x10, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "16")
+
+	TEST_NAME("82")
+	SPRINT_UINT(buffer, 99, 2, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "99")
+
+	#-- Imprimir numeros de 3 digitos
+	TEST_NAME("83")
+	SPRINT_UINT(buffer, 0x100, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "256")
+
+	TEST_NAME("84")
+	SPRINT_UINT(buffer, 999, 3, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "999")
+
+	#-- Imprimir numeros de 4 digitos
+	TEST_NAME("85")
+	SPRINT_UINT(buffer, 0x1000, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "4096")
+
+	TEST_NAME("86")
+	SPRINT_UINT(buffer, 9999, 4, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "9999")
+
+	#-- Imprimir numeros de 5 digitos
+	TEST_NAME("87")
+	SPRINT_UINT(buffer, 0x10000, 5, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "65536")
+
+	TEST_NAME("88")
+	SPRINT_UINT(buffer, 99999, 5, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "99999")
+
+	#-- Imprimir numeros de 6 digitos
+	TEST_NAME("89")
+	SPRINT_UINT(buffer, 0x1a000, 6, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "106496")
+
+	TEST_NAME("90")
+	SPRINT_UINT(buffer, 999999, 6, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "999999")
+
+	#-- Imprimir numeros de 7 digitos
+	TEST_NAME("91")
+	SPRINT_UINT(buffer, 0x100000, 7, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "1048576")
+
+	TEST_NAME("92")
+	SPRINT_UINT(buffer, 9999999, 7, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "9999999")
+
+	#-- Imprimir numeros de 8 digitos
+	TEST_NAME("93")
+	SPRINT_UINT(buffer, 0x1000000, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "16777216")
+
+	TEST_NAME("94")
+	SPRINT_UINT(buffer, 99999999, 8, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "99999999")
+
+	#-- Imprimir numeros de 9 digitos
+	TEST_NAME("95")
+	SPRINT_UINT(buffer, 0x10000000, 9, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "268435456")
+
+	TEST_NAME("96")
+	SPRINT_UINT(buffer, 999999999, 9, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "999999999")
+
+	#-- Imprimir numeros de 10 digitos
+	TEST_NAME("97")
+	SPRINT_UINT(buffer, 0xFFFFFFFF, 10, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "4294967295")
+
+	#-- Imprimir cadena + numero
+	TEST_NAME("98")
+	SPRINT(buffer, "Dec: ")
+	SPRINT_UINT(12345678, 10, CON_0s_INICIALES)
+	ASSERT_STR_EQUAL(buffer, "Dec: 12345678")
+
+	#-- Imprimir cadena + numero + cadena
+	TEST_NAME("99")
+	SPRINT(buffer, "--->")
+	SPRINT_UINT(987654321, 10, CON_0s_INICIALES)
+	SPRINT("<---")
+	ASSERT_STR_EQUAL(buffer, "--->987654321<---")
+
+	UNSTACK16
 
 #------------------------------------------
 #-- Pruebas unitarias de sprint_oct
-#-- TEST70-
+#-- TEST70-TEST77
 #------------------------------------------
 unittest_sprint_hex:
 	STACK16
