@@ -56,104 +56,104 @@ unittest_sprint_uint:
 
 	#-- Imprimir un digito decimal
 	TEST_NAME("78")
-	SPRINT_UINT(buffer, 0, 1, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0, 1, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "0")
 
 	TEST_NAME("79")
-	SPRINT_UINT(buffer, 1, 1, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 1, 1, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "1")
 
 	TEST_NAME("80")
-	SPRINT_UINT(buffer, 9, 1, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 9, 1, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "9")
 
 	#-- Imprimir numeros de 2 digitos
-		TEST_NAME("81")
-	SPRINT_UINT(buffer, 0x10, 2, CON_0s_INICIALES)
+	TEST_NAME("81")
+	SPRINT_UINT(buffer, 0x10, 2, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "16")
 
 	TEST_NAME("82")
-	SPRINT_UINT(buffer, 99, 2, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 99, 2, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "99")
 
 	#-- Imprimir numeros de 3 digitos
 	TEST_NAME("83")
-	SPRINT_UINT(buffer, 0x100, 3, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x100, 3, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "256")
 
 	TEST_NAME("84")
-	SPRINT_UINT(buffer, 999, 3, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 999, 3, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "999")
 
 	#-- Imprimir numeros de 4 digitos
 	TEST_NAME("85")
-	SPRINT_UINT(buffer, 0x1000, 4, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x1000, 4, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "4096")
 
 	TEST_NAME("86")
-	SPRINT_UINT(buffer, 9999, 4, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 9999, 4, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "9999")
 
 	#-- Imprimir numeros de 5 digitos
 	TEST_NAME("87")
-	SPRINT_UINT(buffer, 0x10000, 5, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x10000, 5, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "65536")
 
 	TEST_NAME("88")
-	SPRINT_UINT(buffer, 99999, 5, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 99999, 5, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "99999")
 
 	#-- Imprimir numeros de 6 digitos
 	TEST_NAME("89")
-	SPRINT_UINT(buffer, 0x1a000, 6, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x1a000, 6, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "106496")
 
 	TEST_NAME("90")
-	SPRINT_UINT(buffer, 999999, 6, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 999999, 6, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "999999")
 
 	#-- Imprimir numeros de 7 digitos
 	TEST_NAME("91")
-	SPRINT_UINT(buffer, 0x100000, 7, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x100000, 7, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "1048576")
 
 	TEST_NAME("92")
-	SPRINT_UINT(buffer, 9999999, 7, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 9999999, 7, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "9999999")
 
 	#-- Imprimir numeros de 8 digitos
 	TEST_NAME("93")
-	SPRINT_UINT(buffer, 0x1000000, 8, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x1000000, 8, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "16777216")
 
 	TEST_NAME("94")
-	SPRINT_UINT(buffer, 99999999, 8, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 99999999, 8, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "99999999")
 
 	#-- Imprimir numeros de 9 digitos
 	TEST_NAME("95")
-	SPRINT_UINT(buffer, 0x10000000, 9, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0x10000000, 9, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "268435456")
 
 	TEST_NAME("96")
-	SPRINT_UINT(buffer, 999999999, 9, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 999999999, 9, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "999999999")
 
 	#-- Imprimir numeros de 10 digitos
 	TEST_NAME("97")
-	SPRINT_UINT(buffer, 0xFFFFFFFF, 10, CON_0s_INICIALES)
+	SPRINT_UINT(buffer, 0xFFFFFFFF, 10, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "4294967295")
 
 	#-- Imprimir cadena + numero
 	TEST_NAME("98")
 	SPRINT(buffer, "Dec: ")
-	SPRINT_UINT(12345678, 10, CON_0s_INICIALES)
+	SPRINT_UINT(12345678, 10, SIN_0s_INICIALES)
 	ASSERT_STR_EQUAL(buffer, "Dec: 12345678")
 
 	#-- Imprimir cadena + numero + cadena
 	TEST_NAME("99")
 	SPRINT(buffer, "--->")
-	SPRINT_UINT(987654321, 10, CON_0s_INICIALES)
+	SPRINT_UINT(987654321, 10, SIN_0s_INICIALES)
 	SPRINT("<---")
 	ASSERT_STR_EQUAL(buffer, "--->987654321<---")
 

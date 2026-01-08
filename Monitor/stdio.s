@@ -117,6 +117,7 @@ uint_update_bcd:
 #--   - a0 (dst): Dirección de la cadena destino
 #--   - a1 (n): Numero de 32 bits a imprimir
 #--   - a2 (ndig): Numero de digitos (1-10)
+#--   - a3 (ini0): Ceros iniciales
 #--
 #-- SALIDA:
 #--   - a0: Puntero al final de la cadena destino
@@ -169,6 +170,7 @@ sprint_uint:
 	li s2, 0
 	li s3, 0   #-- Parte alta
 	mv s5, a2  #-- Numero de digitos
+	mv s6, a3  #-- Ceros iniciales
 
 	#------- Estado inicial. Desplazar registro BCD 3 bits
 	#------- a la izquierda  s2 <- s1
@@ -265,7 +267,7 @@ sprint_uint:
 
 	mv a0, s0  #-- Cadena destino
 	mv a2, s5  #-- Numero de digitos
-	li a3, 0   #-- Ceros iniciales: NO
+	mv a3, s6   #-- Ceros iniciales: NO
 	jal bcd_copy
 
 	#-- Liberar la pila
