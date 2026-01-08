@@ -9,7 +9,7 @@
 
 .macro PUTS(%str)
      .data
-msg: .string %str
+ msg: .string %str
 
      .text
     la a0, msg
@@ -46,4 +46,22 @@ msg: .string %str
 	.text
 	la a1, cad
 	jal sprint
+.end_macro
+
+#-----------------------------------------
+#-- Llamar a la funcion sprint(dst, car)
+#-----------------------------------------
+.macro SPRINT_CHAR(%dst, %car)
+	la a0, %dst
+	li a1, %car
+	jal sprint_char
+.end_macro
+
+#-----------------------------------------
+#-- Llamar a la funcion sprint(car)
+#-- No se pasa el buffer
+#-----------------------------------------
+.macro SPRINT_CHAR(%car)
+	li a1, %car
+	jal sprint_char
 .end_macro

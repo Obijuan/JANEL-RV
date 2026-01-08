@@ -28,24 +28,6 @@
 	   jal puts 
 .end_macro
 
-#-----------------------------------------
-#-- Llamar a la funcion sprint(dst, car)
-#-----------------------------------------
-.macro SPRINT_CHAR(%dst, %car)
-	la a0, %dst
-	li a1, %car
-	jal sprint_char
-.end_macro
-
-#-----------------------------------------
-#-- Llamar a la funcion sprint(car)
-#-- No se pasa el buffer
-#-----------------------------------------
-.macro SPRINT_CHAR(%car)
-	li a1, %car
-	jal sprint_char
-.end_macro
-
 #---------------------------------------------------------
 #-- Llamar a la funcion sprint_unary(buffer, num, mark)
 #---------------------------------------------------------
