@@ -285,6 +285,138 @@ data_bcd1:  .word 0, 0x1, 0x12, 0x123, 0x1234, 0x12345, 0x123456, 0x12345678
 	jal unittest_sprint_oct
 	jal unittest_sprint_hex
 
+	#-- 10 digitos
+	la a0, buffer
+	li a1, 0xFFFFFFFF  #-- 4294967295
+	li a2, 10  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 9 digitos
+	la a0, buffer
+	li a1, 0x10000000  #-- 268435456
+	li a2, 9  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 8 digitos
+	la a0, buffer
+	li a1, 0x1000000  #-- 16777216
+	li a2, 8  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 7 digitos
+	la a0, buffer
+	li a1, 0x100000  #-- 1048576
+	li a2, 7  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 6 digitos
+	la a0, buffer
+	li a1, 0x1A000  #-- 106496
+	li a2, 6  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 5 digitos
+	la a0, buffer
+	li a1, 0x10000  #-- 65536
+	li a2, 5  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 4 digitos
+	la a0, buffer
+	li a1, 0x1000  #-- 4096
+	li a2, 4  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 3 digitos
+	la a0, buffer
+	li a1, 0x100  #-- 256
+	li a2, 3  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 2 digitos
+	la a0, buffer
+	li a1, 0x10  #-- 16
+	li a2, 3  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 1 digito
+	la a0, buffer
+	li a1, 0x9  #-- 9
+	li a2, 1  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
+	#-- 1 digito
+	la a0, buffer
+	li a1, 0x0  #-- 0
+	li a2, 1  #-- Digitos
+	jal sprint_uint
+
+	li a1, '\n'
+	jal sprint_char
+
+	la a0, buffer
+	jal puts
+
 
 	#-- Terminar
 	PRINT_CHARI('\n')
@@ -657,6 +789,8 @@ test_print_block_hex:
 	#-- Restaurar pila
     STACK32_POP4(s0, s1, s2, s3)
     UNSTACK32
+
+
 
 
 #------------------------------------------

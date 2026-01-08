@@ -764,6 +764,16 @@ sprint_uint4:
 
 
 
+
+
+
+
+
+
+
+
+
+
 .global sprint_hex4
 sprint_hex4:
  #--------------------------------------------------
@@ -807,6 +817,168 @@ sprint_hex4:
 
 	li a1, 4  #-- 4 bits impresos
 	ret
+
+
+
+
+
+#----------------------------------------------------------------
+#-- SPRINT_UINT(dst, n)
+#--
+#-- Imprimir un numero decimal sin signo, de 32 bits (10 digitos)
+#--
+#-- ENTRADA:
+#--   - a0 (dst): Dirección de la cadena destino
+#--   - a1 (n): Numero de 32 bits a imprimir
+#--   - a2 (ndig): Numero de digitos (1-10)
+#--
+#-- SALIDA:
+#--   - a0: Puntero al final de la cadena destino
+#--   - a1: (Opcional) Nº de bits impresos
+#------------------------------------------------------------------
+#-- Registro de calculo para hacer los desplazamientos:
+#
+#  -Parte alta (s3)
+#    31                                              8 | 7    4 | 3       0
+#  +------------------------------------------------------------------------+
+#  |                                                   |   Dig9 |   Dig8    |
+#  |                                                   | 0 0 0 0|  0 0 0 0  |
+#  +------------------------------------------------------------------------+
+#
+#  -Parte media (s2):
+#   31   28| 27   24|23    20| 19  16 | 15   12 | 11    8| 7      4| 3     0
+#  +------------------------------------------------------------------------+
+#  |  Dig7 |  Dig6  |  Dig5  | Dig 4  |  Dig3   | Dig2   |  Dig1   |  Dig0  |
+#  |0 0 0 0| 0 0 0 0| 0 0 0 0| 0 0 0 0| 0 0 0 0 | 0 0 0 0| 0 0 0 0 | 0 0 0 0|
+#  +------------------------------------------------------------------------+
+#
+#  -Parte baja (s1):
+#   31                                                                    0
+#  +------------------------------------------------------------------------+
+#  |      n                                                                 |
+#  |  d31 - d0                                                              |
+#  +------------------------------------------------------------------------+
+.global sprint_uint
+sprint_uint:
+
+	.data
+
+	#-- Buffer donde guardar los digitos bcd en memoria
+	#-- para luego "imprimirlos"
+ sprint_uint_buff:  .space 10
+
+	.text
+	STACK32
+	STACK32_PUSH6(s0, s1, s2, s3, s4, s5)
+
+	#-- Guardar direccion de la cadena destino
+	mv s0, a0
+	
+	#-- Inicializar registro BCD
+	mv s1, a1  #-- Parte baja
+	li s2, 0
+	li s3, 0   #-- Parte alta
+	mv s5, a2  #-- Numero de digitos
+
+	#------- Estado inicial. Desplazar registro BCD 3 bits
+	#------- a la izquierda  s2 <- s1
+	#-- 1. Obtener los 3 bits de mayor peso de s1
+	li t0, 0xE0000000  #-- Cambiar a lui
+	and t0, s1, t0
+
+	#-- 2. Llevar estos 3 bits a s2 (a la pos de menor peso)
+	srli s2, t0, 29
+
+	#-- 3. Desplazar s1 3 bits a la izquierda
+	slli s1, s1, 3
+
+	#-- Contador de desplazamientos a realizar para finalizar el algoritmo
+	#-- Ya hemos hecho 3, quedan 32-3 = 29
+	li s4, 29
+
+
+ sprint_uint_next:
+
+	#-------------- Actualizar la parte alta del registro bcd
+	#-------------- Este registro almacena 2 digitos
+	mv a0, s3  #-- Registro bcd alto
+	li a1, 2   #-- Actualizar 2 digitos
+	li a2, 0   #-- Offset: 0
+	jal uint_update_bcd_reg
+	mv s3, a0
+
+	#-------------- Actualizar la parte baja del registro bcd
+	#-------------- Este registro almacena 8 digitos
+	mv a0, s2  #-- Registro bcd alto
+	li a1, 8   #-- Actualizar 8 digitos
+	li a2, 0   #-- Offset 0
+	jal uint_update_bcd_reg
+	mv s2, a0
+
+
+	#------------ Desplazamiento a la izquierda del registro s3-s2-s1
+	#-- 1. Desplazar s3 a la izquierda
+	slli s3, s3, 1
+
+	#-- 2. Leer bit mas significativo de s2
+	slt t0, s2, zero
+
+	#-- 3. Añadir BMS de s2 a s3
+	add s3, s3, t0
+
+	#-- 4. Desplazar s2 a la izquierda
+	slli s2, s2, 1
+
+	#-- 5. Leer bit mas significativo de s1
+	slt t0, s1, zero
+
+	#-- 6. Añadir BMS de s1 a s2
+	add s2, s2, t0
+
+	#-- 7. Desplazar s1 a la izquierda
+	slli s1, s1, 1
+
+	#------------ Queda un paso menos por hacer del algoritmo
+	addi s4, s4, -1
+
+	#-- Repetir el algoritmo si todavía toca
+	bgt s4, zero, sprint_uint_next
+
+	#------- Fase de impresion
+	#-- Primero se almacena en un buffer
+	#-- Luego se imprime desde memoria
+
+	#-- Almacenar registro bcd de mayor peso
+	la a0, sprint_uint_buff
+	mv a1, s3  #-- reg
+	li a2, 2   #-- Numero de digitos
+	jal bcd_store_hex
+
+	#-- Almacenar registro bcd de menor peso
+	mv a1, s2  #-- Reg
+	li a2, 8   #-- Numero de digitos
+	jal bcd_store_hex
+
+	#-- "Imprimir" los digitos en la cadena destino
+	mv a0, s0  #-- dst
+	la a1, sprint_uint_buff
+	li a2, 10  #-- Numero de digitos
+	li a3, 0  #-- Ceros iniciales: NO
+	jal bcd_copy
+
+	#-- Liberar la pila
+	STACK32_POP6(s0, s1, s2, s3, s4, s5)
+	UNSTACK32
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1167,7 +1339,7 @@ bcd_copy:
 
 
 #--------------------------------------------------
-#-- sprint_bcd(dst, dig)
+#-- sprint_bcd_digit(dst, dig)
 #--
 #-- Imprimir un digito en BCD. Del digito pasado
 #-- solo se usan los 4 bits de menor peso
