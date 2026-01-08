@@ -16,9 +16,6 @@ buffer: .space MAX
 	#-- Configurar la E/S
 	jal io_init
 
-    #-- Puntero al buffer
-    la s0, buffer
-
     #------ Impresion de numero 1
     SPRINT_UNARY(buffer, 1, '1')
     SPRINT_CHAR('\n')

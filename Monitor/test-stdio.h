@@ -28,25 +28,6 @@
 	   jal puts 
 .end_macro
 
-#------------------------------------------------------
-#-- Llamar a la funcion sprint_bcd_digit(buffer, bcd)
-#------------------------------------------------------
-.macro SPRINT_BCD_DIGIT(%buffer, %bcd)
-	la a0, %buffer
-	li a1, %bcd
-	jal sprint_bcd_digit
-.end_macro
-
-
-#------------------------------------------------------
-#-- Llamar a la funcion sprint_bcd_digit(bcd)
-#-- No se pasa el buffer
-#------------------------------------------------------
-.macro SPRINT_BCD_DIGIT(%bcd)
-	li a1, %bcd
-	jal sprint_bcd_digit
-.end_macro
-
 #-------------------------------------------------------------
 #-- Llamar a la funcion bcd_copy(buff, buff_bcd, ndig, ini0)
 #-------------------------------------------------------------

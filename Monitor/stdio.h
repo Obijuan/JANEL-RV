@@ -85,3 +85,27 @@
 	li a2, %mark   #-- Marca a utilizar
 	jal sprint_unary
 .end_macro
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(buffer, bcd)
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%buffer, %bcd)
+	la a0, %buffer
+	li a1, %bcd
+	jal sprint_bcd_digit
+.end_macro
+
+
+#------------------------------------------------------
+#-- Llamar a la funcion sprint_bcd_digit(bcd)
+#-- No se pasa el buffer
+#------------------------------------------------------
+.macro SPRINT_BCD_DIGIT(%bcd)
+	li a1, %bcd
+	jal sprint_bcd_digit
+.end_macro
+
+.macro SPRINT_BCD_DIGITR(%reg)
+	mv a1, %reg
+	jal sprint_bcd_digit
+.end_macro
