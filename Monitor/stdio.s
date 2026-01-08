@@ -53,10 +53,6 @@ uint_update_bcd_reg:
 	UNSTACK16
 
 
-	#-- Algoritmo Doubble Dabble
-	#-- https://en.wikipedia.org/wiki/Double_dabble
-
-
 #--------------------------------------------------------------------
 #-- uint_update_bcd(reg_bcd, i, n)
 #--
@@ -112,54 +108,6 @@ uint_update_bcd:
 
 
 
-.global sprint_hex4
-sprint_hex4:
- #--------------------------------------------------
- #-- SPRINT_HEX4(dst, n)
- #-- Imprimir un numero hexadecimal de 4 bits
- #--
- #--  ENTRADAS:
- #--   - a0 (dst): Puntero a cadena destino
- #--   - a1 (n): Numero a imprimir
- #--  SALIDA:
- #--   - a0: Puntero al final de la cadena destino
- #--   - a1: (Opcional) Nº de bits impresos
- #--------------------------------------------------
-
-	#-- Quedarse con los 4 bits menos significativos
-	andi a1, a1, 0x0F
-
-	#-- Convertir a caracter '0'...'9' - 'A'...'F'
-	#-- Si n < 10, sumar '0'. Es un digito '0' - '9'
-	#-- sino, sumar ('A'-10) = 0x37
-	li t0, 10
-	blt a1, t0, digit_0_9
-
-	#-- Digito 'A'...'F'
-	addi a1, a1, 0x37
-	j sprint_hex4_next
-
- digit_0_9:
-	addi a1, a1, '0' 
-
- sprint_hex4_next:
-
-	#-- Almacenar caracter en cadena destino
-	sb a1, 0(a0)
-
-	#-- Incrementar puntero de cadena destino
-	addi a0, a0, 1
-
-	#-- Cadena terminada
-	sb zero, 0(a0)
-
-	li a1, 4  #-- 4 bits impresos
-	ret
-
-
-
-
-
 #----------------------------------------------------------------
 #-- SPRINT_UINT(dst, n)
 #--
@@ -196,6 +144,10 @@ sprint_hex4:
 #  |      n                                                                 |
 #  |  d31 - d0                                                              |
 #  +------------------------------------------------------------------------+
+#
+#-- Algoritmo Doubble Dabble
+#-- https://en.wikipedia.org/wiki/Double_dabble
+#----------------------------------------------------------------------------
 .global sprint_uint
 sprint_uint:
 
