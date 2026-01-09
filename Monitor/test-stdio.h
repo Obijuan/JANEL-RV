@@ -39,21 +39,6 @@
 	jal bcd_copy
 .end_macro
 
-.macro SPRINT_BIN(%buffer, %num, %size, %ini0)
-	la a0, %buffer
-	li a1, %num  #-- Numero binario
-	li a2, %size  #-- Tamaño en bits
-	li a3, %ini0  #-- Ceros iniciales
-	jal sprint_bin
-.end_macro
-
-.macro SPRINT_BIN(%num, %size, %ini0)
-	li a1, %num  #-- Numero binario
-	li a2, %size  #-- Tamaño en bits
-	li a3, %ini0  #-- Ceros iniciales
-	jal sprint_bin
-.end_macro
-
 .macro SPRINT_OCT(%buffer, %num, %size, %ini0)
 	la a0, %buffer
 	li a1, %num  #-- Numero binario

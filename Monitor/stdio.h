@@ -95,7 +95,6 @@
 	jal sprint_bcd_digit
 .end_macro
 
-
 #------------------------------------------------------
 #-- Llamar a la funcion sprint_bcd_digit(bcd)
 #-- No se pasa el buffer
@@ -108,4 +107,34 @@
 .macro SPRINT_BCD_DIGITR(%reg)
 	mv a1, %reg
 	jal sprint_bcd_digit
+.end_macro
+
+.macro SPRINT_BIN(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
+.macro SPRINT_BIN(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
+.macro SPRINT_BINR(%buffer, %reg, %size, %ini0)
+	la a0, %buffer
+	mv a1, %reg   #-- Registro con el numero binario a imprimir
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
+.end_macro
+
+.macro SPRINT_BINR(%reg, %size, %ini0)
+	li a1, %reg  #-- Registro con el numero binario a imprimir
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_bin
 .end_macro

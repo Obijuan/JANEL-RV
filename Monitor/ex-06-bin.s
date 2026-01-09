@@ -29,6 +29,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0   #-- Bit 0
     li a2, 1
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
@@ -38,6 +39,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 1   #-- Bit 1
     li a2, 1
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
@@ -51,6 +53,7 @@ msg4:   .string "<-----\n"
 
     li a1, 0x80
     li a2, 8
+    li a3, 1
     jal sprint_bin
 
     li a1, '\n'
@@ -66,6 +69,7 @@ msg4:   .string "<-----\n"
 
     li a1, 0x8080
     li a2, 16
+    li a3, 1
     jal sprint_bin
 
     la a1, msg4
@@ -105,6 +109,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     mv a1, s1
     li a2, 3   #-- 3 bits
+    li a3, 1
     jal sprint_bin
 
     li a1, '\n'
@@ -124,6 +129,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0x5555
     li a2, 16
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
@@ -133,6 +139,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0xAAAA
     li a2, 16
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
@@ -142,6 +149,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0xCAFEBACA
     li a2, 32
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
@@ -151,6 +159,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0xFFFFFFFF
     li a2, 32
+    li a3, 1
     jal sprint_bin
     li a1, '\n'
     jal sprint_char
