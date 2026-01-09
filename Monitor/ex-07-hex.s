@@ -6,6 +6,11 @@
     #-- Tamaño maximo del buffer para imprimir (en bytes)
     .eqv MAX 255
 
+    #-- Constantes para la impresion de numeros
+    #-- Rellenar o NO con 0s iniciales (a la izquierda)
+    .eqv RELLENO_0     1
+    .eqv NO_RELLENO_0  0
+
     .data
 buffer: .space MAX
 msg1:   .string "Numeros Hexadecimales: \n"
@@ -29,6 +34,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0
     li a2, 1
+    li a3, RELLENO_0
     jal sprint_hex
     li a1, '\n'
     jal sprint_char
@@ -38,6 +44,7 @@ msg4:   .string "<-----\n"
     la a0, buffer
     li a1, 0xA
     li a2, 1
+    li a3, RELLENO_0
     jal sprint_hex
     li a1, '\n'
     jal sprint_char
@@ -51,6 +58,7 @@ msg4:   .string "<-----\n"
 
     li a1, 0x80
     li a2, 2
+    li a3, RELLENO_0
     jal sprint_hex
 
     li a1, '\n'

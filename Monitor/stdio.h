@@ -138,3 +138,35 @@
 	li a3, %ini0  #-- Ceros iniciales
 	jal sprint_bin
 .end_macro
+
+.macro SPRINT_HEX(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero hexadecimal
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_HEX(%num, %size, %ini0)
+	li a1, %num  #-- Numero hexadecimal
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_HEXR(%buffer, %reg, %size, %ini0)
+	la a0, %buffer
+	mv a1, %reg   #-- Registro con el numero hexa a imprimir
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+.macro SPRINT_HEXR(%reg, %size, %ini0)
+	li a1, %reg  #-- Registro con el numero hexa a imprimir
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_hex
+.end_macro
+
+
