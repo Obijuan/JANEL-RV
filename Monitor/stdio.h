@@ -139,6 +139,22 @@
 	jal sprint_bin
 .end_macro
 
+.macro SPRINT_OCT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
+.macro SPRINT_OCT(%num, %size, %ini0)
+	li a1, %num  #-- Numero binario
+	li a2, %size  #-- Tamaño en bits
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_oct
+.end_macro
+
+
 .macro SPRINT_HEX(%buffer, %num, %size, %ini0)
 	la a0, %buffer
 	li a1, %num  #-- Numero hexadecimal
@@ -169,4 +185,33 @@
 	jal sprint_hex
 .end_macro
 
+.macro SPRINT_UINT(%buffer, %num, %size, %ini0)
+	la a0, %buffer
+	li a1, %num  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+.macro SPRINT_UINT(%num, %size, %ini0)
+	li a1, %num  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+.macro SPRINT_UINTR(%buffer, %reg, %size, %ini0)
+	la a0, %buffer
+	li a1, %reg  #-- Numero
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
+
+.macro SPRINT_UINTR(%reg, %size, %ini0)
+	li a1, %reg  #-- Numero 
+	li a2, %size  #-- Tamaño en digitos
+	li a3, %ini0  #-- Ceros iniciales
+	jal sprint_uint
+.end_macro
 
