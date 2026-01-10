@@ -202,14 +202,14 @@
 
 .macro SPRINT_UINTR(%buffer, %reg, %size, %ini0)
 	la a0, %buffer
-	li a1, %reg  #-- Numero
+	mv a1, %reg  #-- Numero
 	li a2, %size  #-- Tamaño en digitos
 	li a3, %ini0  #-- Ceros iniciales
 	jal sprint_uint
 .end_macro
 
 .macro SPRINT_UINTR(%reg, %size, %ini0)
-	li a1, %reg  #-- Numero 
+	mv a1, %reg  #-- Numero 
 	li a2, %size  #-- Tamaño en digitos
 	li a3, %ini0  #-- Ceros iniciales
 	jal sprint_uint

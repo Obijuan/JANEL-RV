@@ -3,6 +3,8 @@
 #-- Impresion de numeros decimales
 #----------------------------------------
 
+    .include "stdio.h"
+
     #-- Tamaño maximo del buffer para imprimir (en bytes)
     .eqv MAX 255
 
@@ -169,7 +171,7 @@ msg4:   .string "<-----\n"
     SPRINT_CHAR('\n')
     PUTSL(buffer)
 
-    SPRINT_UINT(buffer, 0, 3, RELLENO_0)
+    SPRINT_UINT(buffer, 0, 4, RELLENO_0)
     SPRINT_CHAR('\n')
     PUTSL(buffer)
 
